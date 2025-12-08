@@ -26,7 +26,7 @@
             {{-- Dados de Gamificação --}}
             <div>
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-xs font-medium text-gray-600 dark:text-text-dark-gray">Jornada do Sucesso</span>
+                    <span class="text-xs font-medium text-gray-600 dark:text-text-dark-gray">Faturamento</span>
                     <span class="text-xs font-bold bg-gradient-to-r from-primary-blue to-secondary-blue bg-clip-text text-transparent">
                         {{ number_format($globalGamificationData['progressPercentage'], 0) }}%
                     </span>
