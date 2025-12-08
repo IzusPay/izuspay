@@ -15,11 +15,91 @@ use Illuminate\Support\Facades\Http;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $associationId = auth()->user()->association_id;
 
         $userLayout = auth()->user()->dashboardSetting->layout ?? null;
+
+        $filterMonth = $request->input('filter_month', null);
+        $filterDay = $request->input('filter_day', null);
+
+        // 4. DADOS PARA GRÁFICO DE RECEITA MENSAL (ÚLTIMOS 12 MESES)
+        $monthlyRevenueQuery = Sale::where('association_id', $associationId)
+            ->where('status', 'paid')
+            ->where('created_at', '>=', now()->subMonths(11));
+
+        $chartLabels = [];
+        $chartData = [];
+
+        if ($filterMonth) {
+            if ($filterDay) {
+                $currentYear = now()->year;
+                
+                $revenueByHour = $monthlyRevenueQuery
+                    ->whereMonth('created_at', $filterMonth)
+                    ->whereDay('created_at', $filterDay)
+                    ->whereYear('created_at', $currentYear)
+                    ->select(
+                        DB::raw('SUM(total_price) as total'),
+                        DB::raw("HOUR(created_at) as hour")
+                    )
+                    ->groupBy(DB::raw("HOUR(created_at)"))
+                    ->orderBy('hour', 'asc')
+                    ->get();
+
+                // Cria array com todas as 24 horas, preenchendo com 0 onde não há dados
+                for ($hour = 0; $hour < 24; $hour++) {
+                    $chartLabels[] = sprintf('%02d:00', $hour);
+                    $hourData = $revenueByHour->where('hour', $hour)->first();
+                    $chartData[] = $hourData ? (float)$hourData->total : 0;
+                }
+            } else {
+                // Agrupa por dia do mês selecionado
+                $revenueByDay = $monthlyRevenueQuery
+                    ->whereMonth('created_at', $filterMonth)
+                    ->select(
+                        DB::raw('SUM(total_price) as total'),
+                        DB::raw("DAY(created_at) as day")
+                    )
+                    ->groupBy(DB::raw("DAY(created_at)"))
+                    ->orderBy('day', 'asc')
+                    ->get();
+
+                // Cria array com todos os dias do mês
+                $daysInMonth = now()->month($filterMonth)->daysInMonth;
+                for ($day = 1; $day <= $daysInMonth; $day++) {
+                    $chartLabels[] = str_pad($day, 2, '0', STR_PAD_LEFT);
+                    $dayData = $revenueByDay->where('day', $day)->first();
+                    $chartData[] = $dayData ? (float)$dayData->total : 0;
+                }
+            }
+        } else {
+            $revenueByMonth = $monthlyRevenueQuery
+                ->select(
+                    DB::raw('SUM(total_price) as total'),
+                    DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month")
+                )
+                ->groupBy('month')
+                ->orderBy('month', 'asc')
+                ->get();
+
+            // Cria array com últimos 12 meses
+            for ($i = 11; $i >= 0; $i--) {
+                $date = now()->subMonths($i);
+                $monthKey = $date->format('Y-m');
+                $monthLabel = $date->format('M/y');
+                
+                $chartLabels[] = $monthLabel;
+                $monthData = $revenueByMonth->where('month', $monthKey)->first();
+                $chartData[] = $monthData ? (float)$monthData->total : 0;
+            }
+        }
+
+        $revenueChartData = [
+            'labels' => $chartLabels,
+            'data' => $chartData
+        ];
 
         // Layout Padrão (se o usuário nunca salvou um)
         $defaultLayout = [
@@ -207,24 +287,35 @@ class DashboardController extends Controller
 
         $user = Auth::user();
         $association = $user->association;
-        $creatorProfile = $user->creatorProfile;
 
-        return view('associacao.dashboard.index', compact(
-            'totalUsers', 'totalMembers', 'totalClients',
-            'docsPendingUploadCount', 'docsUnderReviewCount', 'paymentPendingCount',
-            'totalRevenue', 'pendingRevenue', 'activePlans', 'totalPlans',
-            'publishedNews', 'draftNews', 'recentSales',
-            'averageTicket',
-            'onboardingConversionRate',
-            'activeMembersCount',
-            'inactiveMembersCount',
-            'revenueChartData',
-            'membersChartData',
-            'gamificationData',
-            'layout',
-            'userLayoutConfig',
-            'association',
-            'creatorProfile'
+        $convertedSales = Sale::where('association_id', $associationId)
+        ->whereIn('status', ['paid'])
+        ->count();
+
+    $totalSales = Sale::where('association_id', $associationId)
+        ->count();
+
+    $conversionRate = $totalSales > 0 
+        ? round(($convertedSales / $totalSales) * 100, 2)
+        : 0;
+
+            return view('associacao.dashboard.index', compact(
+                'totalUsers', 'totalMembers', 'totalClients',
+                'docsPendingUploadCount', 'docsUnderReviewCount', 'paymentPendingCount',
+                'totalRevenue', 'pendingRevenue', 'conversionRate',
+                'publishedNews', 'draftNews', 'recentSales',
+                'averageTicket',
+                'onboardingConversionRate',
+                'activeMembersCount',
+                'inactiveMembersCount',
+                'revenueChartData',
+                'membersChartData',
+                'gamificationData',
+                'layout',
+                'userLayoutConfig',
+                'association',
+                'filterMonth',
+                'filterDay'
         ));
     }
 
