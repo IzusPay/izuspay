@@ -37,6 +37,11 @@ class GatewayController extends Controller
             'logo_url' => 'nullable|url',
             'is_active' => 'required|boolean',
             'credentials_schema' => 'required|json', // Mantém a validação como JSON
+            'card_fee_percentage' => 'nullable|numeric|min:0',
+            'pix_fee_percentage' => 'nullable|numeric|min:0',
+            'fixed_fee' => 'nullable|numeric|min:0',
+            'order' => 'required|integer|min:1',
+
         ]);
 
         // Tente decodificar o JSON.
@@ -76,6 +81,11 @@ class GatewayController extends Controller
             'logo_url' => 'nullable|url',
             'is_active' => 'required|boolean',
             'credentials_schema' => 'required|json',
+            'card_fee_percentage' => 'nullable|numeric|min:0',
+            'pix_fee_percentage' => 'nullable|numeric|min:0',
+            'fixed_fee' => 'nullable|numeric|min:0',
+            'order' => 'required|integer|min:1',
+
         ]);
 
         // Mesma lógica de decodificação e validação do store()

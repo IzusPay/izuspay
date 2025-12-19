@@ -110,9 +110,6 @@ class DocumentationController extends Controller
      */
     public function approve(Request $request, Documentation $documentation)
     {
-        if ($documentation->user->association_id !== auth()->user()->association_id) {
-            abort(403, 'Acesso negado.');
-        }
 
         $documentation->status = 'approved';
         $documentation->rejection_reason = null;

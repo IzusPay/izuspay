@@ -118,7 +118,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/associacoes/{association}/aprovar', [AssociationController::class, 'approve'])->name('admin.associations.approve');
         Route::post('/admin/associacoes/{association}/rejeitar', [AssociationController::class, 'reject'])->name('admin.associations.reject');
     });
+
+
+    Route::put('/admin/documentos/{documentation}/approve', [DocumentationController::class, 'approve'])->name('admin.documents.approve');
+    Route::put('/admin/documentos/{documentation}/reject', [DocumentationController::class, 'reject'])->name('admin.documents.reject');
+    Route::get('/admin/documentos/usuario/{user}', [DocumentationController::class, 'showDocs'])->name('admin.documentos.show');
+    Route::get('/admin/documentos/pendentes', [DocumentationController::class, 'pendingDocs'])->name('admin.documentos.pending');
 });
+
 
 Route::middleware(['auth', RedirectByProfile::class])->prefix('associacao')->group(function () {
 
@@ -233,10 +240,6 @@ Route::middleware(['auth', RedirectByProfile::class])->prefix('associacao')->gro
     Route::get('/documentos', [DocumentationController::class, 'index'])->name('associacao.documentos.index');
     Route::post('/documentos', [DocumentationController::class, 'store'])->name('associacao.documentos.store');
     Route::get('/documentos/revisao', [DocumentationController::class, 'review'])->name('associacao.documentos.review');
-    Route::patch('/documentos/{documentation}/approve', [DocumentationController::class, 'approve'])->name('associacao.documentos.approve');
-    Route::patch('/documentos/{documentation}/reject', [DocumentationController::class, 'reject'])->name('associacao.documentos.reject');
-    Route::get('/documentos/usuario/{user}', [DocumentationController::class, 'showDocs'])->name('associacao.documentos.show');
-    Route::get('/documentos/pendentes', [DocumentationController::class, 'pendingDocs'])->name('associacao.documentos.pending');
 
     Route::prefix('documentos/tipos')->name('associacao.document-types.')->group(function () {
         Route::get('/', [DocumentTypeController::class, 'index'])->name('index');

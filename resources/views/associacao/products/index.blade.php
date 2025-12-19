@@ -305,11 +305,11 @@
                 <div class="p-5 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-gray-200 dark:border-white/10 space-y-4">
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
                         <i data-lucide="life-buoy" class="w-5 h-5 mr-2 text-blue-500"></i>
-                        Informações de Suporte (SAC)
+                        UPSELL e SAC
                     </h4>
                     
                     <div>
-                        <label for="product-url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL de Venda (Opcional)</label>
+                        <label for="product-url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Link do Upsell - (Direcionado após a compra)</label>
                         <input type="url" name="url_venda" id="product-url"
                                class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all">
                     </div>

@@ -70,8 +70,6 @@
                 </div>
             </template>
         </div>
-
-        <!-- Botão para Adicionar Novo Campo -->
         <div class="mt-4">
             <button type="button" @click="addField()"
                     class="inline-flex items-center gap-2 px-4 py-2 border border-dashed border-gray-400 dark:border-gray-500 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
@@ -79,6 +77,50 @@
                 Adicionar Campo de Credencial
             </button>
         </div>
+        <br>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Taxa Cartão (%)</label>
+        <input type="number" step="0.01" name="card_fee_percentage"
+               value="{{ old('card_fee_percentage', $gateway->card_fee_percentage ?? '') }}"
+               class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg">
+    </div>
+
+    <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Taxa PIX (%)</label>
+        <input type="number" step="0.01" name="pix_fee_percentage"
+               value="{{ old('pix_fee_percentage', $gateway->pix_fee_percentage ?? '') }}"
+               class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg">
+    </div>
+
+    <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Taxa Fixa (R$)</label>
+        <input type="number" step="0.01" name="fixed_fee"
+               value="{{ old('fixed_fee', $gateway->fixed_fee ?? '') }}"
+               class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg">
+    </div>
+</div>
+
+<div>
+    <label for="order" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Ordem de Prioridade</label>
+    <input
+        type="number"
+        name="order"
+        id="order"
+        min="1"
+        class="mt-1 block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        value="{{ old('order', $gateway->order ?? 1) }}"
+        required
+    >
+    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+        Gateways com ordem menor serão usados primeiro. Se falhar, tenta o próximo.
+    </p>
+</div>
+
+
+
+        <!-- Botão para Adicionar Novo Campo -->
+       
     </div>
 </div>
 

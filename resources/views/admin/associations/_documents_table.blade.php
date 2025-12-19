@@ -38,18 +38,29 @@
                                 {{ $document->user->name ?? 'N/A' }}
                             </td>
                             <td class="px-6 py-4">
-                                @php
-                                    $statusClass = match($document->status) {
-                                        'approved' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-                                        'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-                                        'rejected' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-                                        default => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-                                    };
-                                @endphp
-                                <span class="text-xs font-medium px-2.5 py-0.5 rounded {{ $statusClass }}">
-                                    {{ ucfirst($document->status) }}
-                                </span>
-                            </td>
+    @php
+        $statusClass = match($document->status) {
+            'approved' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+            'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+            'rejected' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+            'missing' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+            default => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+        };
+
+        $statusLabel = match($document->status) {
+            'approved' => 'Aprovado',
+            'pending' => 'Pendente',
+            'rejected' => 'Rejeitado',
+            'missing' => 'Pendente de envio',
+            default => 'Desconhecido',
+        };
+    @endphp
+
+    <span class="text-xs font-medium px-2.5 py-0.5 rounded {{ $statusClass }}">
+        {{ $statusLabel }}
+    </span>
+</td>
+
                             <td class="px-6 py-4">
                                 {{ $document->created_at->format('d/m/Y H:i') }}
                             </td>

@@ -21,6 +21,10 @@ class Gateway extends Model
         'logo_url',
         'is_active',
         'credentials_schema',
+        'card_fee_percentage',
+        'pix_fee_percentage',
+        'fixed_fee',
+        'order'
     ];
 
     /**
