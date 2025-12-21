@@ -7,10 +7,8 @@
                 <span class="sr-only">Abrir menu</span>
                 <i data-lucide="menu" class="w-5 h-5"></i>
             </button>
-            <!-- Você pode adicionar um título ou breadcrumbs aqui se quiser -->
-            <h1 class="hidden md:block text-lg font-semibold text-gray-900 dark:text-white">
-                @yield('page-title', 'Dashboard')
-            </h1>
+                        <h1 class="text-xl font-bold text-slate-900 dark:text-white">Olá, {{ auth()->user()->name ?? 'ArMatch' }}!</h1>
+
         </div>
 
         <!-- Controles do Lado Direito -->

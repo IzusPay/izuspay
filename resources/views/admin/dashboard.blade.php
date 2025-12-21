@@ -6,7 +6,7 @@
 <!-- Professional Payment Gateway Dashboard -->
         
 <!-- Header adaptado para preto/branco/cinza -->
-<div class="sticky top-0 z-30 bg-white/90 dark:bg-black/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 mb-8">
+<div class="sticky top-0 z-30 bg-white/90 dark:bg-black/90 backdrop-blur-sm border-b border-gray-200 dark:border-white/10 mb-8">
     <div class="px-6 py-4">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
@@ -17,17 +17,17 @@
             <!-- Filtros Rápidos -->
             <div class="flex flex-wrap items-center gap-3">
                 <!-- Botões de filtro com tema dark preto/branco -->
-                <div class="flex bg-gray-100 dark:bg-gray-900 rounded-lg p-1">
+                <div class="flex bg-gray-100 dark:bg-black rounded-lg p-1 border border-gray-200 dark:border-white/5">
                     <a href="{{ route('admin.dashboard', array_merge(request()->except(['start_date', 'end_date']), ['start_date' => now()->toDateString(), 'end_date' => now()->toDateString()])) }}" 
-                       class="px-3 py-2 text-sm font-medium rounded-md transition-all {{ request('start_date') == now()->toDateString() ? 'bg-white dark:bg-white text-black' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800' }}">
+                       class="px-3 py-2 text-sm font-medium rounded-md transition-all {{ request('start_date') == now()->toDateString() ? 'bg-white dark:bg-white text-black' : 'text-gray-600 dark:text-gray-400 hover:bg-black/5 dark:hover:bg-white/5' }}">
                         Hoje
                     </a>
                     <a href="{{ route('admin.dashboard', array_merge(request()->except(['start_date', 'end_date']), ['start_date' => now()->subDays(7)->toDateString(), 'end_date' => now()->toDateString()])) }}" 
-                       class="px-3 py-2 text-sm font-medium rounded-md transition-all {{ request('start_date') == now()->subDays(7)->toDateString() ? 'bg-white dark:bg-white text-black' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800' }}">
+                       class="px-3 py-2 text-sm font-medium rounded-md transition-all {{ request('start_date') == now()->subDays(7)->toDateString() ? 'bg-white dark:bg-white text-black' : 'text-gray-600 dark:text-gray-400 hover:bg-black/5 dark:hover:bg-white/5' }}">
                         7 dias
                     </a>
                     <a href="{{ route('admin.dashboard', array_merge(request()->except(['start_date', 'end_date']), ['start_date' => now()->subDays(30)->toDateString(), 'end_date' => now()->toDateString()])) }}" 
-                       class="px-3 py-2 text-sm font-medium rounded-md transition-all {{ request('start_date') == now()->subDays(30)->toDateString() || !request('start_date') ? 'bg-white dark:bg-white text-black' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800' }}">
+                       class="px-3 py-2 text-sm font-medium rounded-md transition-all {{ request('start_date') == now()->subDays(30)->toDateString() || !request('start_date') ? 'bg-white dark:bg-white text-black' : 'text-gray-600 dark:text-gray-400 hover:bg-black/5 dark:hover:bg-white/5' }}">
                         30 dias
                     </a>
                 </div>
@@ -47,24 +47,24 @@
         </div>
         
         <!-- Painel de filtros adaptado para dark -->
-        <div id="advanced-filters" class="hidden mt-4 p-6 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 animate-slide-down">
+        <div id="advanced-filters" class="hidden mt-4 p-6 bg-gray-50 dark:bg-black rounded-xl border border-gray-200 dark:border-white/5 animate-slide-down">
             <form action="{{ route('admin.dashboard') }}" method="GET" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
                         <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data Inicial</label>
                         <input type="date" name="start_date" id="start_date" 
-                               class="w-full bg-white dark:bg-black border border-gray-300 dark:border-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-white focus:border-white" 
+                               class="w-full bg-white dark:bg-black border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white" 
                                value="{{ request('start_date', $startDate) }}">
                     </div>
                     <div>
                         <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data Final</label>
                         <input type="date" name="end_date" id="end_date" 
-                               class="w-full bg-white dark:bg-black border border-gray-300 dark:border-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-white focus:border-white" 
+                               class="w-full bg-white dark:bg-black border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white" 
                                value="{{ request('end_date', $endDate) }}">
                     </div>
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-                        <select name="status" id="status" class="w-full bg-white dark:bg-black border border-gray-300 dark:border-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-white focus:border-white">
+                        <select name="status" id="status" class="w-full bg-white dark:bg-black border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white">
                             <option value="">Todos os Status</option>
                             <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>✅ Pago</option>
                             <option value="awaiting_payment" {{ request('status') == 'awaiting_payment' ? 'selected' : '' }}>⏳ Pendente</option>
@@ -77,12 +77,12 @@
                     <div>
                         <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Buscar</label>
                         <input type="text" name="search" id="search" placeholder="Cliente, produto, ID..." 
-                               class="w-full bg-white dark:bg-black border border-gray-300 dark:border-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-white focus:border-white" 
+                               class="w-full bg-white dark:bg-black border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white" 
                                value="{{ request('search') }}">
                     </div>
                 </div>
                 
-                <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
+                <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-white/10">
                     <div class="text-sm text-gray-600 dark:text-gray-400">
                         @if(request()->hasAny(['search', 'status', 'start_date', 'end_date']))
                             <span class="inline-flex items-center gap-2">
@@ -92,10 +92,10 @@
                         @endif
                     </div>
                     <div class="flex gap-3">
-                        <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">
+                        <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-white/10 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                             Limpar Filtros
                         </a>
-                        <button type="submit" class="px-6 py-2 bg-white dark:bg-white text-black rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-white focus:ring-offset-2 transition-colors">
+                        <button type="submit" class="px-6 py-2 bg-white dark:bg-white text-black rounded-lg hover:bg-black/5 dark:hover:bg-white/10 focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-offset-2 transition-colors">
                             Aplicar Filtros
                         </button>
                     </div>
@@ -109,7 +109,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
     
     <!-- Card: Total -->
-    <div class="group relative overflow-hidden bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
+    <div class="group relative overflow-hidden bg-white dark:bg-black rounded-xl shadow-lg border border-gray-200 dark:border-white/5 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
         <div class="relative">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-10 h-10 bg-white dark:bg-white text-black rounded-lg flex items-center justify-center shadow-md group-hover:rotate-3 transition-transform duration-300">
@@ -129,7 +129,7 @@
     </div>
 
     <!-- Card: Pago -->
-    <div class="group relative overflow-hidden bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
+    <div class="group relative overflow-hidden bg-white dark:bg-black rounded-xl shadow-lg border border-gray-200 dark:border-white/5 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
         <div class="relative">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-10 h-10 bg-white dark:bg-white text-black rounded-lg flex items-center justify-center shadow-md group-hover:-rotate-3 transition-transform duration-300">
@@ -149,7 +149,7 @@
     </div>
 
     <!-- Card: Pendente -->
-    <div class="group relative overflow-hidden bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
+    <div class="group relative overflow-hidden bg-white dark:bg-black rounded-xl shadow-lg border border-gray-200 dark:border-white/5 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
         <div class="relative">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-10 h-10 bg-gray-600 dark:bg-gray-700 text-white rounded-lg flex items-center justify-center shadow-md group-hover:rotate-12 transition-transform duration-300">
@@ -169,7 +169,7 @@
     </div>
 
     <!-- Card: Reembolsado -->
-    <div class="group relative overflow-hidden bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
+    <div class="group relative overflow-hidden bg-white dark:bg-black rounded-xl shadow-lg border border-gray-200 dark:border-white/5 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
         <div class="relative">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-10 h-10 bg-gray-500 dark:bg-gray-600 text-white rounded-lg flex items-center justify-center shadow-md group-hover:-rotate-6 transition-transform duration-300">
@@ -193,7 +193,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-8">
     
     <!-- Card: Chargeback -->
-    <div class="group relative overflow-hidden bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
+    <div class="group relative overflow-hidden bg-white dark:bg-black rounded-xl shadow-lg border border-gray-200 dark:border-white/5 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
         <div class="relative">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-10 h-10 bg-gray-700 dark:bg-gray-700 text-white rounded-lg flex items-center justify-center shadow-md group-hover:rotate-6 transition-transform duration-300">
@@ -213,7 +213,7 @@
     </div>
 
     <!-- Card: Recusado -->
-    <div class="group relative overflow-hidden bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
+    <div class="group relative overflow-hidden bg-white dark:bg-black rounded-xl shadow-lg border border-gray-200 dark:border-white/5 p-4 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-out">
         <div class="relative">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-10 h-10 bg-black dark:bg-black text-white rounded-lg flex items-center justify-center shadow-md group-hover:-rotate-12 transition-transform duration-300">
@@ -233,98 +233,6 @@
     </div>
 </div>
 
-
-<!-- Top 10 Creators adaptado para dark -->
-<div class="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 overflow-hidden mb-8">
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-black">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 bg-white dark:bg-white text-black rounded-lg flex items-center justify-center">
-                    <i data-lucide="award" class="w-5 h-5"></i>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Top 10 Vendedores - Setembro</h3>
-            </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">
-                Maiores vendedores do mês
-            </div>
-        </div>
-    </div>
-    
-    <div class="p-6">
-        <div class="space-y-4">
-            @forelse ($topCreators as $index => $creator)
-                <div class="flex items-center space-x-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-black transition-colors duration-200 group">
-                    <!-- Ranking Badge -->
-                    <div class="flex-shrink-0">
-                        @if($index < 3)
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-lg
-                                {{ $index == 0 ? 'bg-white text-black' : '' }}
-                                {{ $index == 1 ? 'bg-gray-300 text-black' : '' }}
-                                {{ $index == 2 ? 'bg-gray-500 text-white' : '' }}
-                            ">
-                                @if($index == 0) 👑 @elseif($index == 1) 🥈 @else 🥉 @endif
-                            </div>
-                        @else
-                            <div class="w-10 h-10 rounded-full bg-gray-600 dark:bg-gray-700 flex items-center justify-center font-bold text-white shadow-lg">
-                                {{ $index + 1 }}
-                            </div>
-                        @endif
-                    </div>
-                    
-                    <!-- Creator Info -->
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center space-x-3">
-                            <!-- Avatar adaptado para preto/branco -->
-                            <div class="w-12 h-12 rounded-full bg-white dark:bg-white text-black flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
-                                <span class="font-bold text-lg">{{ substr($creator->name, 0, 1) }}</span>
-                            </div>
-                            
-                            <!-- Name and Stats -->
-                            <div class="flex-1 min-w-0">
-                                <h4 class="text-base font-semibold text-gray-900 dark:text-white truncate">{{ $creator->name }}</h4>
-                                <div class="flex items-center space-x-4 mt-1">
-                                    <div class="flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-400">
-                                        <i data-lucide="shopping-cart" class="w-4 h-4"></i>
-                                        <span>{{ $creator->total_sales }} vendas</span>
-                                    </div>
-                                    <div class="flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-400">
-                                        <i data-lucide="trending-up" class="w-4 h-4"></i>
-                                        <span>+{{ rand(5, 25) }}% vs mês anterior</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Revenue -->
-                    <div class="flex-shrink-0 text-right">
-                        <div class="text-xl font-bold text-gray-900 dark:text-white">
-                            R$ {{ number_format($creator->total_revenue, 2, ',', '.') }}
-                        </div>
-                        <div class="text-xs text-gray-500 dark:text-gray-500">
-                            ID: {{ $creator->id }}
-                        </div>
-                    </div>
-                    
-                    <!-- Action -->
-                    <div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <a href="{{ route('admin.associations.show', $creator->id) }}" class="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300" title="Ver detalhes da conta">
-                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                        </a>
-                    </div>
-                </div>
-            @empty
-                <div class="text-center py-12">
-                    <i data-lucide="cloud-off" class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-700"></i>
-                    <h4 class="mt-4 text-lg font-semibold text-gray-600 dark:text-gray-400">Nenhum dado de vendas encontrado para este mês.</h4>
-                    <p class="text-sm text-gray-400 dark:text-gray-500">O ranking será exibido assim que as primeiras vendas forem confirmadas.</p>
-                </div>
-            @endforelse
-        </div>
-    </div>
-</div>
-
-<!-- Filter Button adaptado para dark -->
 <button id="filter-btn" class="fixed bottom-4 right-4 bg-white dark:bg-white text-black p-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 z-40 hover:bg-gray-100">
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"></path>

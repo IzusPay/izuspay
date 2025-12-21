@@ -1,3 +1,19 @@
+<?php
+$path = resource_path('views/movelo01.html');
+$html = file_exists($path) ? file_get_contents($path) : '';
+$replacements = [
+    'Witetec' => 'Izuspay',
+    'witetec.com' => 'izuspay.com',
+    'app.witetec.com' => 'app.izuspay.com',
+    'https://app.witetec.com/login' => route('login'),
+    'title>Witetec' => 'title>Izuspay',
+];
+foreach ($replacements as $search => $replace) {
+    $html = str_replace($search, $replace, $html);
+}
+echo $html;
+exit;
+?>
 <!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>

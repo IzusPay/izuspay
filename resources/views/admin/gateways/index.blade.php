@@ -1,19 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'Gerenciamento de Gateways')
+@section('title', 'Gerenciamento de Adquirentes')
 
 @section('content')
 <div class="px-4 sm:px-6 lg:px-8">
     <!-- Cabeçalho da Página -->
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-            <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Gerenciamento de Gateways</h1>
-            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Liste, crie e edite os gateways de pagamento disponíveis na plataforma.</p>
+            <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Gerenciamento de Adquirentes</h1>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Liste, crie e edite as adquirentes de pagamento disponíveis na plataforma.</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
             <a href="{{ route('admin.gateways.create') }}" class="inline-flex items-center justify-center rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                Novo Gateway
+                Nova Adquirente
             </a>
         </div>
     </div>
@@ -40,9 +40,9 @@
     <div class="mt-8 flex flex-col">
         <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                    <table class="min-w-full divide-y divide-slate-200 dark:divide-gray-700">
-                        <thead class="bg-slate-50 dark:bg-gray-700">
+                <div class="overflow-hidden shadow border border-gray-200 dark:border-white/5 md:rounded-lg bg-white dark:bg-black">
+                    <table class="min-w-full divide-y divide-slate-200 dark:divide-white/10">
+                        <thead class="bg-white dark:bg-black">
                             <tr>
                                 <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider sm:pl-6">Logo</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nome</th>
@@ -52,9 +52,9 @@
                                 <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6"><span class="sr-only">Ações</span></th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+                        <tbody class="divide-y divide-slate-200 dark:divide-white/10 bg-white dark:bg-black">
                             @forelse($gateways as $gateway)
-                                <tr class="hover:bg-slate-50 dark:hover:bg-gray-700/50">
+                                <tr class="hover:bg-black/5 dark:hover:bg-white/5">
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                                         <img class="h-10 w-auto" src="{{ $gateway->logo_url }}" alt="{{ $gateway->name }}">
                                     </td>

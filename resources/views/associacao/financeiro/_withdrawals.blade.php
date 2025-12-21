@@ -1,118 +1,365 @@
-{{-- resources/views/associacao/financeiro/_withdrawals.blade.php --}}
+<div class="space-y-8">
+    
+    {{-- CARDS DE SAQUE E CONVERSÃO --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        {{-- Saque Pix Card --}}
+        <div class="bg-white dark:bg-black p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Saque Pix</h3>
+                <button id="open-pix-modal" class="bg-black dark:bg-white text-white dark:text-black text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-black/10 transition-colors">
+                    Efetuar Saque
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                {{-- Saldo Disponível --}}
+                <div class="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
+                    <p class="text-sm text-gray-500 dark:text-slate-300 flex items-center">
+                        <i data-lucide="wallet" class="w-4 h-4 mr-1.5 text-gray-400 dark:text-slate-400"></i>
+                        Saldo Disponível
+                    </p>
+                    {{-- Usando o saldo disponível do objeto $wallet, se existir --}}
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">R$ {{ number_format($wallet->balance ?? 0.73, 2, ',', '.') }}</p>
+                </div>
+            </div>
+        </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {{-- Saque Cartão Card --}}
+    </div>
 
-    {{-- Coluna da Esquerda: Formulário de Saque --}}
-    <div class="lg:col-span-1 space-y-8">
-        <div class="bg-slate-800/50 backdrop-blur-md border border-white/10 rounded-2xl">
-            {{-- Cabeçalho --}}
-            <div class="px-6 py-4 border-b border-white/10">
-                <h3 class="text-lg font-semibold text-white flex items-center">
-                    <i data-lucide="arrow-down-up" class="w-5 h-5 mr-2 text-blue-400"></i>
-                    Solicitar Saque
-                </h3>
+    {{-- Histórico de saques e Taxas --}}
+    <div class="space-y-6">
+        {{-- Sub-abas Histórico de saques e Taxas --}}
+        <div class="border-b border-gray-200 dark:border-slate-800">
+            <nav class="-mb-px flex space-x-8" aria-label="Sub Tabs">
+                <button class="sub-tab-button inline-flex items-center py-4 px-1 border-b-2 font-medium text-base transition-colors duration-200 border-black dark:border-white text-black dark:text-white" data-sub-tab="history">
+                    Histórico de saques
+                </button>
+                <button class="sub-tab-button inline-flex items-center py-4 px-1 border-b-2 font-medium text-base transition-colors duration-200 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-600" data-sub-tab="fees">
+                    Taxas
+                </button>
+            </nav>
+        </div>
+
+        {{-- Conteúdo das Sub-abas --}}
+        <div class="sub-tab-content" id="history">
+            <div class="bg-white dark:bg-black rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
+                        <thead class="bg-gray-50 dark:bg-slate-900">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-300 uppercase tracking-wider">Data</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-300 uppercase tracking-wider">Valor</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-300 uppercase tracking-wider">Método</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-300 uppercase tracking-wider">Chave PIX</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-300 uppercase tracking-wider">Tipo</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-300 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-300 uppercase tracking-wider">Processado</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-300 uppercase tracking-wider">Ref. Externa</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-300 uppercase tracking-wider">ID</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-black divide-y divide-gray-200 dark:divide-slate-800">
+                            @forelse($withdrawals as $withdrawal)
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $withdrawal->created_at->format('d/m/y, H:i') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">R$ {{ number_format($withdrawal->amount, 2, ',', '.') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ $withdrawal->method ?? 'PIX' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ $withdrawal->key ?? $withdrawal->bankAccount->email ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ $withdrawal->type ?? 'E-mail' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @php
+                                        $statusText = ucfirst($withdrawal->status);
+                                        $statusClass = [
+                                            'Pending' => 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
+                                            'Completed' => 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+                                            'Failed' => 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
+                                        ][$withdrawal->status] ?? 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-200';
+                                    @endphp
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
+                                        {{ $statusText }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ $withdrawal->processed_at ? $withdrawal->processed_at->format('d/m/y, H:i') : '-' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ $withdrawal->external_ref ?? '-' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ $withdrawal->id }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="9" class="px-6 py-12 text-center text-gray-500 dark:text-slate-400">
+                                    Nenhum saque encontrado.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                
+                {{-- Paginação --}}
+                <div class="px-6 py-4 bg-white dark:bg-black border-t border-gray-200 dark:border-slate-800 flex items-center justify-between">
+                    <p class="text-sm text-gray-500 dark:text-slate-400">Página {{ $withdrawals->currentPage() }} de {{ $withdrawals->lastPage() }} ({{ $withdrawals->total() }} saques)</p>
+                    <div class="flex items-center space-x-2">
+                        {{ $withdrawals->links() }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Conteúdo da Sub-aba Taxas --}}
+        <div class="sub-tab-content hidden" id="fees">
+            @include('associacao.financeiro._fees')
+        </div>
+    </div>
+
+    {{-- MODAL DE SAQUE PIX --}}
+    {{-- MODAL DE SAQUE PIX --}}
+<div id="pix-withdrawal-modal" class="fixed inset-0 bg-black/50 dark:bg-black/70 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-black rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md overflow-hidden">
+        
+        {{-- Cabeçalho --}}
+        <div class="px-5 py-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center">
+            <h3 class="text-base font-semibold text-slate-900 dark:text-white">Realizar Saque • PIX</h3>
+            <button id="close-pix-modal" class="text-gray-400 dark:text-slate-300 hover:text-gray-600 dark:hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        {{-- Form --}}
+        <form action="{{ route('associacao.financeiro.withdrawals.store') }}" method="POST" class="p-5 space-y-4">
+            @csrf
+
+            {{-- Alerta --}}
+            <div class="bg-gray-50 dark:bg-slate-800 px-3 py-2 rounded-md border border-gray-200 dark:border-slate-700 flex items-center space-x-2">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-500"></i>
+                <p class="text-xs text-gray-700 dark:text-slate-300">
+                    Saldo disponível:
+                    <span class="font-semibold">
+                        R$ {{ number_format($wallet->balance ?? 0.73, 2, ',', '.') }}
+                    </span>
+                </p>
             </div>
 
-            {{-- Formulário --}}
-            <form method="POST" action="{{ route('associacao.financeiro.withdrawals.store') }}" class="p-6 space-y-6">
-                @csrf
-                
-                {{-- Saldo Disponível --}}
-                <div class="bg-slate-900/70 border border-white/10 rounded-xl p-4 text-center">
-                    <p class="text-sm font-medium text-gray-400">Saldo Disponível para Saque</p>
-                    <p class="text-3xl font-bold text-green-400 mt-1">R$ {{ number_format($wallet->balance, 2, ',', '.') }}</p>
-                </div>
+            {{-- Valor --}}
+            <div>
+                <label for="amount" class="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
+                    Valor do saque
+                </label>
+                <input
+                    type="number"
+                    name="amount"
+                    id="amount"
+                    step="0.01"
+                    min="0.01"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:border-black dark:focus:border-white focus:ring-0"
+                    placeholder="0,00"
+                >
+            </div>
 
-                {{-- Campo de Valor --}}
-                <div>
-                    <label for="amount" class="block text-sm font-medium text-gray-300 mb-1">Valor do Saque *</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">R$</span>
-                        <input type="number" name="amount" id="amount" step="0.01" min="1" required
-                               class="w-full pl-10 pr-4 py-2.5 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all @error('amount') border-red-500 @enderror">
-                    </div>
-                    @error('amount') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
+            {{-- Método --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
+                    Método
+                </label>
+                <select
+                    disabled
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-gray-50 dark:bg-slate-800 cursor-not-allowed text-slate-900 dark:text-slate-200"
+                >
+                    <option>PIX</option>
+                </select>
+                <input type="hidden" name="method" value="pix">
+            </div>
 
-                {{-- Campo de Conta Bancária --}}
-                <div>
-                    <label for="bank_account_id" class="block text-sm font-medium text-gray-300 mb-1">Conta Bancária de Destino *</label>
-                    <select name="bank_account_id" id="bank_account_id" required
-                            class="w-full px-4 py-2.5 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all @error('bank_account_id') border-red-500 @enderror">
-                        <option value="">Selecione uma conta</option>
-                        @forelse($bankAccounts as $account)
-                            <option value="{{ $account->id }}" {{ $account->is_default ? 'selected' : '' }}>
-                                {{ $account->bank_name }} (Final {{ substr($account->account_number, -4) }})
-                            </option>
-                        @empty
-                            <option value="" disabled>Nenhuma conta cadastrada</option>
-                        @endforelse
-                    </select>
-                    @error('bank_account_id') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
+            {{-- Tipo de Chave --}}
+            <div>
+                <label for="pix_key_type" class="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
+                    Tipo de chave PIX
+                </label>
+                <select
+    name="pix_key_type"
+    id="pix_key_type"
+    required
+    class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:border-black dark:focus:border-white focus:ring-0"
+>
+    <option value="">Selecione</option>
+    <option value="cpf">CPF</option>
+    <option value="cnpj">CNPJ</option>
+    <option value="email">E-mail</option>
+    <option value="phone">Telefone</option>
+    <option value="random">Chave aleatória</option>
+</select>
 
-                {{-- Botão de Ação --}}
-                <div class="pt-2">
-                    <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl hover:from-blue-600 hover:to-cyan-700 transition-all font-semibold shadow-lg hover:shadow-blue-500/30">
-                        Confirmar Solicitação
-                    </button>
-                </div>
-            </form>
-        </div>
+            </div>
+
+            {{-- Chave --}}
+            <div>
+                <label for="pix_key" class="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
+                    Chave PIX
+                </label>
+               <input
+                    type="text"
+                    name="pix_key"
+                    id="pix_key"
+                    required
+                    inputmode="numeric"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:border-black dark:focus:border-white focus:ring-0"
+                    placeholder="Digite a chave PIX"
+                />
+
+
+            </div>
+
+            {{-- Ações --}}
+            <div class="flex justify-end gap-3 pt-2">
+                <button
+                    type="button"
+                    id="cancel-pix-modal"
+                    class="px-4 py-2 text-sm text-gray-600 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800"
+                >
+                    Cancelar
+                </button>
+                <button
+                    type="submit"
+                    class="px-4 py-2 text-sm bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-black/10"
+                >
+                    Continuar
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
-    {{-- Coluna da Direita: Histórico de Saques --}}
-    <div class="lg:col-span-2 bg-slate-800/50 backdrop-blur-md border border-white/10 rounded-2xl">
-        <div class="px-6 py-4 border-b border-white/10">
-            <h3 class="text-lg font-semibold text-white flex items-center">
-                <i data-lucide="history" class="w-5 h-5 mr-2 text-blue-400"></i>
-                Histórico de Saques
-            </h3>
-        </div>
+
+    {{-- Script para as Sub-abas e Modal --}}
+    @push('scripts')
+    <script>
+        // Script para as Sub-abas (Mantido)
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Script para as Sub-abas ---
+            const subTabButtons = document.querySelectorAll('.sub-tab-button');
+            const subTabContents = document.querySelectorAll('.sub-tab-content');
+
+            subTabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTabId = button.dataset.subTab;
+
+                    // 1. Atualiza a aparência dos BOTÕES
+                    subTabButtons.forEach(btn => {
+                        if (btn.dataset.subTab === targetTabId) {
+                            // ATIVA o botão clicado
+                            btn.classList.remove('border-transparent', 'text-slate-500', 'dark:text-slate-400', 'hover:text-slate-700', 'dark:hover:text-white', 'hover:border-slate-300', 'dark:hover:border-slate-600');
+                            btn.classList.add('border-black', 'dark:border-white', 'text-black', 'dark:text-white');
+                        } else {
+                            // DESATIVA os outros botões
+                            btn.classList.remove('border-black', 'dark:border-white', 'text-black', 'dark:text-white');
+                            btn.classList.add('border-transparent', 'text-slate-500', 'dark:text-slate-400', 'hover:text-slate-700', 'dark:hover:text-white', 'hover:border-slate-300', 'dark:hover:border-slate-600');
+                        }
+                    });
+
+                    // 2. Esconde e mostra o CONTEÚDO correspondente
+                    subTabContents.forEach(content => {
+                        if (content.id === targetTabId) {
+                            content.classList.remove('hidden'); // Mostra o conteúdo da aba clicada
+                        } else {
+                            content.classList.add('hidden'); // Esconde os outros
+                        }
+                    });
+                });
+            });
+
+            // --- Script para a Modal de Saque PIX ---
+            const openModalBtn = document.getElementById('open-pix-modal');
+            const closeModalBtn = document.getElementById('close-pix-modal');
+            const cancelModalBtn = document.getElementById('cancel-pix-modal');
+            const modal = document.getElementById('pix-withdrawal-modal');
+
+            if (openModalBtn && modal) {
+                openModalBtn.addEventListener('click', () => {
+                    modal.classList.remove('hidden');
+                });
+            }
+
+            if (closeModalBtn && modal) {
+                closeModalBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                });
+            }
+
+            if (cancelModalBtn && modal) {
+                cancelModalBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                });
+            }
+
+            // Fechar modal ao clicar fora
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            }
+        });
+
         
-        <div class="p-6 space-y-4">
-            @forelse($withdrawals as $withdrawal)
-                @php
-                    $statusMap = [
-                        'pending' => ['icon' => 'hourglass', 'color' => 'yellow', 'text' => 'Pendente'],
-                        'completed' => ['icon' => 'check-circle', 'color' => 'green', 'text' => 'Concluído'],
-                        'failed' => ['icon' => 'x-circle', 'color' => 'red', 'text' => 'Falhou'],
-                    ];
-                    $statusInfo = $statusMap[$withdrawal->status] ?? ['icon' => 'help-circle', 'color' => 'gray', 'text' => ucfirst($withdrawal->status)];
-                @endphp
-                <div class="bg-slate-900/70 border border-white/10 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-black/20 border border-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <i data-lucide="arrow-right" class="w-6 h-6 text-gray-400"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-white">Saque de R$ {{ number_format($withdrawal->amount, 2, ',', '.') }}</p>
-                            <p class="text-xs text-gray-400">Para: {{ $withdrawal->bankAccount->bank_name }} (Final {{ substr($withdrawal->bankAccount->account_number, -4) }})</p>
-                        </div>
-                    </div>
-                    <div class="text-right self-end sm:self-center flex-shrink-0">
-                        <span class="flex items-center px-3 py-1 text-xs font-medium bg-{{ $statusInfo['color'] }}-900/50 text-{{ $statusInfo['color'] }}-300 border border-{{ $statusInfo['color'] }}-500/30 rounded-full">
-                            <i data-lucide="{{ $statusInfo['icon'] }}" class="w-3 h-3 mr-1.5"></i>
-                            {{ $statusInfo['text'] }}
-                        </span>
-                        <p class="text-xs text-gray-500 mt-1.5">{{ $withdrawal->created_at->diffForHumans() }}</p>
-                    </div>
-                </div>
-            @empty
-                <div class="text-center py-12">
-                    <div class="w-16 h-16 bg-slate-700/50 border border-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="history" class="w-8 h-8 text-blue-400"></i>
-                    </div>
-                    <h4 class="text-lg font-semibold text-white mb-1">Nenhum saque solicitado</h4>
-                    <p class="text-gray-400 text-sm">Seu histórico de saques aparecerá aqui.</p>
-                </div>
-            @endforelse
+    </script>
+   <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const typeSelect = document.getElementById('pix_key_type');
+    const pixInput = document.getElementById('pix_key');
 
-            @if($withdrawals->hasPages())
-                <div class="mt-6">
-                    {{ $withdrawals->links() }}
-                </div>
-            @endif
-        </div>
-    </div>
+    function allowOnlyNumbers(maxLength = null) {
+        pixInput.addEventListener('input', () => {
+            pixInput.value = pixInput.value.replace(/\D/g, '');
+            if (maxLength) {
+                pixInput.value = pixInput.value.slice(0, maxLength);
+            }
+        });
+    }
+
+    function resetInput() {
+        pixInput.value = '';
+        pixInput.removeAttribute('maxlength');
+        pixInput.removeEventListener('input', allowOnlyNumbers);
+    }
+
+    typeSelect.addEventListener('change', () => {
+        resetInput();
+
+        const type = typeSelect.value;
+
+        if (type === 'cpf') {
+            pixInput.placeholder = 'CPF (somente números)';
+            pixInput.setAttribute('maxlength', 11);
+            allowOnlyNumbers(11);
+        }
+
+        if (type === 'cnpj') {
+            pixInput.placeholder = 'CNPJ (somente números)';
+            pixInput.setAttribute('maxlength', 14);
+            allowOnlyNumbers(14);
+        }
+
+        if (type === 'phone') {
+            pixInput.placeholder = 'Telefone';
+            pixInput.removeAttribute('maxlength');
+        }
+
+        if (type === 'email') {
+            pixInput.placeholder = 'email@dominio.com';
+            pixInput.removeAttribute('maxlength');
+        }
+
+        if (type === 'random') {
+            pixInput.placeholder = 'Chave aleatória';
+            pixInput.removeAttribute('maxlength');
+        }
+    });
+});
+</script>
+
+
+    @endpush
 </div>

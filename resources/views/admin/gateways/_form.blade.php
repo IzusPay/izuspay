@@ -4,19 +4,19 @@
     <div>
         <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Nome do Gateway</label>
         <div class="mt-1">
-            <input type="text" name="name" id="name" class="block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="{{ old('name', $gateway->name ?? '') }}" required placeholder="Ex: Mercado Pago">
+            <input type="text" name="name" id="name" class="block w-full px-4 py-3 bg-white dark:bg-black text-gray-900 dark:text-white border border-gray-300 dark:border-white/10 rounded-lg shadow-sm focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white" value="{{ old('name', $gateway->name ?? '') }}" required placeholder="Ex: Mercado Pago">
         </div>
     </div>
     <div>
         <label for="logo_url" class="block text-sm font-medium text-slate-700 dark:text-slate-300">URL da Logo</label>
         <div class="mt-1">
-            <input type="url" name="logo_url" id="logo_url" class="block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="{{ old('logo_url', $gateway->logo_url ?? '') }}" placeholder="https://...">
+            <input type="url" name="logo_url" id="logo_url" class="block w-full px-4 py-3 bg-white dark:bg-black text-gray-900 dark:text-white border border-gray-300 dark:border-white/10 rounded-lg shadow-sm focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white" value="{{ old('logo_url', $gateway->logo_url ?? '') }}" placeholder="https://...">
         </div>
     </div>
     <div>
         <label for="is_active" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Status</label>
         <div class="mt-1">
-            <select id="is_active" name="is_active" class="block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+            <select id="is_active" name="is_active" class="block w-full px-4 py-3 bg-white dark:bg-black text-gray-900 dark:text-white border border-gray-300 dark:border-white/10 rounded-lg shadow-sm focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white" required>
                 <option value="1" @selected(old('is_active', $gateway->is_active ?? 1 ) == 1)>Ativo</option>
                 <option value="0" @selected(old('is_active', $gateway->is_active ?? 1) == 0)>Inativo</option>
             </select>
@@ -38,23 +38,23 @@
         <!-- Lista de Campos Dinâmicos -->
         <div class="mt-4 space-y-4">
             <template x-for="(field, index) in fields" :key="index">
-                <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-black border border-gray-200 dark:border-white/5 rounded-lg">
                     <!-- Inputs para cada campo -->
                     <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label :for="'field_name_' + index" class="text-xs font-medium text-slate-600 dark:text-slate-400">Nome (ID)</label>
                             <input :id="'field_name_' + index" type="text" x-model="field.name" placeholder="ex: client_id"
-                                   class="mt-1 block w-full text-sm px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                   class="mt-1 block w-full text-sm px-3 py-2 bg-white dark:bg-black border border-gray-300 dark:border-white/10 rounded-md shadow-sm focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white">
                         </div>
                         <div>
                             <label :for="'field_label_' + index" class="text-xs font-medium text-slate-600 dark:text-slate-400">Rótulo (Label)</label>
                             <input :id="'field_label_' + index" type="text" x-model="field.label" placeholder="ex: Client ID"
-                                   class="mt-1 block w-full text-sm px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                   class="mt-1 block w-full text-sm px-3 py-2 bg-white dark:bg-black border border-gray-300 dark:border-white/10 rounded-md shadow-sm focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white">
                         </div>
                         <div>
                             <label :for="'field_type_' + index" class="text-xs font-medium text-slate-600 dark:text-slate-400">Tipo</label>
                             <select :id="'field_type_' + index" x-model="field.type"
-                                    class="mt-1 block w-full text-sm px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                    class="mt-1 block w-full text-sm px-3 py-2 bg-white dark:bg-black border border-gray-300 dark:border-white/10 rounded-md shadow-sm focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white">
                                 <option value="text">Texto</option>
                                 <option value="password">Senha</option>
                             </select>
@@ -72,7 +72,7 @@
         </div>
         <div class="mt-4">
             <button type="button" @click="addField()"
-                    class="inline-flex items-center gap-2 px-4 py-2 border border-dashed border-gray-400 dark:border-gray-500 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    class="inline-flex items-center gap-2 px-4 py-2 border border-dashed border-gray-400 dark:border-white/10 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                 Adicionar Campo de Credencial
             </button>
@@ -83,21 +83,21 @@
         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Taxa Cartão (%)</label>
         <input type="number" step="0.01" name="card_fee_percentage"
                value="{{ old('card_fee_percentage', $gateway->card_fee_percentage ?? '') }}"
-               class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg">
+               class="mt-1 block w-full px-3 py-2 bg-white dark:bg-black text-gray-900 dark:text-white border border-gray-300 dark:border-white/10 rounded-lg">
     </div>
 
     <div>
         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Taxa PIX (%)</label>
         <input type="number" step="0.01" name="pix_fee_percentage"
                value="{{ old('pix_fee_percentage', $gateway->pix_fee_percentage ?? '') }}"
-               class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg">
+               class="mt-1 block w-full px-3 py-2 bg-white dark:bg-black text-gray-900 dark:text-white border border-gray-300 dark:border-white/10 rounded-lg">
     </div>
 
     <div>
         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Taxa Fixa (R$)</label>
         <input type="number" step="0.01" name="fixed_fee"
                value="{{ old('fixed_fee', $gateway->fixed_fee ?? '') }}"
-               class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg">
+               class="mt-1 block w-full px-3 py-2 bg-white dark:bg-black text-gray-900 dark:text-white border border-gray-300 dark:border-white/10 rounded-lg">
     </div>
 </div>
 
@@ -108,7 +108,7 @@
         name="order"
         id="order"
         min="1"
-        class="mt-1 block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="mt-1 block w-full px-4 py-3 bg-white dark:bg-black text-gray-900 dark:text-white border border-gray-300 dark:border-white/10 rounded-lg shadow-sm focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white"
         value="{{ old('order', $gateway->order ?? 1) }}"
         required
     >
@@ -125,9 +125,9 @@
 </div>
 
 <!-- Botões de Ação -->
-<div class="mt-8 pt-5 border-t border-gray-200 dark:border-gray-700">
+<div class="mt-8 pt-5 border-t border-gray-200 dark:border-white/5">
     <div class="flex justify-end gap-x-4">
-        <a href="{{ route('admin.gateways.index') }}" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium text-sm transition-colors">
+        <a href="{{ route('admin.gateways.index') }}" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-white/10 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 font-medium text-sm transition-colors">
             Cancelar
         </a>
         <button type="submit" class="inline-flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-all duration-200 shadow-md hover:shadow-lg">

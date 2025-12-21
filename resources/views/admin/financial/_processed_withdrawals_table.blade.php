@@ -3,19 +3,19 @@
     <form action="{{ route('admin.financial.index') }}" method="GET">
         <input type="hidden" name="tab" value="saques"> {{-- Para manter a aba ativa após filtrar --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-input w-full rounded-md bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600">
-            <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-input w-full rounded-md bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Nome, e-mail, CPF/CNPJ do seller" class="form-input w-full rounded-md bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+            <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-input w-full rounded-md bg-white dark:bg-black border-gray-300 dark:border-white/10">
+            <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-input w-full rounded-md bg-white dark:bg-black border-gray-300 dark:border-white/10">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Nome, e-mail, CPF/CNPJ do seller" class="form-input w-full rounded-md bg-white dark:bg-black border-gray-300 dark:border-white/10">
         </div>
         <div class="flex justify-end space-x-3">
-            <a href="{{ route('admin.financial.index', ['tab' => 'saques']) }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 dark:bg-gray-600 dark:text-gray-200 rounded-md hover:bg-gray-300">Limpar</a>
+            <a href="{{ route('admin.financial.index', ['tab' => 'saques']) }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 dark:bg-white/10 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-white/20">Limpar</a>
             <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Pesquisar</button>
             <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700">Exportar Lista</button>
         </div>
     </form>
 
     <!-- Cabeçalho da Lista -->
-    <div class="mt-6 grid grid-cols-12 gap-4 px-4 py-2 bg-gray-100 dark:bg-gray-700/50 rounded-t-lg text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
+    <div class="mt-6 grid grid-cols-12 gap-4 px-4 py-2 bg-gray-100 dark:bg-black rounded-t-lg text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
         <div class="col-span-1">ID</div>
         <div class="col-span-4">Recebedor</div>
         <div class="col-span-3">Solicitação e Status</div>
@@ -26,7 +26,7 @@
     <!-- Lista de Saques -->
     <div class="space-y-2">
         @forelse($withdrawals as $withdrawal)
-            <div class="grid grid-cols-12 gap-4 p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/20">
+            <div class="grid grid-cols-12 gap-4 p-4 border-b dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5">
                 <!-- Coluna ID -->
                 <div class="col-span-1 text-sm font-medium text-gray-800 dark:text-gray-200">
                     {{ $withdrawal->id }}

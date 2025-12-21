@@ -1,6 +1,6 @@
 <div class="overflow-x-auto">
     <table class="w-full">
-        <thead class="bg-gray-50 dark:bg-gray-700/50">
+        <thead class="bg-white dark:bg-black">
             <tr>
                 <th class="p-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Recebedor</th>
                 <th class="p-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Dados Bancários</th>
@@ -9,9 +9,9 @@
                 <th class="p-4 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Ações</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+        <tbody class="divide-y divide-gray-200 dark:divide-white/10">
             @forelse($withdrawals as $withdrawal)
-                <tr>
+                <tr class="hover:bg-black/5 dark:hover:bg-white/5">
                     <td class="p-4">
                         <div class="font-medium text-gray-900 dark:text-white">{{ $withdrawal->wallet->association->nome }}</div>
                         <div class="text-sm text-gray-500">ID: {{ $withdrawal->wallet->association->id }}</div>

@@ -12,385 +12,294 @@
             theme: {
                 extend: {
                     colors: {
-                        'primary-blue': '#1e40af',
-                        'secondary-blue': '#3b82f6',
-                        'accent-blue': '#60a5fa',
-                        'dark-blue': '#1e3a8a',
-                        'light-blue': '#dbeafe'
+                        'primary': '#000000',
+                        'secondary': '#4F46E5',
+                        'light-gray': '#F9FAFB',
+                        'dark-gray': '#6B7280',
+                        'border-gray': '#E5E7EB'
                     },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'slide-up': 'slideUp 0.8s ease-out',
-                        'fade-in': 'fadeIn 1s ease-out',
-                        'secure-pulse': 'securePulse 2s infinite',
-                        'connection-pulse': 'connectionPulse 1.5s infinite'
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-20px)' }
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(100px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' }
-                        },
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' }
-                        },
-                        securePulse: {
-                            '0%, 100%': { transform: 'scale(1)', opacity: '1' },
-                            '50%': { transform: 'scale(1.1)', opacity: '0.8' }
-                        },
-                        connectionPulse: {
-                            '0%, 100%': { opacity: '0.3', transform: 'scale(0.8)' },
-                            '50%': { opacity: '1', transform: 'scale(1.2)' }
-                        }
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
                     }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
         body {
             font-family: 'Inter', sans-serif;
-        }
-
-        .gradient-bg {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 25%, #60a5fa 50%, #3b82f6 75%, #1e40af 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 8s ease infinite;
-        }
-        
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Container do login */
-        .login-container {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .login-container.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px rgba(30, 64, 175, 0.15);
-            border: 1px solid rgba(96, 165, 250, 0.2);
-        }
-
-        .form-group input {
-            background: rgba(248, 250, 252, 0.8);
-            border-color: #e2e8f0;
-            color: #1e293b;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .form-group input::placeholder {
-            color: #64748b;
-        }
-
-        .form-group input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .loading-spinner {
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #ffffff;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .form-group.error input {
-            border-color: #ef4444;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-        }
-
-        .form-group.success input {
-            border-color: #22c55e;
-            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
-        }
-        
-        .error-message {
-            color: #ef4444;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-        }
-
-        .error-message.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .floating-elements {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .floating-element {
-            position: absolute;
-            background: rgba(96, 165, 250, 0.1);
-            border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .floating-element:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            top: 10%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .floating-element:nth-child(2) {
-            width: 60px;
-            height: 60px;
-            top: 20%;
-            right: 15%;
-            animation-delay: 2s;
-        }
-
-        .floating-element:nth-child(3) {
-            width: 100px;
-            height: 100px;
-            bottom: 15%;
-            left: 20%;
-            animation-delay: 4s;
-        }
-
-        .floating-element:nth-child(4) {
-            width: 40px;
-            height: 40px;
-            bottom: 30%;
-            right: 10%;
-            animation-delay: 1s;
-        }
-
-        .security-indicators {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
         }
 
-        .security-indicator {
+        .login-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .login-form-section {
+            flex: 1;
+            background: white;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            color: #059669;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-graphic-section {
+            flex: 1;
+            background: linear-gradient(135deg, #969696ff 0%, #000000ff 100%);
+            display: none;
+        }
+
+        .form-container {
+            max-width: 400px;
+            width: 100%;
+            padding: 2rem;
+        }
+
+        .form-logo {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-subtitle {
+            color: #6B7280;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
             font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #F9FAFB;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background-color: white;
+        }
+
+        .btn-login {
+            width: 100%;
+            background-color: #000000;
+            color: white;
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-login:hover {
+            background-color: #1F2937;
+        }
+
+        .btn-login i {
+            margin-left: 0.5rem;
+            transition: transform 0.2s;
+        }
+
+        .btn-login:hover i {
+            transform: translateX(4px);
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin: 1rem 0 2rem;
+        }
+
+        .forgot-password a {
+            color: #4F46E5;
+            font-size: 0.875rem;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            color: #9CA3AF;
+            font-size: 0.875rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #E5E7EB;
+            margin: 0 1rem;
+        }
+
+        .signup-link {
+            text-align: center;
+            color: #6B7280;
+            font-size: 0.95rem;
+        }
+
+        .signup-link a {
+            color: #4F46E5;
+            font-weight: 600;
+            text-decoration: none;
+            margin-left: 0.25rem;
+        }
+
+        @media (min-width: 1024px) {
+            .login-graphic-section {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen gradient-bg relative overflow-hidden">
-    
-    <!-- Elementos flutuantes de fundo -->
-    <div class="floating-elements">
-        <div class="floating-element"></div>
-        <div class="floating-element"></div>
-        <div class="floating-element"></div>
-        <div class="floating-element"></div>
-    </div>
-
-    <!-- Container principal do login -->
-    <div id="login-container" class="login-container flex items-center justify-center min-h-screen p-4 relative z-10">
-        <div class="glass-effect rounded-2xl shadow-2xl p-8 lg:p-12 w-full max-w-md">
-            
-            <!-- Logo e título -->
-            <div class="text-center mb-10">
-                <div class="flex items-center justify-center mx-auto mb-6 ">
-                    <div class="flex-grow">
-                    <h1 class="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-blue to-accent-blue">
-    {{ env('APP_NAME', 'Izus Payment') }}
-</h1>
-                    </div>
+<body>
+    <div class="login-container">
+        <!-- Seção do formulário -->
+        <div class="login-form-section">
+            <div class="form-container">
+                <div class="form-logo">
+                    <h1 class="text-2xl font-bold text-gray-900">{{ env('APP_NAME', 'Izus Payment') }}</h1>
                 </div>
-                <p class="text-gray-600 text-sm">Entre em sua conta para acessar</p>
-            </div>
-
-            <!-- Indicadores de segurança -->
-           
-            
-            <!-- Mensagens de erro (integrado do código antigo) -->
-            @if ($errors->any())
-            <div class="mb-8 bg-red-50 border-l-4 border-red-500 rounded-lg p-4 fade-in">
-                <div class="flex items-center mb-2">
-                    <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
-                    <h3 class="text-red-800 font-semibold text-sm">Erro no login</h3>
-                </div>
-                <ul class="text-red-700 text-sm space-y-1">
-                    @foreach ($errors->all() as $error)
-                    <li class="flex items-center">
-                        <i class="fas fa-circle text-red-500 text-xs mr-2"></i>
-                        {{ $error }}
-                    </li>
-                    @endforeach
-                </ul>
-            </div>
-            @endif
-            
-            <!-- Formulário de login -->
-            <form method="POST" action="{{ route('login') }}" id="login-form" novalidate>
-                @csrf
                 
-                <div class="form-group mb-6">
-                    <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
-                        E-mail
-                    </label>
-                    <div class="relative">
-                        <input id="email" 
+                <h2 class="form-title">Entre na sua conta</h2>
+                <p class="form-subtitle">Bem-vindo de volta! Por favor, insira seus dados.</p>
+                
+                @if ($errors->any())
+                <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                        <h3 class="text-red-800 font-semibold text-sm">Erro no login</h3>
+                    </div>
+                    <ul class="text-red-700 text-sm space-y-1">
+                        @foreach ($errors->all() as $error)
+                        <li class="flex items-center">
+                            <i class="fas fa-circle text-red-500 text-xs mr-2"></i>
+                            {{ $error }}
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+                
+                <form method="POST" action="{{ route('login') }}" id="login-form">
+                    @csrf
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">E-mail</label>
+                        <input type="email" 
+                               id="email" 
                                name="email" 
-                               type="email" 
                                value="{{ old('email') }}" 
-                               required 
-                               autocomplete="email"
-                               class="w-full px-4 py-4 pl-12 border-2 rounded-xl focus:outline-none transition-all text-base"
-                               placeholder="seu@email.com">
-                        <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-secondary-blue"></i>
+                               class="form-input" 
+                               placeholder="Digite seu e-mail"
+                               required>
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
-                    @error('email')
-                        <div class="error-message text-xs mt-1 show" id="email-error">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <div class="form-group mb-6">
-                    <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
-                        Senha
-                    </label>
-                    <div class="relative">
-                        <input id="password" 
-                               name="password" 
-                               type="password" 
-                               required 
-                               autocomplete="current-password"
-                               class="w-full px-4 py-4 pl-12 pr-12 border-2 rounded-xl focus:outline-none transition-all text-base"
-                               placeholder="••••••••">
-                        <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-secondary-blue"></i>
-                        <button type="button" 
-                                onclick="togglePassword()" 
-                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-secondary-blue transition-colors">
-                            <i class="fas fa-eye" id="password-icon"></i>
-                        </button>
+                    
+                    <div class="form-group">
+                        <div class="flex justify-between items-center">
+                            <label for="password" class="form-label">Senha</label>
+                            @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">
+                                Esqueceu a senha?
+                            </a>
+                            @endif
+                        </div>
+                        <div class="relative">
+                            <input type="password" 
+                                   id="password" 
+                                   name="password" 
+                                   class="form-input pr-10" 
+                                   placeholder="••••••••"
+                                   required>
+                            <button type="button" 
+                                    onclick="togglePassword()" 
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    aria-label="Mostrar senha">
+                                <i class="fas fa-eye" id="password-icon"></i>
+                            </button>
+                        </div>
+                        @error('password')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
-                    @error('password')
-                        <div class="error-message text-xs mt-1 show" id="password-error">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <div class="flex items-center justify-between mb-8">
-                    <div class="flex items-center">
-                        <input id="remember" 
+                    
+                    <div class="form-group flex items-center">
+                        <input type="checkbox" 
+                               id="remember" 
                                name="remember" 
-                               type="checkbox" 
                                {{ old('remember') ? 'checked' : '' }}
-                               class="h-4 w-4 text-secondary-blue focus:ring-secondary-blue border-gray-300 rounded">
-                        <label for="remember" class="ml-2 block text-sm text-gray-700 font-medium">
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="remember" class="ml-2 block text-sm text-gray-900">
                             Lembrar de mim
                         </label>
                     </div>
                     
-                    @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" 
-                       class="text-sm text-secondary-blue hover:text-primary-blue font-medium transition-colors">
-                        Esqueceu a senha?
-                    </a>
-                    @endif
-                </div>
+                    <button type="submit" class="btn-login" id="login-btn">
+                        Entrar <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
                 
-                <button type="submit" 
-                        class="btn-primary w-full text-white font-semibold py-4 px-6 rounded-xl text-lg mb-6" 
-                        id="login-btn">
-                    <span id="login-text">
-                        <i class="fas fa-sign-in-alt mr-2"></i>
-                        Entrar
-                    </span>
-                </button>
-            </form>
-            
-            <div class="relative mb-8">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-300"></div>
-                </div>
-                <div class="relative flex justify-center text-sm">
-                    <span class="px-4 bg-white text-gray-500 font-medium">ou</span>
-                </div>
-            </div>
-            
-            <div class="text-center">
-                <p class="text-gray-600">
-                    Não tem uma conta?
-                    <a href="{{ route('association.register.form') }}" 
-                       class="text-secondary-blue hover:text-primary-blue font-semibold transition-colors ml-1">
-                        Criar agora
-                    </a>
+                <div class="divider">ou</div>
+                
+                <p class="signup-link">
+                    Não tem uma conta? 
+                    <a href="{{ route('association.register.form') }}">Criar agora</a>
                 </p>
+            </div>
+        </div>
+        
+        <!-- Seção gráfica (visível apenas em telas grandes) -->
+        <div class="login-graphic-section">
+            <!-- Aqui você pode adicionar uma imagem ou ilustração -->
+            <div class="text-white text-center p-8 max-w-md">
             </div>
         </div>
     </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const loginContainer = document.getElementById('login-container');
-            loginContainer.classList.add('show');
             // Função para alternar visibilidade da senha
             window.togglePassword = function() {
                 const passwordField = document.getElementById('password');
@@ -407,53 +316,47 @@
                 }
             };
 
-            // Adicionar validação de formulário básica (se necessário, ou confiar no Laravel)
+            // Adicionar efeito de loading no botão de login
             const loginForm = document.getElementById('login-form');
-            loginForm.addEventListener('submit', function(event) {
-                // Esta validação é mais para feedback instantâneo no cliente.
-                // A validação principal deve ser feita no servidor Laravel.
-                let isValid = true;
-
-                // Validação de Email
-                const emailInput = document.getElementById('email');
-                const emailError = document.getElementById('email-error');
-                if (!emailInput.value || !emailInput.value.includes('@')) {
-                    emailInput.closest('.form-group').classList.add('error');
-                    emailError.textContent = 'Por favor, insira um e-mail válido.';
-                    emailError.classList.add('show');
-                    isValid = false;
+            const loginBtn = document.getElementById('login-btn');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', function() {
+                    loginBtn.disabled = true;
+                    loginBtn.innerHTML = 'Entrando... <i class="fas fa-circle-notch fa-spin ml-2"></i>';
+                });
+            }
+            
+            // Validação em tempo real
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(String(email).toLowerCase());
+            }
+            
+            function updateFieldValidation(input, isValid) {
+                if (isValid) {
+                    input.classList.remove('border-red-500');
+                    input.classList.add('border-green-500');
                 } else {
-                    emailInput.closest('.form-group').classList.remove('error');
-                    emailError.classList.remove('show');
+                    input.classList.remove('border-green-500');
+                    input.classList.add('border-red-500');
                 }
-
-                // Validação de Senha
-                const passwordInput = document.getElementById('password');
-                const passwordError = document.getElementById('password-error');
-                if (!passwordInput.value || passwordInput.value.length < 6) {
-                    passwordInput.closest('.form-group').classList.add('error');
-                    passwordError.textContent = 'A senha deve ter pelo menos 6 caracteres.';
-                    passwordError.classList.add('show');
-                    isValid = false;
-                } else {
-                    passwordInput.closest('.form-group').classList.remove('error');
-                    passwordError.classList.remove('show');
-                }
-
-                if (!isValid) {
-                    event.preventDefault(); // Impede o envio do formulário se a validação falhar
-                }
-            });
-
-            // Remover classes de erro ao digitar
-            document.getElementById('email').addEventListener('input', function() {
-                this.closest('.form-group').classList.remove('error');
-                document.getElementById('email-error').classList.remove('show');
-            });
-            document.getElementById('password').addEventListener('input', function() {
-                this.closest('.form-group').classList.remove('error');
-                document.getElementById('password-error').classList.remove('show');
-            });
+            }
+            
+            if (emailInput) {
+                emailInput.addEventListener('input', function() {
+                    updateFieldValidation(this, validateEmail(this.value));
+                });
+            }
+            
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    updateFieldValidation(this, this.value.length >= 6);
+                });
+            }
         });
     </script>
 </body>

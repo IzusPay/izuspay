@@ -19,7 +19,7 @@
     </div>
 
     <!-- Filtros -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+    <div class="bg-white dark:bg-black rounded-xl shadow-sm border border-gray-200 dark:border-white/5 p-6">
         <form action="{{ route('admin.sales.index') }}" method="GET">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
@@ -57,10 +57,10 @@
     </div>
 
     <!-- Tabela de Vendas -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="bg-white dark:bg-black rounded-xl shadow-sm border border-gray-200 dark:border-white/5 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full">
-                <thead class="bg-gray-50 dark:bg-gray-700">
+                <thead class="bg-white dark:bg-black">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Transação</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Cliente</th>
@@ -71,9 +71,9 @@
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ações</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody class="bg-white dark:bg-black divide-y divide-gray-200 dark:divide-white/10">
                     @forelse($sales as $sale)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <tr class="hover:bg-black/5 dark:hover:bg-white/5">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $sale->transaction_hash ?? 'N/A' }}</div>
                             <div class="text-xs text-gray-500">{{ $sale->id }}</div>
@@ -108,7 +108,7 @@
             </table>
         </div>
         @if($sales->hasPages())
-        <div class="bg-white dark:bg-gray-800 px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-black px-6 py-3 border-t border-gray-200 dark:border-white/5">
             {{ $sales->appends(request()->query())->links() }}
         </div>
         @endif

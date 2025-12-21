@@ -5,7 +5,7 @@
 @section('content')
 <div class="space-y-6" x-data="financialModule()">
     <!-- Header e Abas (sem alterações) -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+    <div class="bg-white dark:bg-black rounded-xl shadow-sm p-6 border border-gray-200 dark:border-white/5">
         <div class="flex items-center space-x-3">
             <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center shadow-md">
                 <i data-lucide="dollar-sign" class="w-7 h-7 text-white"></i>
@@ -16,7 +16,7 @@
             </div>
         </div>
     </div>
-    <div class="border-b border-gray-200 dark:border-gray-700">
+    <div class="border-b border-gray-200 dark:border-white/10">
         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
             <button @click="tab = 'aprovacao'" :class="{ 'border-green-500 text-green-600': tab === 'aprovacao', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'aprovacao' }" class="relative whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                 Aguardando Aprovação
@@ -34,7 +34,7 @@
     </div>
 
     <!-- Conteúdo das Abas -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="bg-white dark:bg-black rounded-xl shadow-sm border border-gray-200 dark:border-white/5 overflow-hidden">
         <div x-show="tab === 'aprovacao'" x-cloak>
             @include('admin.financial._pending_withdrawals_table', ['withdrawals' => $pendingWithdrawals])
         </div>

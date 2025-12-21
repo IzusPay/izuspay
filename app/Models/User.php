@@ -391,4 +391,9 @@ class User extends Authenticatable
         $color = $colors[$this->status] ?? 'secondary';
         return '<span class="badge bg-' . $color . '">' . ucfirst($this->status) . '</span>';
     }
+
+    public function apiTokens()
+{
+    return $this->hasMany(ApiToken::class);
+}
 }

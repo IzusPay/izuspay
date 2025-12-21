@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AssociationController as AdminAssociationControll
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Admin\GatewayController;
+use App\Http\Controllers\Associacao\ApiKeysController;
 use App\Http\Controllers\Associacao\DashboardController;
 use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -132,6 +133,17 @@ Route::middleware(['auth', RedirectByProfile::class])->prefix('associacao')->gro
     Route::post('/configuracoes/documentos/{documentType}/upload', [ConfiguracoesController::class, 'upload'])
     ->name('associacao.documents.upload');
 
+    Route::get('/integracoes', [ApiKeysController::class, 'index'])->name('api-keys.index');
+    Route::get('/integracoes/api-keys/create', [ApiKeysController::class, 'create'])->name('api-keys.create');
+    Route::post('/integracoes/api-keys', [ApiKeysController::class, 'store'])->name('api-keys.store');
+    Route::delete('/integracoes/api-keys/{apiToken}', [ApiKeysController::class, 'destroy'])->name('api-keys.destroy');
+    Route::patch('/integracoes/api-keys/{apiToken}/toggle', [ApiKeysController::class, 'toggle'])->name('api-keys.toggle');
+    
+    Route::get(
+        '/integracoes/api-keys/{apiToken}/reveal',
+        [ApiKeysController::class, 'reveal']
+    )->name('api-keys.reveal');
+
     Route::post('/dashboard/save-layout', [DashboardSettingsController::class, 'saveLayout'])->name('dashboard.saveLayout');
 
     Route::get('/inicio', [DashboardController::class, 'index'])->name('associacao.dashboard');
@@ -194,6 +206,8 @@ Route::middleware(['auth', RedirectByProfile::class])->prefix('associacao')->gro
     Route::delete('/plans/{plan}', [AssociacaoPlanController::class, 'destroy'])->name('associacao.plans.destroy');
 
     Route::get('/vendas', [SaleController::class, 'index'])->name('associacao.vendas.index');
+    Route::get('/disputas', [\App\Http\Controllers\Associacao\DisputeController::class, 'index'])->name('associacao.disputas.index');
+    Route::get('/webhooks', [\App\Http\Controllers\Associacao\WebhooksController::class, 'index'])->name('associacao.webhooks.index');
     Route::get('/vendas/create', [SaleController::class, 'create'])->name('associacao.vendas.create');
     Route::post('/vendas', [SaleController::class, 'store'])->name('associacao.vendas.store');
     Route::get('/vendas/{sale}', [SaleController::class, 'show'])->name('associacao.vendas.show'); // Show já existia
@@ -276,6 +290,8 @@ Route::domain('{subdomain}.copywave.com.br')->group(function () {
 Route::middleware(['auth', RedirectByProfile::class])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     
+    Route::get('/webhooks', [\App\Http\Controllers\Admin\WebhooksController::class, 'index'])->name('admin.webhooks.index');
+
     Route::get('/organizacoes', [OrganizationController::class, 'index'])->name('admin.organizacoes.index');
     Route::get('/organizacoes/create', [OrganizationController::class, 'create'])->name('admin.organizacoes.create');
     Route::post('/organizacoes', [OrganizationController::class, 'store'])->name('admin.organizacoes.store');

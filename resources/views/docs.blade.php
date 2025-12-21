@@ -274,13 +274,49 @@
                 </ul>
                 <h4>API</h4>
                 <ul>
-                    <li><a href="#criar-transacao">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20v-6M6 20v-2M18 20v-4"></path><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path><path d="M6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path><path d="M18 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path></svg>
-                        Criar Transação
+                    <li><a href="#account">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M4 4h16v16H4z"></path></svg>
+                        Conta
                     </a></li>
-                    <li><a href="#consultar-transacao">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        Consultar Transação
+                    <li><a href="#user">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"></circle><path d="M6 20c0-3.3137 2.6863-6 6-6s6 2.6863 6 6"></path></svg>
+                        Usuário
+                    </a></li>
+                    <li><a href="#apikeys">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M6 12l6-6 6 6-6 6-6-6z"></path></svg>
+                        Chaves de API
+                    </a></li>
+                    <li><a href="#webhooks">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                        Webhooks
+                    </a></li>
+                    <li><a href="#two-factor-auth">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h10M7 13h6"></path></svg>
+                        Autenticação 2FA
+                    </a></li>
+                    <li><a href="#seller">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M3 6h18M3 10h18M3 14h18M3 18h18"></path></svg>
+                        Vendedores
+                    </a></li>
+                    <li><a href="#transactions">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M12 20v-6M6 20v-2M18 20v-4"></path></svg>
+                        Transações
+                    </a></li>
+                    <li><a href="#withdrawals">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M12 3v10M5 12l7 7 7-7"></path></svg>
+                        Saques
+                    </a></li>
+                    <li><a href="#seller-wallet">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M16 10h4v4h-4z"></path></svg>
+                        Carteira do Vendedor
+                    </a></li>
+                    <li><a href="#disputes">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path></svg>
+                        Disputas
+                    </a></li>
+                    <li><a href="#health">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M4 12h4l2-3 2 6 2-3h4"></path></svg>
+                        Status de Saúde
                     </a></li>
                 </ul>
                 <h4>Guias</h4>
@@ -312,6 +348,180 @@ Accept: application/json
 Content-Type: application/json</code></pre>
                     </div>
                 </div>
+            </section>
+
+            <section id="account">
+                <h2>Conta</h2>
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/login</span></div>
+                <div class="code-block"><div class="code-header"><span>REQUEST BODY</span></div><div class="code-body"><pre><code class="language-json">{
+  "email": "seuemail@gmail.com",
+  "password": "suasenha"
+}</code></pre></div></div>
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/login</span></div>
+                <div class="code-block"><div class="code-header"><span>REQUEST BODY</span></div><div class="code-body"><pre><code class="language-json">{
+  "email": "seuemail@witete.com",
+  "password": "suasenha@123"
+}</code></pre></div></div>
+            </section>
+
+            <section id="user">
+                <h2>Usuário</h2>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/users/me</span></div>
+                <div class="endpoint"><span class="endpoint-method post">PUT</span><span class="endpoint-url">@{{BASE_URL}}/users</span></div>
+                <div class="code-block"><div class="code-header"><span>REQUEST BODY</span></div><div class="code-body"><pre><code class="language-json">{
+  "name": "Gomes"
+}</code></pre></div></div>
+            </section>
+
+            <section id="apikeys">
+                <h2>Chaves de API</h2>
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/apikeys</span></div>
+                <div class="code-block"><div class="code-header"><span>REQUEST BODY</span></div><div class="code-body"><pre><code class="language-json">{
+  "name": "John Doe 2"
+}</code></pre></div></div>
+                <div class="endpoint"><span class="endpoint-method get">DELETE</span><span class="endpoint-url">@{{BASE_URL}}/apikeys/:idApiKey</span></div>
+            </section>
+
+            <section id="webhooks">
+                <h2>Webhooks</h2>
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/webhooks</span></div>
+                <div class="code-block"><div class="code-header"><span>REQUEST BODY</span></div><div class="code-body"><pre><code class="language-json">{
+  "url": "https://seller.example.com/webhook-endpoint",
+  "description": "Production webhook for transaction events",
+  "eventType": "WITHDRAWAL"
+}</code></pre></div></div>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/webhooks/{id}</span></div>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/webhooks</span></div>
+                <div class="endpoint"><span class="endpoint-method get">DELETE</span><span class="endpoint-url">@{{BASE_URL}}/webhooks/{id}</span></div>
+            </section>
+
+            <section id="two-factor-auth">
+                <h2>Autenticação 2FA</h2>
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/two-factor-auth/active</span></div>
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/two-factor-auth/validate</span></div>
+                <div class="code-block"><div class="code-header"><span>REQUEST BODY</span></div><div class="code-body"><pre><code class="language-json">{
+  "token": "John Doe"
+}</code></pre></div></div>
+            </section>
+
+            <section id="seller">
+                <h2>Vendedores</h2>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/sellers/:idSeller</span></div>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/sellers/:idSeller</span></div>
+            </section>
+
+            <section id="transactions">
+                <h2>Transações</h2>
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/transactions</span></div>
+                <div class="code-block"><div class="code-header"><span>PIX</span></div><div class="code-body"><pre><code class="language-json">{
+  "amount": 500,
+  "method": "PIX",
+  "customer": {
+    "name": "John",
+    "email": "john@example.com",
+    "phone": "1234567890",
+    "documentType": "CPF",
+    "document": "70443438056"
+  },
+  "items": [
+    {
+      "title": "Wireless Mouse",
+      "amount": 5999,
+      "quantity": 1,
+      "tangible": true,
+      "externalRef": "item_abc123"
+    }
+  ]
+}</code></pre></div></div>
+                <div class="code-block"><div class="code-header"><span>BOLETO</span></div><div class="code-body"><pre><code class="language-json">{
+  "amount": 500,
+  "method": "BOLETO",
+  "customer": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "1234567890",
+    "documentType": "CPF",
+    "document": "70443438056"
+  },
+  "items": [
+    {
+      "title": "Wireless Mouse",
+      "amount": 500,
+      "quantity": 1,
+      "tangible": true,
+      "externalRef": "item_abc123"
+    }
+  ]
+}</code></pre></div></div>
+                <div class="code-block"><div class="code-header"><span>CARTÃO DE CRÉDITO</span></div><div class="code-body"><pre><code class="language-json">{
+  "amount": 500,
+  "method": "CREDIT_CARD",
+  "installments": 1,
+  "customer": {
+    "name": "Luiz Jordão",
+    "email": "luiz@hotmail.com",
+    "phone": "1234567890",
+    "documentType": "CPF",
+    "document": "36188196841"
+  },
+  "card": {
+    "number": "4576010058016473 ",
+    "holderName": "LUIZ J R SIMAO",
+    "holderDocument": "36188196841",
+    "expirationMonth": 7,
+    "expirationYear": 2030,
+    "cvv": "813"
+  },
+  "items": [
+    {
+      "title": "Wireless Mouse",
+      "amount": 500,
+      "quantity": 1,
+      "tangible": true,
+      "externalRef": "item_abc123"
+    }
+  ]
+}</code></pre></div></div>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/transactions</span></div>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/transactions/:id</span></div>
+            </section>
+
+            <section id="withdrawals">
+                <h2>Saques</h2>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/withdrawals</span></div>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/withdrawals/{id}</span></div>
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/withdrawals</span></div>
+                <div class="code-block"><div class="code-header"><span>REQUEST BODY</span></div><div class="code-body"><pre><code class="language-json">{
+  "amount": 10000,
+  "pixKey": "111111111111",
+  "pixKeyType": "CNPJ",
+  "method": "PIX",
+  "metadata": {
+    "sellerExternalRef": ""
+  }
+}</code></pre></div></div>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/withdrawals/search?metadataKey=sellerExternalRef&amp;metadataValue=VALOR</span></div>
+            </section>
+
+            <section id="seller-wallet">
+                <h2>Carteira do Vendedor</h2>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/seller-wallet/balance</span></div>
+            </section>
+
+            <section id="disputes">
+                <h2>Disputas</h2>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/disputes</span></div>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/disputes/:id</span></div>
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/disputes/appeal</span></div>
+                <div class="code-block"><div class="code-header"><span>REQUEST BODY</span></div><div class="code-body"><pre><code class="language-json">{
+  "disputeId": "UUID",
+  "appealReason": "Motivo do recurso"
+}</code></pre></div></div>
+            </section>
+
+            <section id="health">
+                <h2>Status de Saúde</h2>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/health</span></div>
             </section>
 
             <section id="criar-transacao">
