@@ -24,6 +24,7 @@ Route::post('/goat-payments/create-pix-transaction', [GoatPaymentController::cla
 Route::post('/goat-payments/postback', [GoatPaymentController::class, 'handlePostback'])->name('api.goat.postback');
 
 Route::post('/witetec/postback', [CheckoutController::class, 'handlePostback'])->name('api.witetec.postback');
+Route::post('/brpagg/postback', [CheckoutController::class, 'handleBrPaggPostback'])->name('api.brpagg.postback');
 
 Route::middleware('auth.api_token')->group(function () {
     Route::post('/transactions', [PaymentController::class, 'create']);

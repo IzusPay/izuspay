@@ -99,9 +99,7 @@ class BrPaggService implements GatewayInterface
             $payload['metadata'] = $customerData['metadata'];
         }
 
-        if (isset($credentials['BRPAGG_POSTBACK_URL'])) {
-            $payload['postbackUrl'] = $credentials['BRPAGG_POSTBACK_URL'];
-        }
+        $payload['postbackUrl'] = $credentials['BRPAGG_POSTBACK_URL'] ?? route('api.brpagg.postback');
 
         $response = Http::withHeaders($this->buildHeaders($credentials, true))
             ->post($base.'/functions/v1/transactions', $payload);
