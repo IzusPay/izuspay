@@ -183,19 +183,27 @@ class CheckoutController extends Controller
     public function handleBrPaggPostback(Request $request)
     {
         Log::info('Postback BRPagg recebido', $request->all());
-        $transactionId = $request->input('id') ?? $request->input('transaction_id') ?? $request->input('hash');
-        $status = strtoupper($request->input('status') ?? $request->input('payment_status') ?? '');
+        $transactionId = $request->input('objectId')
+            ?? data_get($request->all(), 'data.id')
+            ?? $request->input('transaction_id')
+            ?? $request->input('id')
+            ?? $request->input('hash');
+        $statusRaw = data_get($request->all(), 'data.status')
+            ?? $request->input('status')
+            ?? $request->input('payment_status')
+            ?? '';
+        $status = strtolower((string) $statusRaw);
         if (! $transactionId) {
             Log::warning('Postback BRPagg sem id de transação', $request->all());
 
             return response()->json(['status' => 'ignored'], 200);
         }
-        if ($status === 'PAID' || $status === 'PAID_OUT' || $status === 'PAID_PENDING' || $status === 'PAID_CONFIRMED' || $status === 'PAID_SUCCESS' || $status === 'PAID_OK' || $status === 'PAID_APPROVED' || $status === 'PAID_PAYMENT' || $status === 'PAID_PIX' || $status === 'PAID_BOLETO' || $status === 'PAID_CARD' || $status === 'PAID_CREDIT' || $status === 'PAID_DEBIT' || $status === 'PAID_DONE' || $status === 'PAID_COMPLETE' || $status === 'PAID_FINISHED' || $status === 'PAID_SETTLED' || $status === 'PAID_RECEIVED' || $status === 'PAID_CONFIRMED_PIX' || $status === 'PAID_CONFIRMED_BOLETO' || $status === 'PAID_CONFIRMED_CARD' || $status === 'PAID_CONFIRMED_CREDIT' || $status === 'PAID_CONFIRMED_DEBIT' || $status === 'PAID_CONFIRMED') {
+        if ($status === 'paid') {
             $this->processPaidSale($transactionId);
 
             return response()->json(['status' => 'success'], 200);
         }
-        if ($status === 'PENDING' || $status === 'AWAITING_PAYMENT') {
+        if ($status === 'pending' || $status === 'awaiting_payment' || $status === 'waiting_payment') {
             $sale = Sale::where('transaction_hash', $transactionId)->first();
             if ($sale) {
                 $sale->touch();
