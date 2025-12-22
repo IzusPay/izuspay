@@ -30,10 +30,8 @@ class AuthenticateApiToken
         $hashedToken = hash('sha256', $token);
         $user = User::where('api_token', $hashedToken)->first();
 
-        // 3. Verificar se o usuário foi encontrado e se está ativo.
-        if (! $user || $user->status !== 'ativo') {
-            // Se não encontrar o usuário ou ele estiver inativo, retorne um erro 401.
-            return response()->json(['message' => 'Não autorizado. Token inválido ou usuário inativo.'], 401);
+        if (! $user) {
+            return response()->json(['message' => 'Não autorizado. Token inválido.'], 401);
         }
         // 4. Autenticar o usuário para esta requisição.
         // Isso permite que você use Auth::user() nos seus controllers de API.
