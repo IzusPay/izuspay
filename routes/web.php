@@ -51,9 +51,7 @@ Route::post('/criador/{username}/assinar/{planId}', [PublicCreatorController::cl
 
 Route::get('/page/{slug}', [PublicPageController::class, 'showAssociationLp'])->name('lp.show');
 
-Route::get('/', function () {
-    return redirect()->route('login');
-})->name('home');
+Route::redirect('/', '/login')->name('home');
 
 Route::get('/termos', function () {
     return view('terms');
