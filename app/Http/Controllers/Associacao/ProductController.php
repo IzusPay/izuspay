@@ -75,12 +75,13 @@ class ProductController extends Controller
         $avgTicket = $paidSales > 0 ? $totalRevenue / $paidSales : 0;
         $conversionRate = $totalSales > 0 ? round(($paidSales / $totalSales) * 100, 2) : 0;
 
+        $traffic = Product::where('association_id', $associationId)->sum('traffic');
         $metrics = [
             'total_links' => $totalLinks,
             'active_links' => $activeLinks,
             'total_revenue' => $totalRevenue,
             'avg_ticket' => $avgTicket,
-            'traffic' => 0,
+            'traffic' => $traffic,
             'conversion' => $conversionRate,
         ];
 

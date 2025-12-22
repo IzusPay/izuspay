@@ -29,6 +29,7 @@ class Product extends Model
         'offer_hash_goat',
         'product_hash_goat',
         'hash_id',
+        'traffic',
     ];
 
     protected $casts = [

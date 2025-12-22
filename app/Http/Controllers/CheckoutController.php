@@ -26,6 +26,7 @@ class CheckoutController extends Controller
     public function show(string $hash_id)
     {
         $product = Product::where('hash_id', $hash_id)->with(['association'])->firstOrFail();
+        $product->increment('traffic');
 
         return view('checkout-product', compact('product'));
     }
