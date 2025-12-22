@@ -23,7 +23,7 @@ class CreatorProfile extends Model
         'category',
         'website',
         'location',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
@@ -31,7 +31,7 @@ class CreatorProfile extends Model
         'is_active' => 'boolean',
         'followers_count' => 'integer',
         'following_count' => 'integer',
-        'posts_count' => 'integer'
+        'posts_count' => 'integer',
     ];
 
     /**
@@ -54,15 +54,15 @@ class CreatorProfile extends Model
     {
         return $this->hasOneThrough(Association::class, User::class, 'id', 'id', 'user_id', 'association_id');
     }
-    
+
     /**
      * Relacionamento com os seguidores
      */
     public function followers()
     {
         return $this->belongsToMany(User::class, 'creator_followers', 'creator_profile_id', 'user_id')
-                    ->using(CreatorFollower::class) // usa a model pivot customizada
-                    ->withTimestamps();
+            ->using(CreatorFollower::class) // usa a model pivot customizada
+            ->withTimestamps();
     }
 
     /**
@@ -71,7 +71,7 @@ class CreatorProfile extends Model
     public function following()
     {
         return $this->belongsToMany(CreatorProfile::class, 'creator_follows', 'follower_id', 'following_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -88,7 +88,7 @@ class CreatorProfile extends Model
     public function hasActiveSubscriber($userId)
     {
         return \App\Models\Subscription::query()
-            ->whereHas('sale.plan.association.creatorProfile', function($query) {
+            ->whereHas('sale.plan.association.creatorProfile', function ($query) {
                 $query->where('creator_profiles.id', $this->id);
             })
             ->where('user_id', $userId)
@@ -103,7 +103,7 @@ class CreatorProfile extends Model
     public function activeSubscriptions()
     {
         return \App\Models\Subscription::query()
-            ->whereHas('sale.plan.association.creatorProfile', function($query) {
+            ->whereHas('sale.plan.association.creatorProfile', function ($query) {
                 $query->where('creator_profiles.id', $this->id);
             })
             ->where('status', 'active')
@@ -116,10 +116,10 @@ class CreatorProfile extends Model
     public function sales()
     {
         return \App\Models\Sale::query()
-            ->whereHas('plan.association.creatorProfile', function($query) {
+            ->whereHas('plan.association.creatorProfile', function ($query) {
                 $query->where('creator_profiles.id', $this->id);
             })
-            ->orWhereHas('product.association.creatorProfile', function($query) {
+            ->orWhereHas('product.association.creatorProfile', function ($query) {
                 $query->where('creator_profiles.id', $this->id);
             });
     }
@@ -146,10 +146,10 @@ class CreatorProfile extends Model
     public function getActiveSubscribersAttribute()
     {
         return $this->activeSubscriptions()
-                    ->with('user')
-                    ->get()
-                    ->pluck('user')
-                    ->unique('id');
+            ->with('user')
+            ->get()
+            ->pluck('user')
+            ->unique('id');
     }
 
     /**
@@ -158,11 +158,11 @@ class CreatorProfile extends Model
     public function getProfileImageUrlAttribute()
     {
         if ($this->profile_image) {
-            return asset('storage/' . $this->profile_image);
+            return asset('storage/'.$this->profile_image);
         }
-        
+
         // Retorna uma imagem padrão baseada nas iniciais
-        return "https://ui-avatars.com/api/?name=" . urlencode($this->display_name) . "&background=22c55e&color=fff&size=200";
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->display_name).'&background=22c55e&color=fff&size=200';
     }
 
     /**
@@ -171,9 +171,9 @@ class CreatorProfile extends Model
     public function getCoverImageUrlAttribute()
     {
         if ($this->cover_image) {
-            return asset('storage/' . $this->cover_image);
+            return asset('storage/'.$this->cover_image);
         }
-        
+
         return null;
     }
 
@@ -190,10 +190,10 @@ class CreatorProfile extends Model
      */
     public function scopeSearch($query, $term)
     {
-        return $query->where(function($q) use ($term) {
+        return $query->where(function ($q) use ($term) {
             $q->where('display_name', 'LIKE', "%{$term}%")
-              ->orWhere('username', 'LIKE', "%{$term}%")
-              ->orWhere('bio', 'LIKE', "%{$term}%");
+                ->orWhere('username', 'LIKE', "%{$term}%")
+                ->orWhere('bio', 'LIKE', "%{$term}%");
         });
     }
 
@@ -233,10 +233,10 @@ class CreatorProfile extends Model
 
         foreach ($plans as $index => $plan) {
             $priceInReais = $plan->price_in_reais; // Using Plan's accessor
-            
+
             // Determinar o período baseado na duração
             $period = $this->getPeriodText($plan->duration_in_months);
-            
+
             // Calcular desconto se houver
             $discount = null;
             $discountPercent = 0; // Initialize discount percentage as number
@@ -248,13 +248,13 @@ class CreatorProfile extends Model
                     $totalMonthlyPrice = $monthlyPriceInReais * $plan->duration_in_months;
                     if ($priceInReais < $totalMonthlyPrice) {
                         $discountPercent = round((($totalMonthlyPrice - $priceInReais) / $totalMonthlyPrice) * 100);
-                        $discount = $discountPercent . '%';
+                        $discount = $discountPercent.'%';
                         $originalPrice = $totalMonthlyPrice;
                     }
                 }
             }
 
-            $formattedPlans[] = (object)[
+            $formattedPlans[] = (object) [
                 'id' => $plan->id,
                 'name' => $plan->name,
                 'price' => $priceInReais,
@@ -266,7 +266,7 @@ class CreatorProfile extends Model
                 'original_price' => $originalPrice,
                 'popular' => $plan->duration_in_months == 12, // Marcar anual como popular
                 'features' => $this->getPlanFeatures($plan->duration_in_months),
-                'duration_in_months' => $plan->duration_in_months
+                'duration_in_months' => $plan->duration_in_months,
             ];
         }
 
@@ -288,7 +288,7 @@ class CreatorProfile extends Model
             case 12:
                 return '12 meses';
             default:
-                return $durationInMonths . ' meses';
+                return $durationInMonths.' meses';
         }
     }
 
@@ -301,7 +301,7 @@ class CreatorProfile extends Model
             'Conteúdo exclusivo diário',
             'Chat direto com o criador',
             'Lives privadas semanais',
-            'Fotos e vídeos em alta qualidade'
+            'Fotos e vídeos em alta qualidade',
         ];
 
         switch ($durationInMonths) {
@@ -311,7 +311,7 @@ class CreatorProfile extends Model
                 return array_merge($baseFeatures, [
                     'Conteúdo bônus exclusivo',
                     'Acesso antecipado a novos conteúdos',
-                    'Desconto em produtos personalizados'
+                    'Desconto em produtos personalizados',
                 ]);
             case 6:
                 return array_merge($baseFeatures, [
@@ -319,7 +319,7 @@ class CreatorProfile extends Model
                     'Acesso antecipado a novos conteúdos',
                     'Videochamada mensal exclusiva',
                     'Conteúdo personalizado',
-                    'Acesso vitalício a conteúdos especiais'
+                    'Acesso vitalício a conteúdos especiais',
                 ]);
             case 12:
                 return array_merge($baseFeatures, [
@@ -329,7 +329,7 @@ class CreatorProfile extends Model
                     'Encontro presencial anual (se possível)',
                     'Kit de produtos físicos exclusivos',
                     'Acesso vitalício a todo conteúdo',
-                    'Participação em decisões de conteúdo'
+                    'Participação em decisões de conteúdo',
                 ]);
             default:
                 return $baseFeatures;
@@ -373,9 +373,9 @@ class CreatorProfile extends Model
      */
     public function totalPublicPosts()
     {
-        return $this->news()->where(function($query) {
+        return $this->news()->where(function ($query) {
             $query->where('is_private', false)
-                  ->orWhereNull('is_private');
+                ->orWhereNull('is_private');
         })->count();
     }
 
@@ -408,7 +408,7 @@ class CreatorProfile extends Model
             'images' => $this->totalImages(),
             'likes' => $this->totalLikes(),
             'followers' => $this->followers_count,
-            'subscribers' => $this->totalActiveSubscribers()
+            'subscribers' => $this->totalActiveSubscribers(),
         ];
     }
 }

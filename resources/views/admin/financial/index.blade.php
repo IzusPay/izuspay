@@ -167,8 +167,8 @@ function financialModule() {
                 id: withdrawalData.id,
                 amount: parseFloat(withdrawalData.amount).toFixed(2),
                 recipient_name: withdrawalData.wallet.association.nome,
-                pix_key: withdrawalData.bank_account.pix_key,
-                pix_key_type: withdrawalData.bank_account.pix_key_type,
+                pix_key: withdrawalData.pix_key ?? (withdrawalData.bank_account ? withdrawalData.bank_account.pix_key : ''),
+                pix_key_type: withdrawalData.pix_key_type ?? (withdrawalData.bank_account ? withdrawalData.bank_account.pix_key_type : ''),
             };
             this.approvalUrl = `/admin/financeiro/saque/${this.withdrawal.id}/aprovar`;
             this.rejectionUrl = `/admin/financeiro/saque/${this.withdrawal.id}/rejeitar`;

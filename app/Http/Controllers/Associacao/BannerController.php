@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Associacao;
 
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
-use App\Http\Requests\BannerRequest;
 use Illuminate\Http\Request;
 
 class BannerController extends Controller
@@ -15,8 +14,8 @@ class BannerController extends Controller
     public function index()
     {
         $banners = Banner::where('association_id', auth()->user()->association_id)
-                         ->paginate(10);
-        
+            ->paginate(10);
+
         return view('associacao.banners.index', compact('banners'));
     }
 
@@ -38,7 +37,7 @@ class BannerController extends Controller
         Banner::create($request->all());
 
         return redirect()->route('associacao.banners.index')
-                         ->with('success', 'Banner criado com sucesso!');
+            ->with('success', 'Banner criado com sucesso!');
     }
 
     /**
@@ -65,7 +64,7 @@ class BannerController extends Controller
         $banner->update($request->all());
 
         return redirect()->route('associacao.banners.index')
-                         ->with('success', 'Banner atualizado com sucesso!');
+            ->with('success', 'Banner atualizado com sucesso!');
     }
 
     /**
@@ -80,6 +79,6 @@ class BannerController extends Controller
         $banner->delete();
 
         return redirect()->route('associacao.banners.index')
-                         ->with('success', 'Banner excluído com sucesso!');
+            ->with('success', 'Banner excluído com sucesso!');
     }
 }

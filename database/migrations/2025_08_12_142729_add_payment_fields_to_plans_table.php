@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('plans', function (Blueprint $table) {
             // Preço do plano em centavos (INTEGER para evitar problemas de ponto flutuante)
-            $table->integer('price')->after('recurrence')->nullable(); 
+            $table->integer('price')->after('recurrence')->nullable();
             // Hash da oferta na Goat Payments
             $table->string('offer_hash')->after('price')->nullable();
             // Hash do produto na Goat Payments
@@ -38,4 +38,3 @@ return new class extends Migration
         });
     }
 };
-

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Perfil;
 use App\Models\PerfilModel;
 use Illuminate\Http\Request;
 
@@ -11,6 +10,7 @@ class PerfilController extends Controller
     public function index()
     {
         $perfis = PerfilModel::all();
+
         return view('perfis.index', compact('perfis'));
     }
 

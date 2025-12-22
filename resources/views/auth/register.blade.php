@@ -1,5 +1,10 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
+    <div class="relative">
+        <div class="hidden lg:flex fixed inset-y-0 right-0 w-1/2 bg-gradient-to-br from-gray-400 to-black items-center justify-center p-8 z-0">
+            <img src="{{ asset('images/izuspay-login.png') }}" alt="Izuspay" class="max-w-[90%] h-auto object-contain drop-shadow-xl">
+        </div>
+    </div>
+    <form method="POST" action="{{ route('register') }}" class="relative z-10 lg:w-1/2 lg:min-h-screen lg:overflow-y-auto">
         @csrf
 
         <!-- Nome -->

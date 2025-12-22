@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Associacao;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PlanRequest;
 use App\Models\Plan;
 use App\Models\Product;
-use App\Http\Requests\PlanRequest;
 use Illuminate\Http\Request;
 
 class PlanController extends Controller
@@ -17,8 +17,9 @@ class PlanController extends Controller
     {
         // Filtra os planos para mostrar apenas os da associação do usuário logado
         $plans = Plan::where('association_id', auth()->user()->association_id)
-                     ->with('products')
-                     ->paginate(10);
+            ->with('products')
+            ->paginate(10);
+
         return view('associacao.plans.index', compact('plans'));
     }
 
@@ -29,8 +30,9 @@ class PlanController extends Controller
     {
         // Filtra os produtos para mostrar apenas os da associação do usuário logado
         $products = Product::where('association_id', auth()->user()->association_id)
-                           ->where('is_active', true)
-                           ->get();
+            ->where('is_active', true)
+            ->get();
+
         return view('associacao.plans.create_edit', compact('products'));
     }
 
@@ -39,7 +41,7 @@ class PlanController extends Controller
      */
     public function store(Request $request) // Use o PlanRequest
     {
-        
+
         $plan = Plan::create([
             'association_id' => auth()->user()->association_id,
             'name' => $request['name'],
@@ -49,14 +51,14 @@ class PlanController extends Controller
             'image' => $request->file('image')->store('plans', 'public'),
             'is_active' => $request['is_active'] ?? false,
             'offer_hash' => 'jft8thz09y',
-            'product_hash' => 'prvz27ifhw'
-            
+            'product_hash' => 'prvz27ifhw',
+
         ]);
-        
+
         $plan->products()->sync($request['product_ids']);
 
         return redirect()->route('associacao.plans.index')
-                         ->with('success', 'Plano criado com sucesso!');
+            ->with('success', 'Plano criado com sucesso!');
     }
 
     /**
@@ -68,13 +70,13 @@ class PlanController extends Controller
         if ($plan->association_id !== auth()->user()->association_id) {
             abort(403, 'Acesso negado.');
         }
-        
+
         // Filtra os produtos para edição
         $products = Product::where('association_id', auth()->user()->association_id)
-                           ->where('is_active', true)
-                           ->get();
+            ->where('is_active', true)
+            ->get();
         $plan->load('products');
-        
+
         return view('associacao.plans.create_edit', compact('plan', 'products'));
     }
 
@@ -84,7 +86,7 @@ class PlanController extends Controller
         if ($plan->association_id !== auth()->user()->association_id) {
             abort(403, 'Acesso negado.');
         }
-        
+
         // Inicializa um array para armazenar os dados que serão atualizados
         $updateData = [
             'name' => $request->name,
@@ -93,9 +95,9 @@ class PlanController extends Controller
             'recurrence' => $request->recurrence,
             'is_active' => $request->is_active ?? false,
             'offer_hash' => 'jft8thz09y',
-            'product_hash' => 'prvz27ifhw'
+            'product_hash' => 'prvz27ifhw',
         ];
-        
+
         // Lógica para o upload da nova imagem
         if ($request->hasFile('image')) {
             // Se houver uma imagem antiga, a remove do storage
@@ -108,12 +110,12 @@ class PlanController extends Controller
 
         // Atualiza os dados do plano com o array preparado
         $plan->update($updateData);
-        
+
         // Sincroniza os produtos associados ao plano
         $plan->products()->sync($request->product_ids);
 
         return redirect()->route('associacao.plans.index')
-                         ->with('success', 'Plano atualizado com sucesso!');
+            ->with('success', 'Plano atualizado com sucesso!');
     }
 
     /**
@@ -125,10 +127,10 @@ class PlanController extends Controller
         if ($plan->association_id !== auth()->user()->association_id) {
             abort(403, 'Acesso negado.');
         }
-        
+
         $plan->delete();
 
         return redirect()->route('associacao.plans.index')
-                         ->with('success', 'Plano excluído com sucesso!');
+            ->with('success', 'Plano excluído com sucesso!');
     }
 }

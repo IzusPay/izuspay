@@ -24,7 +24,7 @@ class Gateway extends Model
         'card_fee_percentage',
         'pix_fee_percentage',
         'fixed_fee',
-        'order'
+        'order',
     ];
 
     /**
@@ -39,8 +39,6 @@ class Gateway extends Model
 
     /**
      * Define o relacionamento com as carteiras (Wallets) que utilizam este gateway.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function wallets(): HasMany
     {

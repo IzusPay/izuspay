@@ -11,7 +11,9 @@ class OrganizationModel extends Model
     use HasFactory;
 
     protected $table = 'organizations';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = ['name', 'description', 'status'];

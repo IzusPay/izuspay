@@ -4,7 +4,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         @php
             $metrics = [
-                ['title' => 'Saldo Disponível', 'value' => 'R$ ' . number_format($wallet->balance, 2, ',', '.'), 'icon' => 'wallet', 'color' => 'green-emerald'],
+                ['title' => 'Saldo Disponível', 'value' => 'R$ ' . number_format(($balanceDetails['available'] ?? 0), 2, ',', '.'), 'icon' => 'wallet', 'color' => 'green-emerald'],
                 ['title' => 'Receita Total', 'value' => 'R$ ' . number_format($totalRevenue, 2, ',', '.'), 'icon' => 'bar-chart-2', 'color' => 'blue-cyan'],
                 ['title' => 'Saques Pendentes', 'value' => 'R$ ' . number_format($pendingWithdrawals, 2, ',', '.'), 'icon' => 'hourglass', 'color' => 'orange-amber'],
                 ['title' => 'Vendas Pendentes', 'value' => 'R$ ' . number_format($pendingRevenue, 2, ',', '.'), 'icon' => 'clock', 'color' => 'red-rose'],

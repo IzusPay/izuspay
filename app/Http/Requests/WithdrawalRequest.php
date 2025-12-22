@@ -16,7 +16,10 @@ class WithdrawalRequest extends FormRequest
     {
         return [
             'amount' => ['required', 'numeric', 'min:1'],
-            'bank_account_id' => ['required', 'exists:bank_accounts,id'],
+            'bank_account_id' => ['nullable', 'exists:bank_accounts,id'],
+            'pix_key' => ['required_without:bank_account_id', 'string', 'max:255'],
+            'pix_key_type' => ['required_without:bank_account_id', 'string', 'in:cpf,cnpj,email,phone,random'],
+            'method' => ['required', 'in:pix'],
         ];
     }
 }

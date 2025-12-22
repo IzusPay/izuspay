@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Hashids\Hashids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Hashids\Hashids;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
@@ -53,7 +53,7 @@ class Product extends Model
     protected static function booted(): void
     {
         static::creating(function (Product $product) {
-            if (!$product->hash_id) {
+            if (! $product->hash_id) {
                 $hashids = new Hashids(config('app.key'), 8);
                 $product->hash_id = $hashids->encode(time());
             }

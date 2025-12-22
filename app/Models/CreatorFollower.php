@@ -16,9 +16,9 @@ class CreatorFollower extends Pivot
     public $timestamps = true;
 
     public function followers()
-{
-    return $this->belongsToMany(User::class, 'creator_followers', 'creator_profile_id', 'user_id')
-                ->using(CreatorFollower::class) // usa a model pivot customizada
-                ->withTimestamps();
-}
+    {
+        return $this->belongsToMany(User::class, 'creator_followers', 'creator_profile_id', 'user_id')
+            ->using(CreatorFollower::class) // usa a model pivot customizada
+            ->withTimestamps();
+    }
 }

@@ -17,12 +17,12 @@ return new class extends Migration
             $table->foreignId('plan_id')->constrained('plans')->onDelete('cascade');
             $table->foreignId('association_id')->constrained('associations')->onDelete('cascade');
             $table->uuid('sale_id')->constrained('sales')->onDelete('cascade');
-            
+
             $table->string('status'); // Ex: active, cancelled, on_hold, expired
             $table->dateTime('starts_at');
             $table->dateTime('renews_at')->nullable();
             $table->dateTime('trial_ends_at')->nullable();
-            
+
             $table->timestamps();
         });
     }

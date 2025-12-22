@@ -32,6 +32,7 @@ class GroupController extends Controller
     public function create()
     {
         $controllers = Controller::all();
+
         return view('groups.create', compact('controllers'));
     }
 
@@ -42,7 +43,7 @@ class GroupController extends Controller
             $groupAcess = GroupAcess::create([
                 'name' => $request->name,
                 'status' => 1,
-                'type' => 1
+                'type' => 1,
             ]);
 
             // Criação dos grupos em cada controlador
@@ -57,7 +58,7 @@ class GroupController extends Controller
                     // 'external_id' => $group['ids'][0],
                     'external_id' => 1,
                     'status' => 1,
-                    'type' => 1
+                    'type' => 1,
                 ]);
 
                 $groupController = GroupControlator::create([
@@ -67,7 +68,7 @@ class GroupController extends Controller
 
                 GroupAcessGroupControllator::create([
                     'id_group_acess' => $groupAcess->id,
-                    'id_group_controllators' => $groupController->id
+                    'id_group_controllators' => $groupController->id,
                 ]);
             }
 
@@ -83,24 +84,26 @@ class GroupController extends Controller
     {
         // Obtém o grupo e passa para a view
         $group = Group::with('controllers')->findOrFail($id);
+
         return view('groups.show', compact('group'));
     }
 
     public function edit(GroupAcess $group)
     {
         $controllers = Controller::all();
+
         return view('groups.edit', compact('group', 'controllers'));
     }
 
     public function updates(GroupAcess $group, Request $request)
-{
-    // Atualiza os dados do grupo
-    $group->update($request->all());
+    {
+        // Atualiza os dados do grupo
+        $group->update($request->all());
 
-    // Retorna para a view do grupo com uma mensagem de sucesso
-    return redirect()->route('groups.edit', $group)
-                     ->with('success', 'Grupo atualizado com sucesso!');
-}
+        // Retorna para a view do grupo com uma mensagem de sucesso
+        return redirect()->route('groups.edit', $group)
+            ->with('success', 'Grupo atualizado com sucesso!');
+    }
 
     public function destroys(GroupAcess $group)
     {
@@ -116,14 +119,14 @@ class GroupController extends Controller
                 'name' => $request['name'],
                 'external_id' => $request['external_id'],
                 'status' => $request['status'],
-                'type' => $request['type']
+                'type' => $request['type'],
             ]);
 
             // Criação dos registros em GroupControlator
             foreach ($request['controllers'] as $controllerId) {
                 GroupControlator::create([
                     'group_id' => $group->id,
-                    'controller_id' => $controllerId
+                    'controller_id' => $controllerId,
                 ]);
             }
 

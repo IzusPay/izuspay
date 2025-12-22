@@ -21,22 +21,22 @@ class StoreAssociationRequest extends FormRequest
     public function rules(): array
     {
         $tipo = $this->input('tipo');
-        
+
         $baseRules = [
             // Dados básicos
             'tipo' => ['required', 'string', Rule::in(['pf', 'cnpj'])],
-            
+
             // Dados da associação
             'nome' => ['required', 'string', 'max:255'],
             'documento_associacao' => [
-                'required', 
-                'string', 
+                'required',
+                'string',
                 $tipo === 'pf' ? 'size:14' : 'size:18', // CPF formatado: 14 chars, CNPJ formatado: 18 chars
-                'unique:associations,documento'
+                'unique:associations,documento',
             ],
             'email_associacao' => ['required', 'string', 'email', 'max:255', 'unique:associations,email'],
             'telefone_associacao' => ['required', 'string', 'max:20'],
-            
+
             // Endereço
             'endereco' => ['required', 'string', 'max:255'],
             'numero' => ['required', 'string', 'max:10'],
@@ -45,12 +45,12 @@ class StoreAssociationRequest extends FormRequest
             'cidade' => ['required', 'string', 'max:255'],
             'estado' => ['required', 'string', 'size:2'],
             'cep' => ['required', 'string', 'size:9'], // CEP formatado: 00000-000
-            
+
             // Dados opcionais
             'data_fundacao' => ['nullable', 'date'],
             'descricao' => ['nullable', 'string', 'max:1000'],
             'site' => ['nullable', 'url', 'max:255'],
-            
+
             // Senha
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
@@ -60,10 +60,10 @@ class StoreAssociationRequest extends FormRequest
             $baseRules = array_merge($baseRules, [
                 'nome_responsavel' => ['required', 'string', 'max:255'],
                 'documento_responsavel' => [
-                    'required', 
-                    'string', 
+                    'required',
+                    'string',
                     'size:14', // CPF formatado: 000.000.000-00
-                    'unique:users,documento'
+                    'unique:users,documento',
                 ],
                 'email_responsavel' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
                 'telefone_responsavel' => ['required', 'string', 'max:20'],
@@ -75,10 +75,10 @@ class StoreAssociationRequest extends FormRequest
             $baseRules = array_merge($baseRules, [
                 'representante_nome' => ['required', 'string', 'max:255'],
                 'representante_cpf' => [
-                    'required', 
-                    'string', 
+                    'required',
+                    'string',
                     'size:14', // CPF formatado: 000.000.000-00
-                    'unique:associations,representante_cpf'
+                    'unique:associations,representante_cpf',
                 ],
                 'representante_email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
                 'representante_telefone' => ['required', 'string', 'max:20'],
@@ -97,21 +97,21 @@ class StoreAssociationRequest extends FormRequest
             // Dados básicos
             'tipo.required' => 'O tipo de associação é obrigatório.',
             'tipo.in' => 'O tipo de associação deve ser Pessoa Física ou Pessoa Jurídica.',
-            
+
             // Dados da associação
             'nome.required' => 'O nome da associação é obrigatório.',
             'nome.max' => 'O nome da associação não pode ter mais de 255 caracteres.',
-            
+
             'documento_associacao.required' => 'O documento (CPF/CNPJ) da associação é obrigatório.',
             'documento_associacao.size' => 'O formato do documento está inválido.',
             'documento_associacao.unique' => 'Este documento já está cadastrado.',
-            
+
             'email_associacao.required' => 'O e-mail da associação é obrigatório.',
             'email_associacao.email' => 'O e-mail da associação deve ser um endereço válido.',
             'email_associacao.unique' => 'Este e-mail já está cadastrado.',
-            
+
             'telefone_associacao.required' => 'O telefone da associação é obrigatório.',
-            
+
             // Endereço
             'endereco.required' => 'O endereço é obrigatório.',
             'numero.required' => 'O número do endereço é obrigatório.',
@@ -121,17 +121,17 @@ class StoreAssociationRequest extends FormRequest
             'estado.size' => 'O estado deve ter 2 caracteres.',
             'cep.required' => 'O CEP é obrigatório.',
             'cep.size' => 'O CEP deve estar no formato 00000-000.',
-            
+
             // Dados opcionais
             'data_fundacao.date' => 'A data de fundação deve ser uma data válida.',
             'descricao.max' => 'A descrição não pode ter mais de 1000 caracteres.',
             'site.url' => 'O site deve ser uma URL válida.',
-            
+
             // Senha
             'password.required' => 'A senha é obrigatória.',
             'password.min' => 'A senha deve ter pelo menos 8 caracteres.',
             'password.confirmed' => 'A confirmação da senha não confere.',
-            
+
             // Responsável (PF)
             'nome_responsavel.required' => 'O nome do responsável é obrigatório.',
             'documento_responsavel.required' => 'O CPF do responsável é obrigatório.',
@@ -141,7 +141,7 @@ class StoreAssociationRequest extends FormRequest
             'email_responsavel.email' => 'O e-mail do responsável deve ser um endereço válido.',
             'email_responsavel.unique' => 'Este e-mail já está cadastrado.',
             'telefone_responsavel.required' => 'O telefone do responsável é obrigatório.',
-            
+
             // Representante (CNPJ)
             'representante_nome.required' => 'O nome do representante é obrigatório.',
             'representante_cpf.required' => 'O CPF do representante é obrigatório.',
@@ -162,43 +162,43 @@ class StoreAssociationRequest extends FormRequest
         // Remove formatação dos documentos para validação no banco
         if ($this->has('documento_associacao')) {
             $this->merge([
-                'documento_associacao_clean' => preg_replace('/\D/', '', $this->documento_associacao)
+                'documento_associacao_clean' => preg_replace('/\D/', '', $this->documento_associacao),
             ]);
         }
 
         if ($this->has('documento_responsavel')) {
             $this->merge([
-                'documento_responsavel_clean' => preg_replace('/\D/', '', $this->documento_responsavel)
+                'documento_responsavel_clean' => preg_replace('/\D/', '', $this->documento_responsavel),
             ]);
         }
 
         if ($this->has('representante_cpf')) {
             $this->merge([
-                'representante_cpf_clean' => preg_replace('/\D/', '', $this->representante_cpf)
+                'representante_cpf_clean' => preg_replace('/\D/', '', $this->representante_cpf),
             ]);
         }
 
         if ($this->has('cep')) {
             $this->merge([
-                'cep_clean' => preg_replace('/\D/', '', $this->cep)
+                'cep_clean' => preg_replace('/\D/', '', $this->cep),
             ]);
         }
 
         if ($this->has('telefone_associacao')) {
             $this->merge([
-                'telefone_associacao_clean' => preg_replace('/\D/', '', $this->telefone_associacao)
+                'telefone_associacao_clean' => preg_replace('/\D/', '', $this->telefone_associacao),
             ]);
         }
 
         if ($this->has('telefone_responsavel')) {
             $this->merge([
-                'telefone_responsavel_clean' => preg_replace('/\D/', '', $this->telefone_responsavel)
+                'telefone_responsavel_clean' => preg_replace('/\D/', '', $this->telefone_responsavel),
             ]);
         }
 
         if ($this->has('representante_telefone')) {
             $this->merge([
-                'representante_telefone_clean' => preg_replace('/\D/', '', $this->representante_telefone)
+                'representante_telefone_clean' => preg_replace('/\D/', '', $this->representante_telefone),
             ]);
         }
     }

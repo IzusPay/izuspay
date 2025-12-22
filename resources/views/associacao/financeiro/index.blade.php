@@ -3,8 +3,13 @@
 @section('content')
 <div class="space-y-6 p-6 bg-white dark:bg-black rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
     
-    {{-- Título da Seção (simulando o breadcrumb/título superior) --}}
-    <h1 class="text-slate-600 dark:text-slate-300 text-sm font-medium">Financeiro</h1>
+    <div>
+                <div class="flex items-center space-x-4 mb-2">
+                  
+                    <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Financeiro</h1>
+                </div>
+                
+            </div>
 
     <div class="border-b border-slate-200 dark:border-slate-800">
         <nav class="-mb-px flex space-x-8" aria-label="Tabs">

@@ -1,146 +1,99 @@
 @extends('layouts.app')
 
-@section('title', isset($product) ? 'Editar Produto - AssociaMe' : 'Novo Produto - AssociaMe')
-@section('page-title', isset($product) ? 'Editar Produto' : 'Novo Produto')
+@section('title', isset($product) ? 'Editar Link de Pagamento - AssociaMe' : 'Novo Link de Pagamento - AssociaMe')
+@section('page-title', isset($product) ? 'Editar Link de Pagamento' : 'Novo Link de Pagamento')
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-6">
-    <div class="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-700 rounded-xl p-6 border border-green-100 dark:border-gray-600">
+<div class="space-y-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                    <i data-lucide="{{ isset($product) ? 'package-check' : 'plus' }}" class="w-6 h-6 text-white"></i>
+                    <i data-lucide="link-2" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                        {{ isset($product) ? 'Editar Produto' : 'Novo Produto' }}
-                    </h2>
-                    <p class="text-gray-600 dark:text-gray-400">
-                        {{ isset($product) ? 'Atualize as informações do produto ' . $product->name : 'Preencha os dados para criar um novo produto' }}
-                    </p>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ isset($product) ? $product->name : 'Novo Link de Pagamento' }}</h2>
+                    <p class="text-gray-600 dark:text-gray-400">{{ isset($product) ? 'Atualize as informações do link.' : 'Preencha os dados para criar um novo link de pagamento.' }}</p>
                 </div>
             </div>
-            <a href="{{ route('associacao.products.index') }}" 
-               class="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 transition-colors">
+            <a href="{{ route('associacao.products.index') }}" class="inline-flex items-center space-x-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 px-4 py-2 transition-colors">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 <span>Voltar</span>
             </a>
         </div>
     </div>
 
-    <form action="{{ isset($product) ? route('associacao.products.update', $product) : route('associacao.products.store') }}" 
-          method="POST" class="space-y-6">
+    <form action="{{ isset($product) ? route('associacao.products.update', $product) : route('associacao.products.store') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
         @csrf
         @if(isset($product))
             @method('PUT')
         @endif
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Informações</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome</label>
+                            <input type="text" name="name" value="{{ old('name', $product->name ?? '') }}" required class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Preço</label>
+                            <input type="number" step="0.01" id="price" name="price" value="{{ old('price', $product->price ?? '') }}" required class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                            <select name="is_active" class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white">
+                                <option value="1" {{ old('is_active', $product->is_active ?? 1) == 1 ? 'selected' : '' }}>Ativo</option>
+                                <option value="0" {{ old('is_active', $product->is_active ?? 1) == 0 ? 'selected' : '' }}>Inativo</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descrição</label>
+                            <textarea name="description" rows="3" class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white">{{ old('description', $product->description ?? '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-                <div class="flex items-center space-x-2">
-                    <i data-lucide="package" class="w-5 h-5 text-green-600 dark:text-green-400"></i>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Detalhes do Produto</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Suporte</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome do SAC</label>
+                            <input type="text" name="nome_sac" value="{{ old('nome_sac', $product->nome_sac ?? '') }}" class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">E-mail do SAC</label>
+                            <input type="email" name="email_sac" value="{{ old('email_sac', $product->email_sac ?? '') }}" class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Link de Upsell</label>
+                            <input type="url" name="url_venda" value="{{ old('url_venda', $product->url_venda ?? '') }}" class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white">
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="lg:col-span-2">
-                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            <i data-lucide="tag" class="w-4 h-4 inline mr-1"></i>
-                            Nome do Produto *
-                        </label>
-                        <input type="text" 
-                               id="name" 
-                               name="name" 
-                               value="{{ old('name', $product->name ?? '') }}" 
-                               required
-                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all @error('name') border-red-500 focus:ring-red-500 @enderror"
-                               placeholder="Digite o nome do produto">
-                        @error('name')
-                            <p class="text-red-500 text-sm mt-1 flex items-center">
-                                <i data-lucide="alert-circle" class="w-4 h-4 mr-1"></i>
-                                {{ $message }}
-                            </p>
-                        @enderror
-                    </div>
-                    
-                    <div>
-                        <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            <i data-lucide="dollar-sign" class="w-4 h-4 inline mr-1"></i>
-                            Preço *
-                        </label>
-                        <input type="number" 
-                               step="0.01"
-                               id="price" 
-                               name="price" 
-                               value="{{ old('price', $product->price ?? '') }}" 
-                               required
-                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all @error('price') border-red-500 focus:ring-red-500 @enderror"
-                               placeholder="0.00">
-                        @error('price')
-                            <p class="text-red-500 text-sm mt-1 flex items-center">
-                                <i data-lucide="alert-circle" class="w-4 h-4 mr-1"></i>
-                                {{ $message }}
-                            </p>
-                        @enderror
-                    </div>
-                    
-                    <div>
-                        <label for="is_active" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            <i data-lucide="activity" class="w-4 h-4 inline mr-1"></i>
-                            Status *
-                        </label>
-                        <select id="is_active" 
-                                name="is_active" 
-                                required
-                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all @error('is_active') border-red-500 focus:ring-red-500 @enderror">
-                            <option value="1" {{ old('is_active', $product->is_active ?? '') == '1' ? 'selected' : '' }}>
-                                ✅ Ativo
-                            </option>
-                            <option value="0" {{ old('is_active', $product->is_active ?? '') == '0' ? 'selected' : '' }}>
-                                ❌ Inativo
-                            </option>
-                        </select>
-                        @error('is_active')
-                            <p class="text-red-500 text-sm mt-1 flex items-center">
-                                <i data-lucide="alert-circle" class="w-4 h-4 mr-1"></i>
-                                {{ $message }}
-                            </p>
-                        @enderror
-                    </div>
 
-                    <div class="lg:col-span-2">
-                        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            <i data-lucide="align-left" class="w-4 h-4 inline mr-1"></i>
-                            Descrição
-                        </label>
-                        <textarea id="description" 
-                                  name="description" 
-                                  rows="3"
-                                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all @error('description') border-red-500 focus:ring-red-500 @enderror"
-                                  placeholder="Escreva uma breve descrição do produto">{{ old('description', $product->description ?? '') }}</textarea>
-                        @error('description')
-                            <p class="text-red-500 text-sm mt-1 flex items-center">
-                                <i data-lucide="alert-circle" class="w-4 h-4 mr-1"></i>
-                                {{ $message }}
-                            </p>
-                        @enderror
-                    </div>
+            <div class="space-y-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Imagem</h3>
+                    @if(isset($product) && $product->image)
+                        <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" class="w-full rounded-lg border border-gray-200 dark:border-gray-700 mb-4">
+                    @endif
+                    <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white">
                 </div>
             </div>
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
             <div class="flex flex-col sm:flex-row gap-4 justify-end">
-                <a href="{{ route('associacao.products.index') }}" 
-                   class="inline-flex items-center justify-center space-x-2 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <a href="{{ route('associacao.products.index') }}" class="inline-flex items-center justify-center space-x-2 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <i data-lucide="x" class="w-4 h-4"></i>
                     <span>Cancelar</span>
                 </a>
-                <button type="submit" 
-                        class="inline-flex items-center justify-center space-x-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all duration-200 hover:transform hover:scale-105 shadow-lg hover:shadow-xl">
+                <button type="submit" class="inline-flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-lg font-medium transition-all">
                     <i data-lucide="{{ isset($product) ? 'save' : 'plus' }}" class="w-4 h-4"></i>
-                    <span>{{ isset($product) ? 'Atualizar Produto' : 'Criar Produto' }}</span>
+                    <span>{{ isset($product) ? 'Salvar alterações' : 'Criar Produto' }}</span>
                 </button>
             </div>
         </div>
@@ -149,14 +102,11 @@
 
 @push('scripts')
 <script>
-    // Price input mask
     document.getElementById('price').addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
         value = (value / 100).toFixed(2);
         e.target.value = value;
     });
-
-    // Initialize Lucide icons
     document.addEventListener('DOMContentLoaded', function() {
         lucide.createIcons();
     });

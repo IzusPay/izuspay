@@ -36,9 +36,17 @@
                 <div class="col-span-4 text-sm">
                     <div class="font-bold text-gray-900 dark:text-white">{{ $withdrawal->wallet->association->nome }}</div>
                     <div class="text-xs text-gray-500 dark:text-gray-400">ID Interno: #{{ $withdrawal->wallet->association->id }}</div>
-                    <div class="mt-2 font-semibold">Conta/Chave PIX</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">Tipo de chave: {{ $withdrawal->bankAccount->pix_key_type }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">Chave: {{ $withdrawal->bankAccount->pix_key }}</div>
+                    <div class="mt-2 font-semibold">Destino</div>
+                    @if(!empty($withdrawal->pix_key))
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Tipo de chave: {{ $withdrawal->pix_key_type ?? '—' }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Chave: {{ $withdrawal->pix_key }}</div>
+                    @elseif($withdrawal->bankAccount)
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Banco: {{ $withdrawal->bankAccount->bank_name }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Tipo de chave: {{ $withdrawal->bankAccount->pix_key_type }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Chave: {{ $withdrawal->bankAccount->pix_key }}</div>
+                    @else
+                        <div class="text-xs text-gray-500 dark:text-gray-400">—</div>
+                    @endif
                 </div>
 
                 <!-- Coluna Solicitação e Status -->

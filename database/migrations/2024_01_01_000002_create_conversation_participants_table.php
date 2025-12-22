@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('is_muted')->default(false);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            
+
             $table->unique(['conversation_id', 'user_id']);
             $table->index(['user_id', 'is_active']);
             $table->index('last_read_at');
@@ -36,4 +36,3 @@ return new class extends Migration
         Schema::dropIfExists('conversation_participants');
     }
 };
-

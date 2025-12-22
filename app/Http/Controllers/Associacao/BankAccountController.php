@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Associacao;
 
 use App\Http\Controllers\Controller;
-use App\Models\BankAccount;
 use App\Http\Requests\BankAccountRequest;
-use Illuminate\Http\Request;
+use App\Models\BankAccount;
 
 class BankAccountController extends Controller
 {
     public function index()
     {
         $bankAccounts = BankAccount::where('association_id', auth()->user()->association_id)->get();
+
         return view('associacao.financeiro._bank_accounts', compact('bankAccounts'));
     }
 
@@ -32,20 +32,21 @@ class BankAccountController extends Controller
         }
 
         BankAccount::create($data);
-        
+
         return redirect()->route('associacao.financeiro.index')->with('success', 'Conta bancária adicionada com sucesso!');
     }
 
     public function edit(BankAccount $bankAccount)
     {
         abort_if($bankAccount->association_id !== auth()->user()->association_id, 403, 'Acesso negado.');
+
         return view('associacao.financeiro.create_edit_bank_account', compact('bankAccount'));
     }
 
     public function update(BankAccountRequest $request, BankAccount $bankAccount)
     {
         abort_if($bankAccount->association_id !== auth()->user()->association_id, 403, 'Acesso negado.');
-        
+
         $data = $request->validated();
 
         if ($data['is_default'] ?? false) {
@@ -56,6 +57,7 @@ class BankAccountController extends Controller
         }
 
         $bankAccount->update($data);
+
         return redirect()->route('associacao.financeiro.bank-accounts.index')->with('success', 'Conta bancária atualizada com sucesso!');
     }
 
@@ -63,6 +65,7 @@ class BankAccountController extends Controller
     {
         abort_if($bankAccount->association_id !== auth()->user()->association_id, 403, 'Acesso negado.');
         $bankAccount->delete();
+
         return redirect()->back()->with('success', 'Conta bancária excluída com sucesso!');
     }
 }

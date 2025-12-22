@@ -14,12 +14,12 @@ class DocumentType extends Model
         'is_required',
         'is_active',
     ];
-    
+
     protected $casts = [
         'is_required' => 'boolean',
         'is_active' => 'boolean',
     ];
-    
+
     public function documentations()
     {
         return $this->hasMany(Documentation::class);

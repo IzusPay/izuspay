@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\PerfilModel;
+use App\Models\User;
+use App\Models\UserPerfilModel;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use App\Models\PerfilModel;
-use App\Models\UserPerfilModel;
 
 class UserSeeder extends Seeder
 {

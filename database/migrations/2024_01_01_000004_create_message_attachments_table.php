@@ -22,7 +22,7 @@ return new class extends Migration
             $table->json('metadata')->nullable(); // Metadados específicos (dimensões, duração, etc.)
             $table->string('thumbnail_path')->nullable(); // Caminho da thumbnail (para vídeos e imagens)
             $table->timestamps();
-            
+
             $table->index(['message_id', 'file_type']);
             $table->index('file_type');
         });
@@ -36,4 +36,3 @@ return new class extends Migration
         Schema::dropIfExists('message_attachments');
     }
 };
-

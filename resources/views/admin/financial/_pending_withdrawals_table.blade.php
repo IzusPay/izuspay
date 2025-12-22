@@ -3,7 +3,7 @@
         <thead class="bg-white dark:bg-black">
             <tr>
                 <th class="p-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Recebedor</th>
-                <th class="p-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Dados Bancários</th>
+                <th class="p-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Destino do Saque</th>
                 <th class="p-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Valor Solicitado</th>
                 <th class="p-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Data Solicitação</th>
                 <th class="p-4 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Ações</th>
@@ -17,8 +17,14 @@
                         <div class="text-sm text-gray-500">ID: {{ $withdrawal->wallet->association->id }}</div>
                     </td>
                     <td class="p-4 text-sm text-gray-500 dark:text-gray-400">
-                        <div><strong>Banco:</strong> {{ $withdrawal->bankAccount->bank_name }}</div>
-                        <div><strong>Chave Pix:</strong> {{ $withdrawal->bankAccount->pix_key }} ({{ $withdrawal->bankAccount->pix_key_type }})</div>
+                        @if(!empty($withdrawal->pix_key))
+                            <div><strong>Chave Pix:</strong> {{ $withdrawal->pix_key }} ({{ $withdrawal->pix_key_type ?? '—' }})</div>
+                        @elseif($withdrawal->bankAccount)
+                            <div><strong>Banco:</strong> {{ $withdrawal->bankAccount->bank_name }}</div>
+                            <div><strong>Chave Pix:</strong> {{ $withdrawal->bankAccount->pix_key }} ({{ $withdrawal->bankAccount->pix_key_type }})</div>
+                        @else
+                            <div>—</div>
+                        @endif
                     </td>
                     <td class="p-4 font-semibold text-lg text-gray-900 dark:text-white">
                         R$ {{ number_format($withdrawal->amount, 2, ',', '.') }}

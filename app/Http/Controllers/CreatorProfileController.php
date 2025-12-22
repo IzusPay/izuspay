@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\CreatorProfile;
 use App\Models\News;
 use Illuminate\Http\Request;
@@ -19,8 +18,8 @@ class CreatorProfileController extends Controller
         $category = $request->get('category');
 
         $query = CreatorProfile::with('user')
-                              ->active()
-                              ->orderBy('followers_count', 'desc');
+            ->active()
+            ->orderBy('followers_count', 'desc');
 
         if ($search) {
             $query->search($search);
@@ -34,9 +33,9 @@ class CreatorProfileController extends Controller
 
         // Buscar categorias disponíveis
         $categories = CreatorProfile::active()
-                                  ->whereNotNull('category')
-                                  ->distinct()
-                                  ->pluck('category');
+            ->whereNotNull('category')
+            ->distinct()
+            ->pluck('category');
 
         return view('cliente.creators.explore', compact('creators', 'categories', 'search', 'category'));
     }
@@ -46,14 +45,14 @@ class CreatorProfileController extends Controller
      */
     public function show($username)
     {
-        $creator = CreatorProfile::with(['user', 'news' => function($query) {
+        $creator = CreatorProfile::with(['user', 'news' => function ($query) {
             $query->where('status', 'published')
-                  ->latest()
-                  ->take(9);
+                ->latest()
+                ->take(9);
         }])
-        ->where('username', $username)
-        ->active()
-        ->firstOrFail();
+            ->where('username', $username)
+            ->active()
+            ->firstOrFail();
 
         $isFollowing = false;
         if (Auth::check()) {
@@ -68,7 +67,7 @@ class CreatorProfileController extends Controller
      */
     public function toggleFollow(Request $request, $username)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['error' => 'Você precisa estar logado'], 401);
         }
 
@@ -92,7 +91,7 @@ class CreatorProfileController extends Controller
         return response()->json([
             'action' => $action,
             'followers_count' => $creator->fresh()->followers_count,
-            'is_following' => !$isFollowing
+            'is_following' => ! $isFollowing,
         ]);
     }
 
@@ -102,27 +101,27 @@ class CreatorProfileController extends Controller
     public function search(Request $request)
     {
         $term = $request->get('q');
-        
+
         if (strlen($term) < 2) {
             return response()->json([]);
         }
 
         $creators = CreatorProfile::with('user')
-                                 ->active()
-                                 ->search($term)
-                                 ->limit(10)
-                                 ->get()
-                                 ->map(function($creator) {
-                                     return [
-                                         'id' => $creator->id,
-                                         'username' => $creator->username,
-                                         'display_name' => $creator->display_name,
-                                         'profile_image_url' => $creator->profile_image_url,
-                                         'followers_count' => $creator->followers_count,
-                                         'is_verified' => $creator->is_verified,
-                                         'bio' => $creator->bio ? Str::limit($creator->bio, 50) : null
-                                     ];
-                                 });
+            ->active()
+            ->search($term)
+            ->limit(10)
+            ->get()
+            ->map(function ($creator) {
+                return [
+                    'id' => $creator->id,
+                    'username' => $creator->username,
+                    'display_name' => $creator->display_name,
+                    'profile_image_url' => $creator->profile_image_url,
+                    'followers_count' => $creator->followers_count,
+                    'is_verified' => $creator->is_verified,
+                    'bio' => $creator->bio ? Str::limit($creator->bio, 50) : null,
+                ];
+            });
 
         return response()->json($creators);
     }
@@ -132,19 +131,19 @@ class CreatorProfileController extends Controller
      */
     public function following()
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login');
         }
 
         $user = Auth::user();
-        
-        $followingCreators = CreatorProfile::whereHas('followers', function($query) use ($user) {
+
+        $followingCreators = CreatorProfile::whereHas('followers', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })
-        ->with('user')
-        ->active()
-        ->orderBy('display_name')
-        ->paginate(12);
+            ->with('user')
+            ->active()
+            ->orderBy('display_name')
+            ->paginate(12);
 
         return view('cliente.creators.following', compact('followingCreators'));
     }
@@ -154,31 +153,30 @@ class CreatorProfileController extends Controller
      */
     public function feed()
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login');
         }
 
         $user = Auth::user();
-        
+
         // Buscar notícias dos criadores que o usuário segue
-        $news = News::whereHas('creatorProfile.followers', function($query) use ($user) {
+        $news = News::whereHas('creatorProfile.followers', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })
-        ->with(['author', 'creatorProfile'])
-        ->where('status', 'published')
-        ->latest()
-        ->paginate(10);
+            ->with(['author', 'creatorProfile'])
+            ->where('status', 'published')
+            ->latest()
+            ->paginate(10);
 
         // Buscar criadores sugeridos (não seguidos ainda)
-        $suggestedCreators = CreatorProfile::whereDoesntHave('followers', function($query) use ($user) {
+        $suggestedCreators = CreatorProfile::whereDoesntHave('followers', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })
-        ->active()
-        ->orderBy('followers_count', 'desc')
-        ->limit(5)
-        ->get();
+            ->active()
+            ->orderBy('followers_count', 'desc')
+            ->limit(5)
+            ->get();
 
         return view('cliente.feed', compact('news', 'suggestedCreators'));
     }
 }
-

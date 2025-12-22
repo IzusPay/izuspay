@@ -42,7 +42,7 @@ class ApiKeysController extends Controller
             'environment' => 'required|in:production,sandbox',
         ]);
 
-        $plainToken = 'sk_' . Str::random(60);
+        $plainToken = 'sk_'.Str::random(60);
 
         ApiToken::create([
             'user_id' => Auth::id(),
@@ -66,7 +66,7 @@ class ApiKeysController extends Controller
         $this->authorizeToken($apiToken);
 
         $apiToken->update([
-            'active' => ! $apiToken->active
+            'active' => ! $apiToken->active,
         ]);
 
         return back()->with('success', 'Status da chave atualizado.');

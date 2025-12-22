@@ -35,7 +35,7 @@ return new class extends Migration
     public function down(): void
     {
         // Revertimos as mudanças na ordem inversa
-        
+
         // 1. Drop the foreign key from 'transactions'
         Schema::table('transactions', function (Blueprint $table) {
             $table->dropForeign(['sale_id']);
@@ -46,7 +46,7 @@ return new class extends Migration
             $table->dropPrimary();
             $table->bigIncrements('id')->change();
         });
-        
+
         // 3. Re-add the foreign key to 'transactions'
         Schema::table('transactions', function (Blueprint $table) {
             $table->unsignedBigInteger('sale_id')->change();

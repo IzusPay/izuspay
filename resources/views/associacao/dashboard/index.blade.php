@@ -6,7 +6,7 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto p-4 lg:p-8 space-y-6 text-slate-800 dark:text-slate-200">
+<div x-data="{ showRevenueChart: true, showRelatorioDiario: true }" x-init="showRevenueChart = localStorage.getItem('assoc_showRevenueChart') !== '0'; showRelatorioDiario = localStorage.getItem('assoc_showRelatorioDiario') !== '0'" class="container mx-auto p-4 lg:p-8 space-y-6 text-slate-800 dark:text-slate-200">
     
     {{-- Header --}}
        
@@ -16,9 +16,9 @@
         <div class="bg-white dark:bg-black p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <div class="flex items-center gap-2 mb-3 text-slate-500">
                 <i data-lucide="qr-code" class="w-4 h-4"></i>
-                <span class="text-sm font-medium">Pix (Total)</span>
+                <span class="text-sm font-medium">Receita Total</span>
             </div>
-            <p class="text-2xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($totalRevenue ?? 20, 2, ',', '.') }}</p>
+            <p class="text-2xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($totalRevenue, 2, ',', '.') }}</p>
         </div>
 
         <div class="bg-slate-900 dark:bg-black p-5 rounded-xl shadow-lg border border-slate-800 flex flex-col justify-between">
@@ -26,7 +26,7 @@
                 <i data-lucide="wallet" class="w-4 h-4"></i>
                 <span class="text-sm font-medium">Saldo disponível</span>
             </div>
-            <p class="text-2xl font-bold text-white mt-2">R$ {{ number_format($saldo ?? 0.73, 2, ',', '.') }}</p>
+            <p class="text-2xl font-bold text-white mt-2">R$ {{ number_format($saldo, 2, ',', '.') }}</p>
         </div>
     </div>
 
@@ -35,9 +35,8 @@
         <div class="lg:col-span-2 bg-white dark:bg-black p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300">Gráfico de Vendas <span class="text-slate-400 font-normal">(Últimos 30 Dias)</span></h3>
-                <button class="text-xs text-slate-400 dark:text-slate-300 flex items-center gap-1"><i data-lucide="eye-off" class="w-3 h-3"></i> Ocultar</button>
             </div>
-            <div class="h-[250px]">
+            <div class="h-[250px]" x-show="showRevenueChart">
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
@@ -46,17 +45,17 @@
             <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center border border-slate-100 dark:border-slate-700 mb-4">
                 <i data-lucide="building-2" class="w-10 h-10 text-slate-400"></i>
             </div>
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white">{{ auth()->user()->company_name ?? 'ArMatch' }}</h2>
-            <p class="text-xs text-slate-400 dark:text-slate-400 mb-6">CNPJ: {{ auth()->user()->cnpj ?? '34562746000100' }}</p>
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white">{{ request()->user()->company_name ?? 'Associação' }}</h2>
+            <p class="text-xs text-slate-400 dark:text-slate-400 mb-6">CNPJ: {{ request()->user()->cnpj ?? '—' }}</p>
             
             <div class="grid grid-cols-2 w-full pt-4 border-t border-slate-50 dark:border-slate-800">
                 <div>
                     <p class="text-xs text-slate-400 dark:text-slate-400">Afiliados</p>
-                    <p class="text-lg font-bold text-slate-900 dark:text-white">{{ $afiliados ?? 0 }}</p>
+                    <p class="text-lg font-bold text-slate-900 dark:text-white">{{ $afiliados }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-slate-400 dark:text-slate-400">Transações</p>
-                    <p class="text-lg font-bold text-slate-900 dark:text-white">{{ $transacoes ?? 18 }}</p>
+                    <p class="text-lg font-bold text-slate-900 dark:text-white">{{ $transacoes }}</p>
                 </div>
             </div>
         </div>
@@ -67,27 +66,26 @@
         <div class="lg:col-span-3 bg-white dark:bg-black p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300">Relatório Diário</h3>
-                <button class="text-xs text-slate-400 dark:text-slate-300 flex items-center gap-1"><i data-lucide="eye-off" class="w-3 h-3"></i> Ocultar</button>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" x-show="showRelatorioDiario">
                 <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
                     <p class="text-xs text-slate-500 dark:text-slate-300 mb-1">Pix (Hoje)</p>
-                    <p class="text-xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($pixHoje ?? 0, 2, ',', '.') }}</p>
+                    <p class="text-xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($pixHoje, 2, ',', '.') }}</p>
                 </div>
                 <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
                     <p class="text-xs text-slate-500 dark:text-slate-300 mb-1">Cartão (Hoje)</p>
-                    <p class="text-xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($cartaoHoje ?? 0, 2, ',', '.') }}</p>
+                    <p class="text-xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($cartaoHoje, 2, ',', '.') }}</p>
                 </div>
                 <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
                     <p class="text-xs text-slate-500 dark:text-slate-300 mb-1">Boleto (Hoje)</p>
-                    <p class="text-xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($boletoHoje ?? 0, 2, ',', '.') }}</p>
+                    <p class="text-xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($boletoHoje, 2, ',', '.') }}</p>
                 </div>
             </div>
         </div>
 
         <div class="bg-white dark:bg-black p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <p class="text-xs text-slate-500 dark:text-slate-300 mb-1 text-center">Ticket médio</p>
-            <p class="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">R$ {{ number_format($averageTicket ?? 45.42, 2, ',', '.') }}</p>
+            <p class="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">R$ {{ number_format($averageTicket, 2, ',', '.') }}</p>
             <div class="flex items-end justify-center gap-1 h-16">
                 <div class="w-2 bg-slate-200 rounded-t h-[40%]"></div>
                 <div class="w-2 bg-slate-800 rounded-t h-[80%]"></div>

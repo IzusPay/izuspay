@@ -182,11 +182,28 @@
         }
 
         @media (min-width: 1024px) {
+            .login-container {
+                padding-right: 50vw;
+            }
             .login-graphic-section {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 2rem;
+                position: fixed;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                width: 50vw;
+            }
+            .graphic-img {
+                height: auto;
+                object-fit: contain;
+                filter: drop-shadow(0 10px 20px rgba(0,0,0,0.35));
+            }
+            .login-form-section {
+                flex: 0 0 50vw;
+                min-height: 100vh;
+                overflow-y: auto;
             }
         }
     </style>
@@ -223,6 +240,12 @@
                 <form method="POST" action="{{ route('login') }}" id="login-form">
                     @csrf
                     
+                    @if (session('status'))
+                    <div class="mb-4 p-3 bg-green-50 border-l-4 border-green-500 rounded text-sm text-green-800">
+                        {{ session('status') }}
+                    </div>
+                    @endif
+                    
                     <div class="form-group">
                         <label for="email" class="form-label">E-mail</label>
                         <input type="email" 
@@ -241,7 +264,7 @@
                         <div class="flex justify-between items-center">
                             <label for="password" class="form-label">Senha</label>
                             @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">
+                            <a href="#" onclick="openForgotModal(event)" class="text-sm text-blue-600 hover:underline">
                                 Esqueceu a senha?
                             </a>
                             @endif
@@ -292,9 +315,24 @@
         
         <!-- Seção gráfica (visível apenas em telas grandes) -->
         <div class="login-graphic-section">
-            <!-- Aqui você pode adicionar uma imagem ou ilustração -->
-            <div class="text-white text-center p-8 max-w-md">
-            </div>
+            <img src="{{ asset('img/izuspay-login.png') }}" alt="Izuspay" class="graphic-img">
+        </div>
+    </div>
+    
+    <div id="forgot-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Recuperar senha</h3>
+            <form method="POST" action="{{ route('password.email') }}">
+                @csrf
+                <div class="form-group">
+                    <label for="forgot_email" class="form-label">E-mail</label>
+                    <input type="email" id="forgot_email" name="email" class="form-input" placeholder="Digite seu e-mail" required>
+                </div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" onclick="closeForgotModal()" class="px-4 py-2 rounded-md border border-gray-300 text-gray-700">Cancelar</button>
+                    <button type="submit" class="btn-login">Enviar link</button>
+                </div>
+            </form>
         </div>
     </div>
     
@@ -330,6 +368,22 @@
             // Validação em tempo real
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
+            window.openForgotModal = function(e) {
+                if (e) e.preventDefault();
+                const modal = document.getElementById('forgot-modal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                const sourceEmail = document.getElementById('email');
+                const targetEmail = document.getElementById('forgot_email');
+                if (sourceEmail && targetEmail) {
+                    targetEmail.value = sourceEmail.value;
+                }
+            };
+            window.closeForgotModal = function() {
+                const modal = document.getElementById('forgot-modal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
             
             function validateEmail(email) {
                 const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -361,4 +415,3 @@
     </script>
 </body>
 </html>
-

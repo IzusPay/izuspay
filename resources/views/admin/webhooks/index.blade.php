@@ -3,7 +3,7 @@
 @section('title', 'Webhooks')
 
 @section('content')
-<div x-data="{ openConfig: false, scope: 'global' }" class="px-4 sm:px-6 lg:px-8">
+<div x-data="webhooksPage()" class="px-4 sm:px-6 lg:px-8">
     <!-- Cabeçalho -->
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
@@ -15,6 +15,42 @@
                 <i data-lucide="settings" class="w-5 h-5 mr-2"></i>
                 Configuração
             </button>
+        </div>
+    </div>
+
+    <!-- Indicadores -->
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white dark:bg-black rounded-xl shadow-sm p-4 border border-gray-200 dark:border-white/10">
+            <p class="text-xs text-slate-600 dark:text-slate-400">Total</p>
+            <p class="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">{{ $stats['total'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-black rounded-xl shadow-sm p-4 border border-gray-200 dark:border-white/10">
+            <p class="text-xs text-slate-600 dark:text-slate-400">Manuais</p>
+            <p class="mt-1 text-2xl font-semibold text-indigo-700 dark:text-indigo-300">{{ $stats['manual'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-black rounded-xl shadow-sm p-4 border border-gray-200 dark:border-white/10">
+            <p class="text-xs text-slate-600 dark:text-slate-400">Automáticos</p>
+            <p class="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">{{ $stats['automatic'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-black rounded-xl shadow-sm p-4 border border-gray-200 dark:border-white/10">
+            <p class="text-xs text-slate-600 dark:text-slate-400">Pendentes</p>
+            <p class="mt-1 text-2xl font-semibold text-yellow-700 dark:text-yellow-300">{{ $stats['pending'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-black rounded-xl shadow-sm p-4 border border-gray-200 dark:border-white/10">
+            <p class="text-xs text-slate-600 dark:text-slate-400">Enviados</p>
+            <p class="mt-1 text-2xl font-semibold text-blue-700 dark:text-blue-300">{{ $stats['sent'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-black rounded-xl shadow-sm p-4 border border-gray-200 dark:border-white/10">
+            <p class="text-xs text-slate-600 dark:text-slate-400">Falhos</p>
+            <p class="mt-1 text-2xl font-semibold text-red-700 dark:text-red-300">{{ $stats['failed'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-black rounded-xl shadow-sm p-4 border border-gray-200 dark:border-white/10">
+            <p class="text-xs text-slate-600 dark:text-slate-400">Aprovados</p>
+            <p class="mt-1 text-2xl font-semibold text-green-700 dark:text-green-300">{{ $stats['approved'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-black rounded-xl shadow-sm p-4 border border-gray-200 dark:border-white/10">
+            <p class="text-xs text-slate-600 dark:text-slate-400">Rejeitados</p>
+            <p class="mt-1 text-2xl font-semibold text-red-700 dark:text-red-300">{{ $stats['rejected'] ?? 0 }}</p>
         </div>
     </div>
 
@@ -30,8 +66,8 @@
                                 <th scope="col" class="px-3 py-3.5 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Cliente</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Evento</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Origem</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Recebido em</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Payload</th>
                                 <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6"><span class="sr-only">Ações</span></th>
                             </tr>
                         </thead>
@@ -39,31 +75,44 @@
                             @forelse($webhooks as $hook)
                                 <tr class="hover:bg-black/5 dark:hover:bg-white/5">
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6 text-slate-900 dark:text-white">{{ $hook['id'] }}</td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-slate-900 dark:text-white">{{ $hook['cliente'] }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-slate-900 dark:text-white">
+                                        @php $url = $hook['endpoint_url'] ?? $hook['cliente']; @endphp
+                                        <a href="{{ $url }}" target="_blank" class="text-blue-600 hover:underline"><code>{{ $hook['cliente'] }}</code></a>
+                                    </td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-slate-700 dark:text-slate-300"><code>{{ $hook['event'] }}</code></td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm">
-                                        @php
-                                            $status = $hook['status'];
-                                        @endphp
-                                        @if($status === 'aprovado')
+                                        @php $status = $hook['status']; @endphp
+                                        @if(in_array($status, ['approved']))
                                             <span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:text-green-300">Aprovado</span>
-                                        @elseif($status === 'rejeitado')
+                                        @elseif(in_array($status, ['rejected']))
                                             <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/30 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:text-red-300">Rejeitado</span>
+                                        @elseif(in_array($status, ['sent']))
+                                            <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-300">Enviado</span>
+                                        @elseif(in_array($status, ['failed']))
+                                            <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/30 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:text-red-300">Falhou</span>
                                         @else
                                             <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-300">Pendente</span>
                                         @endif
                                     </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+                                        @if($hook['is_manual'] ?? false)
+                                            <span class="inline-flex items-center rounded-full bg-indigo-100 dark:bg-indigo-900/30 px-2.5 py-0.5 text-xs font-medium text-indigo-800 dark:text-indigo-300" title="{{ $hook['moderation_reason'] ?? '' }}">Manual</span>
+                                        @else
+                                            <span class="inline-flex items-center rounded-full bg-gray-100 dark:bg-white/10 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:text-white">Automático</span>
+                                        @endif
+                                    </td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-slate-700 dark:text-slate-300">{{ $hook['received_at'] }}</td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-xs text-slate-600 dark:text-slate-400 max-w-xs truncate">{{ $hook['payload_excerpt'] }}</td>
+                                    
                                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                        <div class="flex items-center justify-end gap-x-3">
-                                            <button type="button" class="inline-flex items-center gap-2 text-green-700 hover:text-green-900 dark:text-green-300 dark:hover:text-green-200">
-                                                <i data-lucide="check-circle" class="w-4 h-4"></i>
-                                                Aprovar manualmente
+                                        <div class="flex items-center justify-end gap-x-2">
+                                            <button @click="openPayload({{ json_encode($hook['payload']) }})" title="Ver payload" class="p-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/10">
+                                                <i data-lucide="eye" class="w-4 h-4"></i>
                                             </button>
-                                            <button type="button" class="inline-flex items-center gap-2 text-red-700 hover:text-red-900 dark:text-red-300 dark:hover:text-red-200">
+                                            <button @click="openApprove({ id: {{ $hook['id'] }}, event: '{{ $hook['event'] }}', cliente: '{{ addslashes($hook['cliente']) }}' })" title="Aprovar" class="p-2 rounded-md text-green-700 hover:bg-green-50 dark:text-green-300 dark:hover:bg-green-900/20">
+                                                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                            </button>
+                                            <button @click="openReject({ id: {{ $hook['id'] }}, event: '{{ $hook['event'] }}', cliente: '{{ addslashes($hook['cliente']) }}' })" title="Rejeitar" class="p-2 rounded-md text-red-700 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-900/20">
                                                 <i data-lucide="x-circle" class="w-4 h-4"></i>
-                                                Rejeitar
                                             </button>
                                         </div>
                                     </td>
@@ -91,12 +140,14 @@
                 </button>
             </div>
 
+            <form method="POST" action="{{ route('admin.webhooks.config.save') }}">
+            @csrf
             <div class="px-6 py-5 space-y-6">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Escopo</label>
                     <div class="mt-2 flex items-center gap-4">
                         <label class="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-                            <input type="radio" name="scope" value="global" x-model="scope" class="text-blue-600 border-gray-300 dark:border-white/10">
+                            <input type="radio" name="scope" value="global" x-model="scope" class="text-blue-600 border-gray-300 dark:border-white/10" checked>
                             Global
                         </label>
                         <label class="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
@@ -106,11 +157,11 @@
                     </div>
                     <div class="mt-3" x-show="scope === 'cliente'">
                         <label for="cliente" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Cliente</label>
-                        <select id="cliente" class="mt-1 block w-full rounded-lg bg-white dark:bg-black border border-gray-300 dark:border-white/10 px-3 py-2 text-sm text-slate-900 dark:text-white">
+                        <select id="cliente" name="association_id" class="mt-1 block w-full rounded-lg bg-white dark:bg-black border border-gray-300 dark:border-white/10 px-3 py-2 text-sm text-slate-900 dark:text-white">
                             <option value="">Selecione um cliente</option>
-                            <option>Loja Alpha</option>
-                            <option>Loja Beta</option>
-                            <option>Loja Gamma</option>
+                            @foreach($associations as $assoc)
+                                <option value="{{ $assoc->id }}">{{ $assoc->nome }}</option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
@@ -119,7 +170,7 @@
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">A cada N vendas do cliente</label>
                         <div class="flex items-center gap-3">
-                            <input type="number" min="1" placeholder="Ex: 5" class="block w-32 rounded-lg bg-white dark:bg-black border border-gray-300 dark:border-white/10 px-3 py-2 text-sm text-slate-900 dark:text-white">
+                            <input type="number" name="skip_every_n_sales" min="1" placeholder="Ex: 5" class="block w-32 rounded-lg bg-white dark:bg-black border border-gray-300 dark:border-white/10 px-3 py-2 text-sm text-slate-900 dark:text-white">
                             <span class="text-sm text-slate-700 dark:text-slate-300">pular envio da próxima</span>
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400">Neste caso, o sistema envia o webhook de confirmação de compra manualmente.</p>
@@ -128,9 +179,9 @@
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">A cada N reais faturados</label>
                         <div class="flex items-center gap-3">
-                            <input type="number" min="1" placeholder="Ex: 1000" class="block w-32 rounded-lg bg-white dark:bg-black border border-gray-300 dark:border-white/10 px-3 py-2 text-sm text-slate-900 dark:text-white">
+                            <input type="number" name="revenue_threshold_cents" min="1" placeholder="Ex: 100000 (R$ 1000,00)" class="block w-48 rounded-lg bg-white dark:bg-black border border-gray-300 dark:border-white/10 px-3 py-2 text-sm text-slate-900 dark:text-white">
                             <span class="text-sm text-slate-700 dark:text-slate-300">reservar</span>
-                            <input type="number" min="0" step="0.01" placeholder="Ex: 200,00" class="block w-32 rounded-lg bg-white dark:bg-black border border-gray-300 dark:border-white/10 px-3 py-2 text-sm text-slate-900 dark:text-white">
+                            <input type="number" name="reserve_amount_cents" min="0" placeholder="Ex: 20000 (R$ 200,00)" class="block w-48 rounded-lg bg-white dark:bg-black border border-gray-300 dark:border-white/10 px-3 py-2 text-sm text-slate-900 dark:text-white">
                             <span class="text-sm text-slate-700 dark:text-slate-300">reais</span>
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400">Define um valor resguardado com base no faturamento acumulado.</p>
@@ -142,11 +193,140 @@
                 <button @click="openConfig = false" class="inline-flex items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-black/10 dark:hover:bg-white/10">
                     Cancelar
                 </button>
-                <button class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                     Salvar
                 </button>
             </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Visualizar Payload -->
+    <div x-cloak x-show="payloadModal" class="fixed inset-0 z-50 flex items-center justify-center">
+        <div class="fixed inset-0 bg-black/60" @click="payloadModal=false"></div>
+        <div class="relative bg-white dark:bg-black w-full max-w-2xl rounded-xl shadow-2xl border border-gray-200 dark:border-white/10">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-white/10 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Payload</h2>
+                <button @click="payloadModal=false" class="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-black/5 dark:hover:bg.white/5">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <pre class="text-xs overflow-x-auto bg-gray-900 text-gray-100 p-4 rounded-md"><code x-text="prettyPayload"></code></pre>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-white/10 flex items-center justify-end gap-3">
+                <button @click="copyPayload()" class="inline-flex items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-black/10 dark:hover:bg-white/10">
+                    Copiar
+                </button>
+                <button @click="payloadModal=false" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Aprovar -->
+    <div x-cloak x-show="approveModal" class="fixed inset-0 z-50 flex items-center justify-center">
+        <div class="fixed inset-0 bg-black/60" @click="approveModal=false"></div>
+        <div class="relative bg-white dark:bg-black w-full max-w-md rounded-xl shadow-2xl border border-gray-200 dark:border-white/10">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-white/10 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Confirmar aprovação</h2>
+                <button @click="approveModal=false" class="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-black/5 dark:hover:bg.white/5">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-5 text-sm text-slate-700 dark:text-slate-300">
+                <p>Você está prestes a aprovar o webhook <strong>#<span x-text="selected?.id"></span></strong> para <span x-text="selected?.cliente"></span>.</p>
+            </div>
+            <div class="px-5 py-4 border-t border-gray-200 dark:border-white/10 flex items-center justify-end gap-3">
+                <button @click="approveModal=false" class="inline-flex items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-black/10 dark:hover:bg-white/10">Cancelar</button>
+                <form :action="approveUrl()" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700">
+                        Confirmar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Rejeitar -->
+    <div x-cloak x-show="rejectModal" class="fixed inset-0 z-50 flex items-center justify-center">
+        <div class="fixed inset-0 bg-black/60" @click="rejectModal=false"></div>
+        <div class="relative bg-white dark:bg-black w-full max-w-md rounded-xl shadow-2xl border border-gray-200 dark:border-white/10">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-white/10 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Rejeitar webhook</h2>
+                <button @click="rejectModal=false" class="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-black/5 dark:hover:bg.white/5">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form :action="rejectUrl()" method="POST">
+                @csrf
+                @method('PATCH')
+                <div class="p-5 space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
+                        <select name="status" class="w-full rounded-md border-gray-300 text-sm dark:bg-black dark:text-white">
+                            <option value="refused">Recusada</option>
+                            <option value="canceled">Cancelada</option>
+                            <option value="refunded">Estornada</option>
+                            <option value="chargeback">Chargeback</option>
+                            <option value="failed">Falhou</option>
+                            <option value="expired">Expirada</option>
+                            <option value="in_analysis">Em análise</option>
+                            <option value="in_protest">Em protesto</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Motivo</label>
+                        <input type="text" name="reason" placeholder="Descreva o motivo" class="w-full rounded-md border-gray-300 text-sm dark:bg-black dark:text-white" />
+                    </div>
+                </div>
+                <div class="px-5 py-4 border-t border-gray-200 dark:border-white/10 flex items-center justify-end gap-3">
+                    <button type="button" @click="rejectModal=false" class="inline-flex items-center justify-center rounded-lg bg-black/5 dark:bg白/5 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-black/10 dark:hover:bg-white/10">Cancelar</button>
+                    <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Confirmar Rejeição</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+function webhooksPage() {
+    return {
+        openConfig: false,
+        scope: 'global',
+        payloadModal: false,
+        approveModal: false,
+        rejectModal: false,
+        selected: null,
+        prettyPayload: '',
+        openPayload(payload) {
+            try { this.prettyPayload = JSON.stringify(payload, null, 2); } catch (e) { this.prettyPayload = 'Payload inválido'; }
+            this.payloadModal = true;
+        },
+        copyPayload() {
+            navigator.clipboard.writeText(this.prettyPayload);
+        },
+        openApprove(hook) {
+            this.selected = hook;
+            this.approveModal = true;
+        },
+        openReject(hook) {
+            this.selected = hook;
+            this.rejectModal = true;
+        },
+        approveUrl() {
+            return `/admin/webhooks/${this.selected.id}/approve`;
+        },
+        rejectUrl() {
+            return `/admin/webhooks/${this.selected.id}/reject`;
+        }
+    }
+}
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+});
+</script>
+@endpush
 @endsection

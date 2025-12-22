@@ -3,29 +3,30 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\PerfilModel;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use App\Models\LedgerEntry;
 use App\Models\Plan;
-use App\Models\User;
+use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Subscription;
+use App\Models\User;
 use App\Models\UserPerfilModel;
+use App\Models\WebhookEndpoint;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Product;
-use App\Models\LedgerEntry; // Importação do novo modelo de livro-razão
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log; // Importação do novo modelo de livro-razão
 
 class GoatPaymentController extends Controller
 {
     private $apiToken;
+
     private $apiUrl;
 
     public function __construct()
     {
         $this->apiToken = env('GOAT_API_TOKEN', 'POZyVZ3yHrnHXZ9RNaKcsRpS4wcjWf6A3StWKXz07HlGVXs0xz5aCBAgB4QC');
-        $this->apiUrl = env('GOAT_API_URL', 'https://api.goatpayments.com.br/api/public/v1/transactions' );
+        $this->apiUrl = env('GOAT_API_URL', 'https://api.goatpayments.com.br/api/public/v1/transactions');
     }
 
     /**
@@ -34,7 +35,7 @@ class GoatPaymentController extends Controller
     public function createPixTransaction(Request $request)
     {
         $plan = Plan::find($request->plan_id);
-        if (!$plan) {
+        if (! $plan) {
             return response()->json(['error' => 'Plano não encontrado.'], 404);
         }
 
@@ -54,26 +55,26 @@ class GoatPaymentController extends Controller
             UserPerfilModel::create(['user_id' => $user->id, 'perfil_id' => 3, 'is_atual' => 1, 'status' => 1]);
 
             $data = [
-                "amount" => ((int) round($plan->getTotalPriceAttribute() * 100)),
-                "offer_hash" => $plan->offer_hash,
-                "payment_method" => "pix",
-                "customer" => [
-                    "name" => $request->nome,
-                    "email" => $request->email,
-                    "phone_number" => $request->telefone,
-                    "document" => $request->cpf,
-                    "street_name" => "Rua Exemplo", "number" => "123", "complement" => "", "neighborhood" => "Bairro Teste", "city" => "Cidade Exemplo", "state" => "SP", "zip_code" => "00000000"
+                'amount' => ((int) round($plan->getTotalPriceAttribute() * 100)),
+                'offer_hash' => $plan->offer_hash,
+                'payment_method' => 'pix',
+                'customer' => [
+                    'name' => $request->nome,
+                    'email' => $request->email,
+                    'phone_number' => $request->telefone,
+                    'document' => $request->cpf,
+                    'street_name' => 'Rua Exemplo', 'number' => '123', 'complement' => '', 'neighborhood' => 'Bairro Teste', 'city' => 'Cidade Exemplo', 'state' => 'SP', 'zip_code' => '00000000',
                 ],
-                "cart" => [[
-                    "product_hash" => $plan->product_hash, "title" => $plan->name, "price" => ((int) round($plan->getTotalPriceAttribute() * 100)), "quantity" => 1, "operation_type" => 1, "tangible" => true
+                'cart' => [[
+                    'product_hash' => $plan->product_hash, 'title' => $plan->name, 'price' => ((int) round($plan->getTotalPriceAttribute() * 100)), 'quantity' => 1, 'operation_type' => 1, 'tangible' => true,
                 ]],
-                "tracking" => [
-                    "utm_source" => $request->query('utm_source', ''), "utm_medium" => $request->query('utm_medium', ''), "utm_campaign" => $request->query('utm_campaign', ''), "utm_term" => $request->query('utm_term', ''), "utm_content" => $request->query('utm_content', '')
+                'tracking' => [
+                    'utm_source' => $request->query('utm_source', ''), 'utm_medium' => $request->query('utm_medium', ''), 'utm_campaign' => $request->query('utm_campaign', ''), 'utm_term' => $request->query('utm_term', ''), 'utm_content' => $request->query('utm_content', ''),
                 ],
-                "installments" => 1, "expire_in_days" => 1, "postback_url" => route('api.goat.postback'), // Rota para o postback
+                'installments' => 1, 'expire_in_days' => 1, 'postback_url' => route('api.goat.postback'), // Rota para o postback
             ];
 
-            $response = Http::withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])->post($this->apiUrl . '?api_token=' . $this->apiToken, $data);
+            $response = Http::withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])->post($this->apiUrl.'?api_token='.$this->apiToken, $data);
             $responseData = $response->json();
 
             if ($response->successful()) {
@@ -82,15 +83,18 @@ class GoatPaymentController extends Controller
                     'user_id' => $user->id, 'plan_id' => $plan->id, 'transaction_hash' => $responseData['hash'], 'status' => 'awaiting_payment', 'total_price' => $plan->getTotalPriceAttribute(), 'payment_method' => 'pix', 'association_id' => $plan->association_id,
                 ]);
                 DB::commit();
+
                 return response()->json($responseData);
             } else {
                 DB::rollBack();
                 Log::error('Erro ao criar transação Pix na Goat Payments:', ['status' => $response->status(), 'response' => $responseData]);
+
                 return response()->json(['error' => 'Falha ao se comunicar com a API de pagamento.', 'details' => $responseData], $response->status());
             }
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Exceção ao chamar API da Goat Payments ou salvar dados:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+
             return response()->json(['error' => 'Erro interno ao processar a requisição.'], 500);
         }
     }
@@ -101,7 +105,7 @@ class GoatPaymentController extends Controller
     public function createProductPixTransaction(Request $request)
     {
         $product = Product::where('hash_id', $request->hash_id)->first();
-        if (!$product) {
+        if (! $product) {
             return response()->json(['error' => 'Produto não encontrado.'], 404);
         }
 
@@ -113,20 +117,20 @@ class GoatPaymentController extends Controller
             UserPerfilModel::create(['user_id' => $user->id, 'perfil_id' => 3, 'is_atual' => 1, 'status' => 1]);
 
             $data = [
-                "amount" => ((int) round($product->price * 100)), "offer_hash" => $product->offer_hash_goat, "payment_method" => "pix",
-                "customer" => [
-                    "name" => $request->nome, "email" => $request->email, "phone_number" => $request->telefone, "document" => $request->cpf, "street_name" => "Rua Exemplo", "number" => "123", "complement" => "", "neighborhood" => "Bairro Teste", "city" => "Cidade Exemplo", "state" => "SP", "zip_code" => "00000000"
+                'amount' => ((int) round($product->price * 100)), 'offer_hash' => $product->offer_hash_goat, 'payment_method' => 'pix',
+                'customer' => [
+                    'name' => $request->nome, 'email' => $request->email, 'phone_number' => $request->telefone, 'document' => $request->cpf, 'street_name' => 'Rua Exemplo', 'number' => '123', 'complement' => '', 'neighborhood' => 'Bairro Teste', 'city' => 'Cidade Exemplo', 'state' => 'SP', 'zip_code' => '00000000',
                 ],
-                "cart" => [[
-                    "product_hash" => $product->product_hash_goat, "title" => $product->name, "price" => ((int) round($product->price * 100)), "quantity" => 1, "operation_type" => 1, "tangible" => true
+                'cart' => [[
+                    'product_hash' => $product->product_hash_goat, 'title' => $product->name, 'price' => ((int) round($product->price * 100)), 'quantity' => 1, 'operation_type' => 1, 'tangible' => true,
                 ]],
-                "tracking" => [
-                    "utm_source" => $request->query('utm_source', ''), "utm_medium" => $request->query('utm_medium', ''), "utm_campaign" => $request->query('utm_campaign', ''), "utm_term" => $request->query('utm_term', ''), "utm_content" => $request->query('utm_content', '')
+                'tracking' => [
+                    'utm_source' => $request->query('utm_source', ''), 'utm_medium' => $request->query('utm_medium', ''), 'utm_campaign' => $request->query('utm_campaign', ''), 'utm_term' => $request->query('utm_term', ''), 'utm_content' => $request->query('utm_content', ''),
                 ],
-                "installments" => 1, "expire_in_days" => 1, "postback_url" => route('api.goat.postback'),
+                'installments' => 1, 'expire_in_days' => 1, 'postback_url' => route('api.goat.postback'),
             ];
 
-            $response = Http::withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])->post($this->apiUrl . '?api_token=' . $this->apiToken, $data);
+            $response = Http::withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])->post($this->apiUrl.'?api_token='.$this->apiToken, $data);
             $responseData = $response->json();
 
             if ($response->successful()) {
@@ -134,15 +138,18 @@ class GoatPaymentController extends Controller
                     'user_id' => $user->id, 'product_id' => $product->id, 'transaction_hash' => $responseData['hash'], 'status' => 'awaiting_payment', 'total_price' => $product->price, 'payment_method' => 'pix', 'association_id' => $product->association_id,
                 ]);
                 DB::commit();
+
                 return response()->json($responseData);
             } else {
                 DB::rollBack();
                 Log::error('Erro ao criar transação Pix para produto:', ['status' => $response->status(), 'response' => $responseData]);
+
                 return response()->json(['error' => 'Falha ao se comunicar com a API de pagamento.', 'details' => $responseData], $response->status());
             }
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Exceção ao processar produto:', ['message' => $e->getMessage()]);
+
             return response()->json(['error' => 'Erro interno ao processar a requisição.'], 500);
         }
     }
@@ -153,7 +160,7 @@ class GoatPaymentController extends Controller
     /**
      * Verifica o status de uma transação Pix na Goat Payments.
      *
-     * @param Request $request Espera 'transaction_hash' na URL
+     * @param  Request  $request  Espera 'transaction_hash' na URL
      * @return \Illuminate\Http\JsonResponse
      */
     public function checkTransactionStatus(Request $request)
@@ -163,7 +170,7 @@ class GoatPaymentController extends Controller
         ]);
 
         $transactionHash = $request->transaction_hash;
-        $url = $this->apiUrl . '/' . $transactionHash . '?api_token=' . $this->apiToken;
+        $url = $this->apiUrl.'/'.$transactionHash.'?api_token='.$this->apiToken;
 
         try {
             $response = Http::withHeaders([
@@ -175,7 +182,7 @@ class GoatPaymentController extends Controller
             if ($response->successful()) {
                 $sale = Sale::where('transaction_hash', $transactionHash)->first();
 
-                if (!$sale) {
+                if (! $sale) {
                     return response()->json(['error' => 'Venda não encontrada para este transaction_hash.'], 404);
                 }
 
@@ -185,15 +192,15 @@ class GoatPaymentController extends Controller
                 }
 
                 if (isset($responseData['payment_status'])) {
-                    
+
                     // ===================================================================
                     // LÓGICA DE PRODUÇÃO ATIVADA
                     // ===================================================================
                     // A linha que forçava o status foi removida.
                     // Agora, lemos o status real que a API da Goat Payments nos enviou.
-                    
+
                     $paymentStatus = $responseData['payment_status'];
-                    
+
                     // ===================================================================
 
                     // O fluxo continua, mas agora depende do status REAL.
@@ -212,17 +219,18 @@ class GoatPaymentController extends Controller
 
                             // Registra as movimentações financeiras no livro-razão
                             $this->registerFinancialEntries($sale);
-                            
+
                             DB::commit();
-                            
+
                             return response()->json([
-                                'status' => 'paid', 
-                                'message' => 'Pagamento confirmado e processado com sucesso.'
+                                'status' => 'paid',
+                                'message' => 'Pagamento confirmado e processado com sucesso.',
                             ]);
 
                         } catch (\Exception $e) {
                             DB::rollBack();
-                            Log::error("Erro ao processar a venda #{$sale->id} após confirmação de pagamento: " . $e->getMessage());
+                            Log::error("Erro ao processar a venda #{$sale->id} após confirmação de pagamento: ".$e->getMessage());
+
                             return response()->json(['error' => 'Erro interno ao finalizar a venda.'], 500);
                         }
                     }
@@ -235,15 +243,17 @@ class GoatPaymentController extends Controller
             } else {
                 Log::error('Erro ao verificar status da transação:', [
                     'status' => $response->status(),
-                    'response' => $responseData
+                    'response' => $responseData,
                 ]);
+
                 return response()->json([
                     'error' => 'Erro ao verificar o status do pagamento.',
-                    'details' => $responseData
+                    'details' => $responseData,
                 ], $response->status());
             }
         } catch (\Exception $e) {
             Log::error('Exceção ao verificar status da transação:', ['message' => $e->getMessage()]);
+
             return response()->json(['error' => 'Erro interno ao verificar o status.'], 500);
         }
     }
@@ -257,8 +267,9 @@ class GoatPaymentController extends Controller
         $transactionHash = $request->input('transaction_hash');
         $paymentStatus = $request->input('payment_status');
 
-        if (!$transactionHash || !$paymentStatus) {
+        if (! $transactionHash || ! $paymentStatus) {
             Log::warning('Postback inválido: falta transaction_hash ou payment_status.', $request->all());
+
             return response('Bad Request: Missing parameters', 400);
         }
 
@@ -270,6 +281,7 @@ class GoatPaymentController extends Controller
                 if ($sale->status === 'paid') {
                     Log::info("Venda {$transactionHash} já estava como 'paid'. Postback ignorado.");
                     DB::commit();
+
                     return response('OK - Already processed', 200);
                 }
 
@@ -282,20 +294,142 @@ class GoatPaymentController extends Controller
                         $this->createOrUpdateSubscription($sale);
                     }
                     $this->registerFinancialEntries($sale);
+
+                    $amountCents = (int) round($sale->total_price * 100);
+                    $payload = [
+                        'id' => $sale->transaction_hash,
+                        'type' => 'transaction',
+                        'event' => 'paid',
+                        'metadata' => [
+                            'sale_id' => $sale->id,
+                        ],
+                        'amount' => $amountCents,
+                        'method' => strtoupper($sale->payment_method),
+                        'created_at' => $sale->created_at ? $sale->created_at->toIso8601String() : now()->toIso8601String(),
+                        'updated_at' => $sale->updated_at ? $sale->updated_at->toIso8601String() : now()->toIso8601String(),
+                        'status' => 'paid',
+                        'customer' => $sale->user ? [
+                            'name' => $sale->user->name,
+                            'email' => $sale->user->email,
+                            'phone' => preg_replace('/\D/', '', $sale->user->phone ?? ''),
+                            'document' => preg_replace('/\D/', '', $sale->user->documento ?? ''),
+                        ] : null,
+                        'items' => [[
+                            'title' => $sale->product ? $sale->product->name : 'Item',
+                            'amount' => $amountCents,
+                            'quantity' => 1,
+                            'tangible' => false,
+                        ]],
+                    ];
+                    $this->forwardWebhooks($sale, $payload);
                 }
-                
+
                 DB::commit();
+
                 return response('OK', 200);
             } else {
                 DB::rollBack();
                 Log::warning("Venda com hash {$transactionHash} não encontrada.");
+
                 return response('Not Found', 404);
             }
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erro ao processar postback:', ['transaction_hash' => $transactionHash, 'error' => $e->getMessage()]);
+
             return response('Internal Server Error', 500);
         }
+    }
+
+    private function forwardWebhooks(Sale $sale, array $payload): void
+    {
+        $deliveryModel = \App\Models\WebhookDelivery::class;
+        $autoConfig = $this->getAutoConfig($sale->association_id);
+        $shouldSkip = $this->shouldSkipAutoSend($sale, $payload, $autoConfig);
+        $endpoints = WebhookEndpoint::where('association_id', $sale->association_id)
+            ->where('is_active', true)
+            ->get();
+
+        foreach ($endpoints as $endpoint) {
+            try {
+                $deliveryData = [
+                    'association_id' => $sale->association_id,
+                    'endpoint_url' => $endpoint->url,
+                    'endpoint_description' => $endpoint->description,
+                    'event' => $payload['event'] ?? ($payload['status'] ?? 'unknown'),
+                    'status' => 'pending',
+                    'is_manual' => false,
+                    'payload' => $payload,
+                ];
+                if ($shouldSkip) {
+                    $deliveryData['moderation_reason'] = 'auto-rule: skipped';
+                    $deliveryModel::create($deliveryData);
+                } else {
+                    $delivery = $deliveryModel::create($deliveryData);
+                    Http::withHeaders([
+                        'Content-Type' => 'application/json',
+                    ])->post($endpoint->url, $payload);
+                    $delivery->update([
+                        'status' => 'sent',
+                        'response_status' => 200,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Falha ao encaminhar webhook', [
+                    'url' => $endpoint->url,
+                    'sale_id' => $sale->id,
+                    'error' => $e->getMessage(),
+                ]);
+                $deliveryModel::create([
+                    'association_id' => $sale->association_id,
+                    'endpoint_url' => $endpoint->url,
+                    'endpoint_description' => $endpoint->description,
+                    'event' => $payload['event'] ?? ($payload['status'] ?? 'unknown'),
+                    'status' => 'failed',
+                    'is_manual' => false,
+                    'payload' => $payload,
+                    'error_message' => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    private function getAutoConfig(int $associationId): ?\App\Models\WebhookAutoConfig
+    {
+        $assocConfig = \App\Models\WebhookAutoConfig::where('scope', 'association')
+            ->where('association_id', $associationId)
+            ->where('is_active', true)
+            ->first();
+        if ($assocConfig) {
+            return $assocConfig;
+        }
+
+        return \App\Models\WebhookAutoConfig::where('scope', 'global')->where('is_active', true)->first();
+    }
+
+    private function shouldSkipAutoSend(Sale $sale, array $payload, ?\App\Models\WebhookAutoConfig $config): bool
+    {
+        if (! $config) {
+            return false;
+        }
+        $event = $payload['event'] ?? '';
+        if ($event !== 'paid') {
+            return false;
+        }
+        if ($config->skip_every_n_sales && $config->skip_every_n_sales > 0) {
+            $paidCount = Sale::where('association_id', $sale->association_id)->where('status', 'paid')->count();
+            if ($paidCount > 0 && ($paidCount % $config->skip_every_n_sales) === 0) {
+                return true;
+            }
+        }
+        if ($config->revenue_threshold_cents && $config->reserve_amount_cents !== null) {
+            $total = (int) round(Sale::where('association_id', $sale->association_id)->where('status', 'paid')->sum('total_price') * 100);
+            if ($total >= $config->revenue_threshold_cents) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -317,7 +451,7 @@ class GoatPaymentController extends Controller
             );
             Log::info("Assinatura para o usuário {$sale->user_id} e plano {$sale->plan_id} criada/atualizada.");
         } else {
-            Log::warning("Não foi possível criar/atualizar assinatura: venda, usuário ou plano ausente na venda.");
+            Log::warning('Não foi possível criar/atualizar assinatura: venda, usuário ou plano ausente na venda.');
         }
     }
 
@@ -329,10 +463,10 @@ class GoatPaymentController extends Controller
         // ===================================================================
         // CORREÇÃO DO CÁLCULO DA TAXA
         // ===================================================================
-        
+
         // Defina a taxa como um valor percentual (ex: 0.1 para 0.1%)
-        $platformFeeAsPercentage = 9.0; 
-        
+        $platformFeeAsPercentage = 9.0;
+
         // Converta a porcentagem para o formato decimal correto para cálculo
         $platformFeeAsDecimal = $platformFeeAsPercentage / 100; // 0.1 / 100 = 0.001
 
@@ -351,7 +485,7 @@ class GoatPaymentController extends Controller
 
         // 2. Saída da Taxa da Plataforma (cálculo e descrição corrigidos)
         $platformFeeAmount = $sale->total_price * $platformFeeAsDecimal; // Ex: 500 * 0.001 = 0.50
-        
+
         LedgerEntry::create([
             'association_id' => $sale->association_id,
             'related_type' => get_class($sale),

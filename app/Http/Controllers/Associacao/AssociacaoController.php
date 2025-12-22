@@ -7,11 +7,11 @@ use App\Models\News;
 use App\Models\Plan;
 use App\Models\Sale;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class AssociacaoController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $associationId = auth()->user()->association_id;
 
         // Metricas da Associacao
@@ -22,7 +22,7 @@ class AssociacaoController extends Controller
 
         // Metrica de Membros (associados)
         $totalMembers = User::comPerfil('Membro')->where('association_id', $associationId)->count();
-        
+
         // Metrica de Clientes
         $totalClients = User::comPerfil('Cliente')->where('association_id', $associationId)->count();
 
@@ -39,15 +39,15 @@ class AssociacaoController extends Controller
 
         // Atividade Recente
         $recentSales = Sale::where('association_id', $associationId)
-                           ->with(['user', 'plan'])
-                           ->latest()
-                           ->take(5)
-                           ->get();
-        
+            ->with(['user', 'plan'])
+            ->latest()
+            ->take(5)
+            ->get();
+
         $newUsersThisMonth = User::where('association_id', $associationId)
-                                 ->whereMonth('created_at', now()->month)
-                                 ->whereYear('created_at', now()->year)
-                                 ->count();
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
 
         return view('associacao.dashboard.index', compact(
             'totalUsers', 'activeUsers', 'pendingUsers', 'inactiveUsers',

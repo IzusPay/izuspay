@@ -29,14 +29,14 @@ class FinancialService
         $netMargin = ($grossRevenue > 0) ? ($platformRevenue / $grossRevenue) * 100 : 0;
 
         return [
-            'gross_revenue'       => $grossRevenue,
-            'platform_revenue'    => $platformRevenue,
-            'net_margin'          => $netMargin,
+            'gross_revenue' => $grossRevenue,
+            'platform_revenue' => $platformRevenue,
+            'net_margin' => $netMargin,
             'acquirer_fixed_cost' => $acquirerCost,
-            'mdr_cost'            => $mdrCost,
-            'mdr_received'        => 0, 
-            'interest_received'   => 0,
-            'whitelabel_fee'      => 0,
+            'mdr_cost' => $mdrCost,
+            'mdr_received' => 0,
+            'interest_received' => 0,
+            'whitelabel_fee' => 0,
         ];
     }
 
@@ -46,9 +46,9 @@ class FinancialService
     public function getMovements(Carbon $startDate, Carbon $endDate, int $limit = 100)
     {
         return LedgerEntry::whereBetween('created_at', [$startDate, $endDate])
-                          ->with('association')
-                          ->latest()
-                          ->paginate($limit)
-                          ->withQueryString();
+            ->with('association')
+            ->latest()
+            ->paginate($limit)
+            ->withQueryString();
     }
 }

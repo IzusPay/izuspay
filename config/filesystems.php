@@ -80,7 +80,7 @@ return [
             'video' => 100 * 1024 * 1024, // 100MB
             'document' => 25 * 1024 * 1024, // 25MB
         ],
-        
+
         'allowed_mime_types' => [
             'image' => [
                 'image/jpeg',
@@ -102,7 +102,7 @@ return [
                 'text/plain',
             ],
         ],
-        
+
         'thumbnail_settings' => [
             'image' => [
                 'width' => 300,

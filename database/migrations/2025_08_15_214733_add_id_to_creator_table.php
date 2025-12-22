@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('creator_profiles', function (Blueprint $table) {
             $table->foreignId('association_id')->nullable()->after('user_id')->constrained()->onDelete('cascade');
-            
+
             $table->index(['user_id', 'association_id']);
             $table->index(['username']);
             $table->index(['is_active', 'is_verified']);

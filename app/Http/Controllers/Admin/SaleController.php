@@ -20,11 +20,11 @@ class SaleController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
-                  ->orWhere('transaction_hash', 'like', "%{$search}%") // Adicionado busca por hash
-                  ->orWhereHas('user', function ($userQuery) use ($search) {
-                      $userQuery->where('name', 'like', "%{$search}%")
-                                ->orWhere('email', 'like', "%{$search}%");
-                  });
+                    ->orWhere('transaction_hash', 'like', "%{$search}%") // Adicionado busca por hash
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -50,13 +50,13 @@ class SaleController extends Controller
     {
         // Carrega todos os relacionamentos necessários para exibir no modal
         $sale->load([
-            'user', 
-            'product', 
-            'plan', 
-            'association.creatorProfile', 
-            'transactions' // Essencial para detalhes como o código PIX
+            'user',
+            'product',
+            'plan',
+            'association.creatorProfile',
+            'transactions', // Essencial para detalhes como o código PIX
         ]);
-        
+
         // Retorna os dados como JSON
         return response()->json($sale);
     }

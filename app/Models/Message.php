@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Message extends Model
@@ -21,14 +20,14 @@ class Message extends Model
         'metadata',
         'reply_to_id',
         'is_edited',
-        'edited_at'
+        'edited_at',
     ];
 
     protected $casts = [
         'metadata' => 'array',
         'is_edited' => 'boolean',
         'edited_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     protected $dates = ['deleted_at'];
@@ -144,7 +143,7 @@ class Message extends Model
     {
         $this->reads()->firstOrCreate([
             'user_id' => $userId,
-            'read_at' => now()
+            'read_at' => now(),
         ]);
     }
 
@@ -169,7 +168,7 @@ class Message extends Model
      */
     public function isReply(): bool
     {
-        return !is_null($this->reply_to_id);
+        return ! is_null($this->reply_to_id);
     }
 
     /**
@@ -188,7 +187,7 @@ class Message extends Model
         $this->update([
             'content' => $newContent,
             'is_edited' => true,
-            'edited_at' => now()
+            'edited_at' => now(),
         ]);
     }
 
@@ -199,7 +198,7 @@ class Message extends Model
     {
         $this->update([
             'is_deleted' => true,
-            'deleted_at' => now()
+            'deleted_at' => now(),
         ]);
     }
 
@@ -231,7 +230,7 @@ class Message extends Model
                 'type' => $attachment->file_type,
                 'size' => $attachment->file_size,
                 'url' => $attachment->getFileUrl(),
-                'thumbnail' => $attachment->getThumbnailUrl()
+                'thumbnail' => $attachment->getThumbnailUrl(),
             ];
         })->toArray();
     }
@@ -249,4 +248,3 @@ class Message extends Model
         });
     }
 }
-

@@ -2,9 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Perfil;
 use App\Models\PerfilModel;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PerfilService
 {
@@ -27,6 +25,7 @@ class PerfilService
     {
         $perfil = PerfilModel::findOrFail($id);
         $perfil->update($data);
+
         return $perfil;
     }
 

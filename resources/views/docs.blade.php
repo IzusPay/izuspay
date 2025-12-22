@@ -160,6 +160,9 @@
         .endpoint-method.post { background-color: #38A169; }
         .endpoint-method.get { background-color: #3182CE; }
         .endpoint-url { font-family: 'Menlo', 'Consolas', monospace; font-size: 1em; }
+        .endpoint { justify-content: space-between; cursor: pointer; }
+        .endpoint .toggle { margin-left: auto; color: var(--text-color-light); }
+        .accordion-content { display: none; }
 
         /* --- ESTILO VS CODE PARA BLOCOS DE CÓDIGO --- */
         .code-block {
@@ -224,9 +227,24 @@
         .token.function, .token.class-name { color: #DCDCAA; }
         .token.regex, .token.important, .token.variable { color: #9CDCFE; }
         .token.key { color: #9CDCFE; } /* Específico para chaves JSON */
-
         /* --- Mobile --- */
         .mobile-menu-button { display: none; background: none; border: none; cursor: pointer; }
+        /* Painéis Request/Response */
+        .doc-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 1024px) { .doc-panels { grid-template-columns: 1fr; } }
+        .panel { border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background-color: var(--sidebar-bg); }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; background-color: var(--code-header-bg); padding: 12px 16px; }
+        .panel-header span { font-size: 0.85rem; font-weight: 600; color: var(--text-color-light); }
+        .panel-body { padding: 12px 16px; background-color: var(--code-body-bg); }
+        .panel-body pre { margin: 0; }
+        .schema-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .schema-table th, .schema-table td { border-bottom: 1px solid var(--border-color); padding: 8px 10px; text-align: left; }
+        .schema-table th { color: var(--text-color); font-weight: 600; background-color: var(--sidebar-bg); }
+        .chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 6px 10px; font-size: 0.8rem; font-weight: 600; }
+        .chip.get { background: #EBF8FF; color: #2B6CB0; }
+        .chip.post { background: #C6F6D5; color: #285E61; }
+        .chip.delete { background: #FED7D7; color: #9B2C2C; }
+        .muted { color: var(--text-color-light); }
         @media (max-width: 1024px) {
             .sidebar { position: fixed; left: -100%; top: 0; height: 100%; z-index: 2000; transition: left 0.3s ease-in-out; box-shadow: 4px 0px 15px rgba(0,0,0,0.1); }
             .sidebar.open { left: 0; }
@@ -264,65 +282,65 @@
                 <h4>Introdução</h4>
                 <ul>
                     <li><a href="#primeiros-passos" class="active">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M10 8l6 4-6 4V8z"></path></svg>
                         Primeiros passos
                     </a></li>
                     <li><a href="#autenticacao">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M7 11V8a5 5 0 0 1 10 0v3"></path></svg>
                         Autenticação
                     </a></li>
                 </ul>
                 <h4>API</h4>
                 <ul>
                     <li><a href="#account">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M4 4h16v16H4z"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"></rect><circle cx="8" cy="11" r="3"></circle><path d="M14 13h6"></path></svg>
                         Conta
                     </a></li>
                     <li><a href="#user">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"></circle><path d="M6 20c0-3.3137 2.6863-6 6-6s6 2.6863 6 6"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M6 20c0-3.3137 2.6863-6 6-6s6 2.6863 6 6"></path></svg>
                         Usuário
                     </a></li>
                     <li><a href="#apikeys">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M6 12l6-6 6 6-6 6-6-6z"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="7" cy="14" r="3"></circle><path d="M9.5 12.5l8-8M19 5l2 2M16 8l2 2"></path></svg>
                         Chaves de API
                     </a></li>
                     <li><a href="#webhooks">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M2 12h3M19 12h3M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
                         Webhooks
                     </a></li>
                     <li><a href="#two-factor-auth">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h10M7 13h6"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"></path><path d="M9 12l2 2 4-4"></path></svg>
                         Autenticação 2FA
                     </a></li>
                     <li><a href="#seller">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M3 6h18M3 10h18M3 14h18M3 18h18"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7h18M3 7l3-3h12l3 3M6 7v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7"></path></svg>
                         Vendedores
                     </a></li>
                     <li><a href="#transactions">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M12 20v-6M6 20v-2M18 20v-4"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path><path d="M6 15h2"></path></svg>
                         Transações
                     </a></li>
                     <li><a href="#withdrawals">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M12 3v10M5 12l7 7 7-7"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12l4 4 4-4"></path></svg>
                         Saques
                     </a></li>
                     <li><a href="#seller-wallet">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M16 10h4v4h-4z"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7h18v10H3z"></path><path d="M3 7l3-3h12l3 3"></path></svg>
                         Carteira do Vendedor
                     </a></li>
                     <li><a href="#disputes">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2l10 18H2L12 2z"></path><path d="M12 9v4M12 15h.01"></path></svg>
                         Disputas
                     </a></li>
                     <li><a href="#health">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M4 12h4l2-3 2 6 2-3h4"></path></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M2 12h4l3-5 4 10 3-5h6"></path></svg>
                         Status de Saúde
                     </a></li>
                 </ul>
                 <h4>Guias</h4>
                 <ul>
                     <li><a href="#codigos-de-erro">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86L7.86 2z"></path><path d="M12 8v4M12 16h.01"></path></svg>
                         Códigos de Erro
                     </a></li>
                 </ul>
@@ -412,95 +430,285 @@ Content-Type: application/json</code></pre>
 
             <section id="transactions">
                 <h2>Transações</h2>
-                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/transactions</span></div>
-                <div class="code-block"><div class="code-header"><span>PIX</span></div><div class="code-body"><pre><code class="language-json">{
-  "amount": 500,
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/api/transactions</span></div>
+                <div class="code-block"><div class="code-header"><span>REQUEST BODY</span></div><div class="code-body"><pre><code class="language-json">{
+  "amount": 99.90,
   "method": "PIX",
   "customer": {
-    "name": "John",
-    "email": "john@example.com",
-    "phone": "1234567890",
-    "documentType": "CPF",
-    "document": "70443438056"
+    "name": "João da Silva",
+    "email": "joao@example.com",
+    "phone": "11999998888",
+    "document": "12345678900"
   },
   "items": [
-    {
-      "title": "Wireless Mouse",
-      "amount": 5999,
-      "quantity": 1,
-      "tangible": true,
-      "externalRef": "item_abc123"
-    }
-  ]
+    { "title": "Mensalidade Plano A", "amount": 9990, "quantity": 1 }
+  ],
+  "metadata": { "orderId": "ORD-123" }
 }</code></pre></div></div>
-                <div class="code-block"><div class="code-header"><span>BOLETO</span></div><div class="code-body"><pre><code class="language-json">{
-  "amount": 500,
-  "method": "BOLETO",
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/api/transactions/{transactionId}</span></div>
+                <div class="doc-panels">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Request</span>
+                            <span class="chip post">POST /api/transactions</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>cURL</span></div>
+                                <div class="code-body">
+<pre><code class="language-bash">curl --location --request POST '@{{BASE_URL}}/api/transactions' \
+--header 'Authorization: Bearer SEU_TOKEN' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+  "amount": 99.90,
+  "method": "PIX",
   "customer": {
-    "name": "John Doe",
-    "email": "john@example.com",
-    "phone": "1234567890",
-    "documentType": "CPF",
-    "document": "70443438056"
-  },
-  "items": [
-    {
-      "title": "Wireless Mouse",
-      "amount": 500,
-      "quantity": 1,
-      "tangible": true,
-      "externalRef": "item_abc123"
-    }
-  ]
-}</code></pre></div></div>
-                <div class="code-block"><div class="code-header"><span>CARTÃO DE CRÉDITO</span></div><div class="code-body"><pre><code class="language-json">{
-  "amount": 500,
-  "method": "CREDIT_CARD",
-  "installments": 1,
-  "customer": {
-    "name": "Luiz Jordão",
-    "email": "luiz@hotmail.com",
-    "phone": "1234567890",
-    "documentType": "CPF",
-    "document": "36188196841"
-  },
-  "card": {
-    "number": "4576010058016473 ",
-    "holderName": "LUIZ J R SIMAO",
-    "holderDocument": "36188196841",
-    "expirationMonth": 7,
-    "expirationYear": 2030,
-    "cvv": "813"
-  },
-  "items": [
-    {
-      "title": "Wireless Mouse",
-      "amount": 500,
-      "quantity": 1,
-      "tangible": true,
-      "externalRef": "item_abc123"
-    }
-  ]
-}</code></pre></div></div>
-                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/transactions</span></div>
-                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/transactions/:id</span></div>
+    "name": "João da Silva",
+    "email": "joao@example.com",
+    "phone": "11999998888",
+    "document": "12345678900"
+  }
+}'</code></pre>
+                                </div>
+                            </div>
+                            <table class="schema-table" style="margin-top:12px">
+                                <thead><tr><th>Header Param</th><th>Tipo</th><th>Obrigatório</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Authorization</td><td>string</td><td>sim</td></tr>
+                                    <tr><td>Accept</td><td>string</td><td>sim</td></tr>
+                                    <tr><td>Content-Type</td><td>string</td><td>sim</td></tr>
+                                </tbody>
+                            </table>
+                            <table class="schema-table" style="margin-top:12px">
+                                <thead><tr><th>Body Param</th><th>Tipo</th><th>Obrigatório</th></tr></thead>
+                                <tbody>
+                                    <tr><td>amount</td><td>number</td><td>sim</td></tr>
+                                    <tr><td>method</td><td>string</td><td>não</td></tr>
+                                    <tr><td>customer.name</td><td>string</td><td>sim</td></tr>
+                                    <tr><td>customer.email</td><td>string (email)</td><td>sim</td></tr>
+                                    <tr><td>customer.phone</td><td>string</td><td>sim</td></tr>
+                                    <tr><td>customer.document</td><td>string</td><td>sim</td></tr>
+                                    <tr><td>items</td><td>array</td><td>não</td></tr>
+                                    <tr><td>metadata</td><td>object</td><td>não</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Response</span>
+                            <span class="chip post">200 OK</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>application/json</span></div>
+                                <div class="code-body">
+<pre><code class="language-json">{
+  "success": true,
+  "message": "Transação iniciada com sucesso!",
+  "transaction_id": "txn_a1b2c3d4e5",
+  "pix_copy_paste": "00020126...",
+  "total_price": 99.9
+}</code></pre>
+                                </div>
+                            </div>
+                            <table class="schema-table" style="margin-top:12px">
+                                <thead><tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+                                <tbody>
+                                    <tr><td>success</td><td>boolean</td><td>Indica sucesso</td></tr>
+                                    <tr><td>message</td><td>string</td><td>Mensagem amigável</td></tr>
+                                    <tr><td>transaction_id</td><td>string</td><td>ID da transação</td></tr>
+                                    <tr><td>pix_copy_paste</td><td>string|null</td><td>Chave copia-e-cola PIX</td></tr>
+                                    <tr><td>total_price</td><td>number</td><td>Total cobrado</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="doc-panels" style="margin-top:16px">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Request</span>
+                            <span class="chip get">GET /api/transactions/{transactionId}</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>cURL</span></div>
+                                <div class="code-body">
+<pre><code class="language-bash">curl --location --request GET '@{{BASE_URL}}/api/transactions/txn_a1b2c3d4e5' \
+--header 'Authorization: Bearer SEU_TOKEN' \
+--header 'Accept: application/json'</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Response</span>
+                            <span class="chip get">200 OK</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>application/json</span></div>
+                                <div class="code-body">
+<pre><code class="language-json">{
+  "success": true,
+  "transaction_id": "txn_a1b2c3d4e5",
+  "status": "paid",
+  "created_at": "2025-09-24T10:00:00Z",
+  "updated_at": "2025-09-24T10:01:30Z",
+  "product": { "name": "Nome do Produto Exemplo" },
+  "customer": { "name": "João da Silva", "email": "joao.silva@email.com" },
+  "total_price": 99.9
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section id="withdrawals">
                 <h2>Saques</h2>
-                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/withdrawals</span></div>
-                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/withdrawals/{id}</span></div>
-                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/withdrawals</span></div>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/api/withdrawals</span></div>
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/api/withdrawals/{id}</span></div>
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/api/withdrawals</span></div>
                 <div class="code-block"><div class="code-header"><span>REQUEST BODY</span></div><div class="code-body"><pre><code class="language-json">{
-  "amount": 10000,
-  "pixKey": "111111111111",
-  "pixKeyType": "CNPJ",
-  "method": "PIX",
-  "metadata": {
-    "sellerExternalRef": ""
-  }
+  "amount": 120.50,
+  "method": "pix",
+  "pix_key_type": "email",
+  "pix_key": "seller@example.com"
 }</code></pre></div></div>
-                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/withdrawals/search?metadataKey=sellerExternalRef&amp;metadataValue=VALOR</span></div>
+                <div class="code-block"><div class="code-header"><span>REQUEST BODY (com conta bancária)</span></div><div class="code-body"><pre><code class="language-json">{
+  "amount": 250.00,
+  "method": "pix",
+  "bank_account_id": 42
+}</code></pre></div></div>
+                <div class="code-block"><div class="code-header"><span>RESPONSE 201</span></div><div class="code-body"><pre><code class="language-json">{
+  "id": 182,
+  "amount": 120.5,
+  "status": "pending",
+  "pix_key": "seller@example.com",
+  "pix_key_type": "email",
+  "created_at": "2025-12-22T12:34:56Z"
+}</code></pre></div></div>
+                <div class="doc-panels">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Request</span>
+                            <span class="chip post">POST /api/withdrawals</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>cURL</span></div>
+                                <div class="code-body">
+<pre><code class="language-bash">curl --location --request POST '@{{BASE_URL}}/api/withdrawals' \
+--header 'Authorization: Bearer SEU_TOKEN' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+  "amount": 120.50,
+  "method": "pix",
+  "pix_key_type": "email",
+  "pix_key": "seller@example.com"
+}'</code></pre>
+                                </div>
+                            </div>
+                            <table class="schema-table" style="margin-top:12px">
+                                <thead><tr><th>Body Param</th><th>Tipo</th><th>Obrigatório</th></tr></thead>
+                                <tbody>
+                                    <tr><td>amount</td><td>number</td><td>sim</td></tr>
+                                    <tr><td>method</td><td>string</td><td>sim</td></tr>
+                                    <tr><td>bank_account_id</td><td>integer</td><td>não</td></tr>
+                                    <tr><td>pix_key</td><td>string</td><td>required_without bank_account_id</td></tr>
+                                    <tr><td>pix_key_type</td><td>string</td><td>required_without bank_account_id</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Response</span>
+                            <span class="chip post">201 Created</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>application/json</span></div>
+                                <div class="code-body">
+<pre><code class="language-json">{
+  "id": 182,
+  "amount": 120.5,
+  "status": "pending",
+  "pix_key": "seller@example.com",
+  "pix_key_type": "email",
+  "created_at": "2025-12-22T12:34:56Z"
+}</code></pre>
+                                </div>
+                            </div>
+                            <table class="schema-table" style="margin-top:12px">
+                                <thead><tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+                                <tbody>
+                                    <tr><td>id</td><td>integer</td><td>ID do saque</td></tr>
+                                    <tr><td>amount</td><td>number</td><td>Valor solicitado</td></tr>
+                                    <tr><td>status</td><td>string</td><td>Estado do saque</td></tr>
+                                    <tr><td>pix_key</td><td>string|null</td><td>Chave PIX usada</td></tr>
+                                    <tr><td>pix_key_type</td><td>string|null</td><td>Tipo da chave PIX</td></tr>
+                                    <tr><td>created_at</td><td>string</td><td>Data de criação</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="doc-panels" style="margin-top:16px">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Request</span>
+                            <span class="chip get">GET /api/withdrawals</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>cURL</span></div>
+                                <div class="code-body">
+<pre><code class="language-bash">curl --location --request GET '@{{BASE_URL}}/api/withdrawals' \
+--header 'Authorization: Bearer SEU_TOKEN' \
+--header 'Accept: application/json'</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Response</span>
+                            <span class="chip get">200 OK</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>application/json</span></div>
+                                <div class="code-body">
+<pre><code class="language-json">{
+  "data": [
+    {
+      "id": 182,
+      "amount": 120.5,
+      "status": "pending",
+      "pix_key": "seller@example.com",
+      "pix_key_type": "email",
+      "created_at": "2025-12-22T12:34:56Z"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "last_page": 1,
+    "per_page": 15,
+    "total": 1
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section id="seller-wallet">
@@ -536,13 +744,18 @@ Content-Type: application/json</code></pre>
                     <div class="code-header"><span>REQUEST BODY</span><button class="copy-btn">Copiar</button></div>
                     <div class="code-body">
                         <pre><code class="language-json">{
-  <span class="token-key">"product_hash_id"</span>: <span class="token-string">"prod_a1b2c3d4e5f6"</span>,
+  <span class="token-key">"amount"</span>: <span class="token-number">99.90</span>,
+  <span class="token-key">"method"</span>: <span class="token-string">"PIX"</span>,
   <span class="token-key">"customer"</span>: {
     <span class="token-key">"name"</span>: <span class="token-string">"João da Silva"</span>,
     <span class="token-key">"email"</span>: <span class="token-string">"joao.silva@email.com"</span>,
     <span class="token-key">"phone"</span>: <span class="token-string">"11999998888"</span>,
     <span class="token-key">"document"</span>: <span class="token-string">"12345678900"</span>
-  }
+  },
+  <span class="token-key">"items"</span>: [
+    { <span class="token-key">"title"</span>: <span class="token-string">"Mensalidade Plano A"</span>, <span class="token-key">"amount"</span>: <span class="token-number">9990</span>, <span class="token-key">"quantity"</span>: <span class="token-number">1</span> }
+  ],
+  <span class="token-key">"metadata"</span>: { <span class="token-key">"orderId"</span>: <span class="token-string">"ORD-123"</span> }
 }</code></pre>
                     </div>
                 </div>
@@ -555,7 +768,6 @@ Content-Type: application/json</code></pre>
   <span class="token-key">"message"</span>: <span class="token-string">"Transação iniciada com sucesso!"</span>,
   <span class="token-key">"transaction_id"</span>: <span class="token-string">"txn_a1b2c3d4e5"</span>,
   <span class="token-key">"pix_copy_paste"</span>: <span class="token-string">"00020126..."</span>,
-  <span class="token-key">"product_name"</span>: <span class="token-string">"Nome do Produto Exemplo"</span>,
   <span class="token-key">"total_price"</span>: <span class="token-number">99.90</span>
 }</code></pre>
                     </div>
@@ -597,13 +809,23 @@ Content-Type: application/json</code></pre>
 { <span class="token-key">"message"</span>: <span class="token-string">"Token de autenticação não fornecido."</span> }
 
 <span class="token-comment">// 404 Not Found</span>
-{ <span class="token-key">"success"</span>: <span class="token-boolean">false</span>, <span class="token-key">"message"</span>: <span class="token-string">"Transação não encontrada."</span> }
+{ <span class="token-key">"success"</span>: <span class="token-boolean">false</span>, <span class="token-key">"message"</span>: <span class="token-string">"Transação não encontrada ou não pertence a você."</span> }
 
-<span class="token-comment">// 422 Unprocessable Entity</span>
+<span class="token-comment">// 422 Unprocessable Entity (Transações)</span>
 {
-  <span class="token-key">"message"</span>: <span class="token-string">"Dados inválidos."</span>,
+  <span class="token-key">"message"</span>: <span class="token-string">"Os dados fornecidos são inválidos."</span>,
   <span class="token-key">"errors"</span>: {
-    <span class="token-key">"product_hash_id"</span>: [<span class="token-string">"O campo product hash id é obrigatório."</span>]
+    <span class="token-key">"amount"</span>: [<span class="token-string">"O campo amount é obrigatório."</span>],
+    <span class="token-key">"customer.name"</span>: [<span class="token-string">"O campo customer.name é obrigatório."</span>]
+  }
+}
+
+<span class="token-comment">// 422 Unprocessable Entity (Saques)</span>
+{
+  <span class="token-key">"message"</span>: <span class="token-string">"Os dados fornecidos são inválidos."</span>,
+  <span class="token-key">"errors"</span>: {
+    <span class="token-key">"pix_key"</span>: [<span class="token-string">"O campo pix_key é obrigatório quando bank_account_id não está presente."</span>],
+    <span class="token-key">"pix_key_type"</span>: [<span class="token-string">"O campo pix_key_type deve ser um dos: cpf, cnpj, email, phone, random."</span>]
   }
 }</code></pre>
                     </div>
@@ -676,6 +898,30 @@ Content-Type: application/json</code></pre>
                         setTimeout(() => { button.innerHTML = 'Copiar'; }, 2000);
                     }).catch(err => { console.error('Falha ao copiar: ', err); });
                 });
+            });
+
+            // Accordions para todas as requisições
+            document.querySelectorAll('.endpoint').forEach(ep => {
+                const group = [];
+                let sib = ep.nextElementSibling;
+                while (sib && (sib.classList.contains('code-block') || sib.classList.contains('doc-panels'))) {
+                    sib.classList.add('accordion-content');
+                    sib.style.display = 'none';
+                    group.push(sib);
+                    sib = sib.nextElementSibling;
+                }
+                if (group.length > 0) {
+                    const toggle = document.createElement('span');
+                    toggle.className = 'toggle';
+                    toggle.textContent = '▼';
+                    ep.appendChild(toggle);
+                    let open = false;
+                    ep.addEventListener('click', () => {
+                        open = !open;
+                        group.forEach(el => el.style.display = open ? 'block' : 'none');
+                        toggle.textContent = open ? '▲' : '▼';
+                    });
+                }
             });
         });
     </script>

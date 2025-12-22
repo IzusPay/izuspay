@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Associacao;
 
 use App\Http\Controllers\Controller;
 use App\Models\Association;
-use App\Http\Requests\AssociationRequest;
 use App\Models\CreatorProfile;
 use App\Models\Documentation;
 use App\Models\DocumentType;
@@ -12,8 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Str; // <-- Importe a classe Str
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule; // <-- Importe a classe Str
 
 class ConfiguracoesController extends Controller
 {
@@ -22,53 +21,54 @@ class ConfiguracoesController extends Controller
      */
     // No App\Http\Controllers\Associacao\ConfiguracoesController.php
 
-public function edit()
-{
-    $user = Auth::user();
+    public function edit()
+    {
+        $user = Auth::user();
 
-    $apiKey = $user->api_token;
-    $association = $user->association;
-    $creatorProfile = $user->creatorProfile;
+        $apiKey = $user->api_token;
+        $association = $user->association;
+        $creatorProfile = $user->creatorProfile;
 
-    if (!$association) {
-        return redirect()->route('dashboard')->with('error', 'Associação não encontrada.');
+        if (! $association) {
+            return redirect()->route('dashboard')->with('error', 'Associação não encontrada.');
+        }
+
+        // 1. Carrega os tipos de documentos (os que o cliente TEM que enviar)
+        // Busca todos os tipos obrigatórios PENDENTES de envio.
+        // Usaremos os registros da tabela 'documentation' com status 'missing' ou 'rejected'.
+        $documentsRequired = Documentation::where('user_id', $user->id)
+            ->whereIn('status', ['missing', 'rejected', 'pending'])
+            ->with('documentType') // Carrega o tipo do documento para ter o nome
+            ->get();
+
+        // 2. Carrega todos os documentos enviados (para visualização de status)
+        $allDocuments = Documentation::where('user_id', $user->id)
+            ->with('documentType')
+            ->latest()
+            ->get();
+
+        // Se o cliente não tem nenhum registro em 'documentations', algo deu errado no cadastro.
+        // Você pode forçar a criação aqui para evitar o erro.
+        if ($allDocuments->isEmpty()) {
+            // Lógica para recriar os 'missing' se o seeder falhou no cadastro.
+            // Chame uma função que recria os 'missing' aqui.
+        }
+
+        return view('associacao.configuracoes.edit', compact(
+            'association',
+            'creatorProfile',
+            'user',
+            'apiKey',
+            'allDocuments',
+            'documentsRequired' // Você pode usar uma ou as duas, dependendo de como montar o loop na view
+        ));
     }
-    
-    // 1. Carrega os tipos de documentos (os que o cliente TEM que enviar)
-    // Busca todos os tipos obrigatórios PENDENTES de envio.
-    // Usaremos os registros da tabela 'documentation' com status 'missing' ou 'rejected'.
-    $documentsRequired = Documentation::where('user_id', $user->id)
-        ->whereIn('status', ['missing', 'rejected', 'pending'])
-        ->with('documentType') // Carrega o tipo do documento para ter o nome
-        ->get();
-        
-    // 2. Carrega todos os documentos enviados (para visualização de status)
-    $allDocuments = Documentation::where('user_id', $user->id)
-        ->with('documentType')
-        ->latest()
-        ->get();
-    
-    // Se o cliente não tem nenhum registro em 'documentations', algo deu errado no cadastro.
-    // Você pode forçar a criação aqui para evitar o erro.
-    if ($allDocuments->isEmpty()) {
-         // Lógica para recriar os 'missing' se o seeder falhou no cadastro.
-         // Chame uma função que recria os 'missing' aqui.
-    }
-
-    return view('associacao.configuracoes.edit', compact(
-        'association', 
-        'creatorProfile', 
-        'user', 
-        'apiKey', 
-        'allDocuments', 
-        'documentsRequired' // Você pode usar uma ou as duas, dependendo de como montar o loop na view
-    ));
-}
 
     /**
      * Atualiza as configurações da associação.
      */
-    public function update(Request $request, Association $association){
+    public function update(Request $request, Association $association)
+    {
         $user = Auth::user();
         $association = $user->association;
         $creatorProfile = $user->creatorProfile;
@@ -80,7 +80,7 @@ public function edit()
             'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'current_password' => 'nullable|string',
             'password' => 'nullable|string|min:8|confirmed',
-            
+
             // Creator Profile fields
             'username' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z0-9_]+$/', Rule::unique('creator_profiles')->ignore($creatorProfile?->id)],
             'display_name' => 'required|string|max:100',
@@ -92,7 +92,7 @@ public function edit()
             'youtube_url' => 'nullable|url',
             'tiktok_url' => 'nullable|url',
             'twitter_url' => 'nullable|url',
-            
+
             // Association fields
             'association_name' => 'required|string|max:255',
             'tipo' => 'required|in:pf,cnpj',
@@ -111,7 +111,7 @@ public function edit()
 
         // Verify current password if changing password
         if ($request->filled('password')) {
-            if (!Hash::check($request->current_password, $user->password)) {
+            if (! Hash::check($request->current_password, $user->password)) {
                 return back()->withErrors(['current_password' => 'A senha atual está incorreta.']);
             }
         }
@@ -122,11 +122,11 @@ public function edit()
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
             ];
-            
+
             if ($request->filled('password')) {
                 $userData['password'] = Hash::make($validatedData['password']);
             }
-            
+
             $user->update($userData);
 
             // Update Association
@@ -152,7 +152,7 @@ public function edit()
             // Handle profile_image and cover_image uploads
             $profileImagePath = null;
             $coverImagePath = null;
-            
+
             if ($request->hasFile('profile_image')) {
                 // Delete old profile image if exists
                 if ($creatorProfile && $creatorProfile->profile_image) {
@@ -185,7 +185,7 @@ public function edit()
             if ($profileImagePath) {
                 $creatorData['profile_image'] = $profileImagePath;
             }
-            
+
             if ($coverImagePath) {
                 $creatorData['cover_image'] = $coverImagePath;
             }
@@ -201,14 +201,14 @@ public function edit()
             return redirect()->route('associacao.configuracoes.edit')->with('success', 'Configurações atualizadas com sucesso!');
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Erro ao atualizar configurações: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Erro ao atualizar configurações: '.$e->getMessage()]);
         }
     }
 
-     public function regenerateApiToken()
+    public function regenerateApiToken()
     {
         $user = Auth::user();
-        
+
         // Gera um novo token aleatório e seguro
         $newToken = Str::random(60);
 
@@ -220,8 +220,8 @@ public function edit()
         // Redireciona de volta com o novo token visível (apenas desta vez)
         // e uma mensagem de sucesso.
         return redirect()->route('associacao.configuracoes.edit')
-                         ->with('success', 'Nova chave de API gerada com sucesso!')
-                         ->with('newApiKey', $newToken);
+            ->with('success', 'Nova chave de API gerada com sucesso!')
+            ->with('newApiKey', $newToken);
     }
 
     public function upload(Request $request, DocumentType $documentType)
@@ -247,7 +247,7 @@ public function edit()
 
             return back()->with('success', "O documento '{$documentType->name}' foi enviado para análise!");
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Erro ao fazer upload do documento: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Erro ao fazer upload do documento: '.$e->getMessage()]);
         }
     }
 }

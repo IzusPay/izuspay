@@ -19,8 +19,7 @@
                         <i data-lucide="wallet" class="w-4 h-4 mr-1.5 text-gray-400 dark:text-slate-400"></i>
                         Saldo Disponível
                     </p>
-                    {{-- Usando o saldo disponível do objeto $wallet, se existir --}}
-                    <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">R$ {{ number_format($wallet->balance ?? 0.73, 2, ',', '.') }}</p>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">R$ {{ number_format($balanceDetails['available'] ?? 0, 2, ',', '.') }}</p>
                 </div>
             </div>
         </div>
@@ -66,15 +65,15 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $withdrawal->created_at->format('d/m/y, H:i') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">R$ {{ number_format($withdrawal->amount, 2, ',', '.') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ $withdrawal->method ?? 'PIX' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ $withdrawal->key ?? $withdrawal->bankAccount->email ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ $withdrawal->type ?? 'E-mail' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ $withdrawal->pix_key ?? ($withdrawal->bankAccount->pix_key ?? 'N/A') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">{{ $withdrawal->pix_key_type ?? ($withdrawal->bankAccount->pix_key_type ?? '—') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     @php
                                         $statusText = ucfirst($withdrawal->status);
                                         $statusClass = [
-                                            'Pending' => 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
-                                            'Completed' => 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
-                                            'Failed' => 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
+                                            'pending' => 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
+                                            'completed' => 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+                                            'failed' => 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
                                         ][$withdrawal->status] ?? 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-200';
                                     @endphp
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
@@ -135,12 +134,21 @@
                 <p class="text-xs text-gray-700 dark:text-slate-300">
                     Saldo disponível:
                     <span class="font-semibold">
-                        R$ {{ number_format($wallet->balance ?? 0.73, 2, ',', '.') }}
+                        R$ {{ number_format($balanceDetails['available'] ?? 0, 2, ',', '.') }}
                     </span>
                 </p>
             </div>
 
-            {{-- Valor --}}
+            <input type="hidden" id="available-balance" value="{{ number_format($balanceDetails['available'] ?? 0, 2, '.', '') }}">
+            @php
+                $withdrawalFee = ($fees ?? collect())->firstWhere('payment_method', 'withdrawal');
+                $withdrawalFeePercentage = $withdrawalFee->percentage_fee ?? 0;
+                $withdrawalFeeFixed = $withdrawalFee->fixed_fee ?? 5.00;
+            @endphp
+            <input type="hidden" id="withdrawal-fee-percentage" value="{{ number_format($withdrawalFeePercentage, 2, '.', '') }}">
+            <input type="hidden" id="withdrawal-fee-fixed" value="{{ number_format($withdrawalFeeFixed, 2, '.', '') }}">
+            <input type="hidden" id="withdrawal-minimum" value="10.00">
+            
             <div>
                 <label for="amount" class="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
                     Valor do saque
@@ -155,6 +163,17 @@
                     class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:border-black dark:focus:border-white focus:ring-0"
                     placeholder="0,00"
                 >
+                <div id="withdrawal-preview" class="mt-2 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-700 dark:text-slate-300">Taxa de saque:</span>
+                        <span id="fee-amount" class="font-semibold text-slate-900 dark:text-white">R$ 0,00</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-700 dark:text-slate-300">Total a sacar:</span>
+                        <span id="net-amount" class="font-semibold text-slate-900 dark:text-white">R$ 0,00</span>
+                    </div>
+                    <p id="withdrawal-error" class="mt-1 text-red-600 dark:text-red-400 hidden"></p>
+                </div>
             </div>
 
             {{-- Método --}}
@@ -221,7 +240,8 @@
                 </button>
                 <button
                     type="submit"
-                    class="px-4 py-2 text-sm bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-black/10"
+                    id="submit-withdrawal"
+                    class="px-4 py-2 text-sm bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-black/10 disabled:opacity-50"
                 >
                     Continuar
                 </button>
@@ -301,6 +321,56 @@
                     }
                 });
             }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const amountInput = document.getElementById('amount');
+            const balanceEl = document.getElementById('available-balance');
+            const feePercEl = document.getElementById('withdrawal-fee-percentage');
+            const feeFixedEl = document.getElementById('withdrawal-fee-fixed');
+            const minEl = document.getElementById('withdrawal-minimum');
+            const feeAmountEl = document.getElementById('fee-amount');
+            const netAmountEl = document.getElementById('net-amount');
+            const errorEl = document.getElementById('withdrawal-error');
+            const submitBtn = document.getElementById('submit-withdrawal');
+
+            function fmtBRL(v) {
+                return 'R$ ' + Number(v).toFixed(2).replace('.', ',');
+            }
+
+            function validate() {
+                const amount = parseFloat(amountInput.value || '0');
+                const balance = parseFloat(balanceEl.value || '0');
+                const feePerc = parseFloat(feePercEl.value || '0');
+                const feeFixed = parseFloat(feeFixedEl.value || '0');
+                const minimum = parseFloat(minEl.value || '10');
+
+                const fee = (amount * (feePerc / 100)) + feeFixed;
+                const net = Math.max(0, amount - fee);
+                const required = amount + fee;
+
+                feeAmountEl.textContent = fmtBRL(fee);
+                netAmountEl.textContent = fmtBRL(net);
+
+                let error = '';
+                if (amount < minimum) {
+                    error = 'O valor mínimo para saque é R$ ' + minimum.toFixed(2).replace('.', ',');
+                } else if (required > balance) {
+                    error = 'Saldo insuficiente. Necessário: ' + fmtBRL(required) + ' • Saldo: ' + fmtBRL(balance);
+                }
+
+                if (error) {
+                    errorEl.textContent = error;
+                    errorEl.classList.remove('hidden');
+                    submitBtn.setAttribute('disabled', 'disabled');
+                } else {
+                    errorEl.classList.add('hidden');
+                    submitBtn.removeAttribute('disabled');
+                }
+            }
+
+            amountInput.addEventListener('input', validate);
+            validate();
         });
 
         

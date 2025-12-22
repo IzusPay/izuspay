@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Withdrawal;
-use App\Models\Transaction; // Assumindo que você tenha um model para movimentações
-use App\Models\Sale;
-use App\Services\FinancialService;
+use App\Models\Transaction;
+use App\Models\Withdrawal; // Assumindo que você tenha um model para movimentações
 use App\Services\FinancialServices;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http; // Para futuras chamadas de API
-use Illuminate\Support\Facades\DB;   // Para transações de banco de dados
+// Para transações de banco de dados
 use Illuminate\Support\Facades\Log;
 
 class FinancialController extends Controller
@@ -22,12 +20,12 @@ class FinancialController extends Controller
     {
         $this->financialService = $financialService;
     }
-    
+
     public function index(Request $request)
     {
         // --- Abas 1 e 2 (Saques) ---
         $pendingWithdrawals = Withdrawal::with('wallet.association', 'bankAccount')->where('status', 'pending')->latest()->get();
-        
+
         $processedQuery = Withdrawal::with('wallet.association', 'bankAccount')->whereIn('status', ['completed', 'failed', 'processing']);
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $processedQuery->whereBetween('updated_at', [$request->start_date, $request->end_date]);
@@ -41,7 +39,7 @@ class FinancialController extends Controller
         $processedWithdrawals = $processedQuery->latest()->paginate(10)->withQueryString();
 
         // --- Aba 3: Movimentação do Saldo ---
-        
+
         // 1. Define o período a partir do request
         $movStartDate = Carbon::parse($request->input('mov_start_date', now()->startOfMonth()));
         $movEndDate = Carbon::parse($request->input('mov_end_date', now()->endOfMonth()));
@@ -73,6 +71,10 @@ class FinancialController extends Controller
             return back()->with('error', 'Este saque não está mais pendente de aprovação.');
         }
 
+        if (empty($withdrawal->pix_key) && ! $withdrawal->bankAccount) {
+            return back()->with('error', 'Dados de destino ausentes. Informe uma chave PIX.');
+        }
+
         $withdrawal->update(['status' => 'processing']);
 
         try {
@@ -82,13 +84,15 @@ class FinancialController extends Controller
 
             // **CÓDIGO DE SIMULAÇÃO (REMOVER EM PRODUÇÃO)**
             $withdrawal->update(['status' => 'completed']);
+
             return back()->with('success', "Saque #{$withdrawal->id} aprovado e enviado com sucesso (Simulação).");
 
         } catch (\Exception $e) {
             $withdrawal->update(['status' => 'failed']);
             // Estornar valor
             $this->refundWallet($withdrawal, 'Erro de API');
-            Log::error("Falha na aprovação do saque #{$withdrawal->id}: " . $e->getMessage());
+            Log::error("Falha na aprovação do saque #{$withdrawal->id}: ".$e->getMessage());
+
             return back()->with('error', 'Ocorreu um erro inesperado ao tentar processar o saque.');
         }
     }
@@ -130,8 +134,8 @@ class FinancialController extends Controller
     private function refundWallet(Withdrawal $withdrawal, string $reason)
     {
         $wallet = $withdrawal->wallet;
-        $amountToRefund = $withdrawal->amount + 5.00; // Devolve o valor do saque + a taxa de R$5,00
-        
+        $amountToRefund = $withdrawal->amount + 5.00;
+
         $wallet->balance += $amountToRefund;
         $wallet->save();
 

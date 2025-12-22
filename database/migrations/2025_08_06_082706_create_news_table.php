@@ -26,7 +26,7 @@ return new class extends Migration
             $table->integer('views_count')->default(0);
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
-            
+
             // Índices para performance
             $table->index(['association_id', 'status']);
             $table->index(['published_at', 'status']);

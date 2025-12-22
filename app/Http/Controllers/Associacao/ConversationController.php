@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Associacao;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -25,14 +25,14 @@ class ConversationController extends Controller
                 'lastMessage.attachments',
                 'participants' => function ($query) use ($user) {
                     $query->where('user_id', '!=', $user->id);
-                }
+                },
             ])
             ->orderBy('last_message_at', 'desc')
             ->paginate(20);
 
         $conversationsData = $conversations->map(function ($conversation) use ($user) {
             $otherParticipant = $conversation->participants->first();
-            
+
             return [
                 'id' => $conversation->id,
                 'type' => $conversation->type,
@@ -43,7 +43,7 @@ class ConversationController extends Controller
                     'type' => $conversation->lastMessage->type,
                     'created_at' => $conversation->lastMessage->created_at,
                     'user_name' => $conversation->lastMessage->user->name,
-                    'is_own' => $conversation->lastMessage->user_id === $user->id
+                    'is_own' => $conversation->lastMessage->user_id === $user->id,
                 ] : null,
                 'unread_count' => $conversation->getUnreadCountForUser($user->id),
                 'participants_count' => $conversation->participants->count(),
@@ -51,8 +51,8 @@ class ConversationController extends Controller
                     'id' => $otherParticipant->id,
                     'name' => $otherParticipant->name,
                     'username' => $otherParticipant->username ?? null,
-                    'avatar' => $otherParticipant->avatar ?? null
-                ] : null
+                    'avatar' => $otherParticipant->avatar ?? null,
+                ] : null,
             ];
         });
 
@@ -63,8 +63,8 @@ class ConversationController extends Controller
                 'current_page' => $conversations->currentPage(),
                 'last_page' => $conversations->lastPage(),
                 'per_page' => $conversations->perPage(),
-                'total' => $conversations->total()
-            ]
+                'total' => $conversations->total(),
+            ],
         ]);
     }
 
@@ -74,19 +74,19 @@ class ConversationController extends Controller
     public function show(Request $request, $id): JsonResponse
     {
         $user = Auth::user();
-        
+
         $conversation = Conversation::with([
             'participants',
             'messages' => function ($query) {
                 $query->with(['user', 'attachments', 'replyTo.user'])
-                      ->orderBy('created_at', 'asc');
-            }
+                    ->orderBy('created_at', 'asc');
+            },
         ])->find($id);
 
-        if (!$conversation || !$conversation->hasParticipant($user->id)) {
+        if (! $conversation || ! $conversation->hasParticipant($user->id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Conversa não encontrada ou acesso negado'
+                'message' => 'Conversa não encontrada ou acesso negado',
             ], 404);
         }
 
@@ -107,7 +107,7 @@ class ConversationController extends Controller
                     'username' => $participant->username ?? null,
                     'avatar' => $participant->avatar ?? null,
                     'role' => $participant->pivot->role,
-                    'joined_at' => $participant->pivot->joined_at
+                    'joined_at' => $participant->pivot->joined_at,
                 ];
             }),
             'messages' => $conversation->messages->map(function ($message) use ($user) {
@@ -122,21 +122,21 @@ class ConversationController extends Controller
                     'user' => [
                         'id' => $message->user->id,
                         'name' => $message->user->name,
-                        'avatar' => $message->user->avatar ?? null
+                        'avatar' => $message->user->avatar ?? null,
                     ],
                     'attachments' => $message->attachment_info,
                     'reply_to' => $message->replyTo ? [
                         'id' => $message->replyTo->id,
                         'content' => $message->replyTo->formatted_content,
-                        'user_name' => $message->replyTo->user->name
-                    ] : null
+                        'user_name' => $message->replyTo->user->name,
+                    ] : null,
                 ];
-            })
+            }),
         ];
 
         return response()->json([
             'success' => true,
-            'data' => $conversationData
+            'data' => $conversationData,
         ]);
     }
 
@@ -150,14 +150,14 @@ class ConversationController extends Controller
             'title' => 'required_if:type,group|string|max:255',
             'description' => 'nullable|string|max:1000',
             'participants' => 'required|array|min:1',
-            'participants.*' => 'exists:users,id'
+            'participants.*' => 'exists:users,id',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -174,7 +174,7 @@ class ConversationController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => ['id' => $existingConversation->id],
-                'message' => 'Conversa encontrada ou criada com sucesso'
+                'message' => 'Conversa encontrada ou criada com sucesso',
             ]);
         }
 
@@ -183,7 +183,7 @@ class ConversationController extends Controller
             'type' => $request->type,
             'title' => $request->title,
             'description' => $request->description,
-            'created_by' => $user->id
+            'created_by' => $user->id,
         ]);
 
         // Adiciona o criador como participante
@@ -199,7 +199,7 @@ class ConversationController extends Controller
         return response()->json([
             'success' => true,
             'data' => ['id' => $conversation->id],
-            'message' => 'Conversa criada com sucesso'
+            'message' => 'Conversa criada com sucesso',
         ], 201);
     }
 
@@ -209,33 +209,33 @@ class ConversationController extends Controller
     public function update(Request $request, $id): JsonResponse
     {
         $user = Auth::user();
-        
+
         $conversation = Conversation::find($id);
 
-        if (!$conversation || !$conversation->hasParticipant($user->id)) {
+        if (! $conversation || ! $conversation->hasParticipant($user->id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Conversa não encontrada ou acesso negado'
+                'message' => 'Conversa não encontrada ou acesso negado',
             ], 404);
         }
 
         if ($conversation->type !== 'group') {
             return response()->json([
                 'success' => false,
-                'message' => 'Apenas conversas em grupo podem ser editadas'
+                'message' => 'Apenas conversas em grupo podem ser editadas',
             ], 400);
         }
 
         $validator = Validator::make($request->all(), [
             'title' => 'sometimes|string|max:255',
-            'description' => 'sometimes|nullable|string|max:1000'
+            'description' => 'sometimes|nullable|string|max:1000',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -243,7 +243,7 @@ class ConversationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Conversa atualizada com sucesso'
+            'message' => 'Conversa atualizada com sucesso',
         ]);
     }
 
@@ -253,39 +253,39 @@ class ConversationController extends Controller
     public function addParticipants(Request $request, $id): JsonResponse
     {
         $user = Auth::user();
-        
+
         $conversation = Conversation::find($id);
 
-        if (!$conversation || !$conversation->hasParticipant($user->id)) {
+        if (! $conversation || ! $conversation->hasParticipant($user->id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Conversa não encontrada ou acesso negado'
+                'message' => 'Conversa não encontrada ou acesso negado',
             ], 404);
         }
 
         if ($conversation->type !== 'group') {
             return response()->json([
                 'success' => false,
-                'message' => 'Apenas conversas em grupo permitem adicionar participantes'
+                'message' => 'Apenas conversas em grupo permitem adicionar participantes',
             ], 400);
         }
 
         $validator = Validator::make($request->all(), [
             'participants' => 'required|array|min:1',
-            'participants.*' => 'exists:users,id'
+            'participants.*' => 'exists:users,id',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $addedCount = 0;
         foreach ($request->participants as $participantId) {
-            if (!$conversation->hasParticipant($participantId)) {
+            if (! $conversation->hasParticipant($participantId)) {
                 $conversation->addParticipant($participantId);
                 $addedCount++;
             }
@@ -293,7 +293,7 @@ class ConversationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "{$addedCount} participante(s) adicionado(s) com sucesso"
+            'message' => "{$addedCount} participante(s) adicionado(s) com sucesso",
         ]);
     }
 
@@ -303,20 +303,20 @@ class ConversationController extends Controller
     public function removeParticipant(Request $request, $id, $participantId): JsonResponse
     {
         $user = Auth::user();
-        
+
         $conversation = Conversation::find($id);
 
-        if (!$conversation || !$conversation->hasParticipant($user->id)) {
+        if (! $conversation || ! $conversation->hasParticipant($user->id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Conversa não encontrada ou acesso negado'
+                'message' => 'Conversa não encontrada ou acesso negado',
             ], 404);
         }
 
         if ($conversation->type !== 'group') {
             return response()->json([
                 'success' => false,
-                'message' => 'Apenas conversas em grupo permitem remover participantes'
+                'message' => 'Apenas conversas em grupo permitem remover participantes',
             ], 400);
         }
 
@@ -324,7 +324,7 @@ class ConversationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Participante removido com sucesso'
+            'message' => 'Participante removido com sucesso',
         ]);
     }
 
@@ -334,13 +334,13 @@ class ConversationController extends Controller
     public function leave(Request $request, $id): JsonResponse
     {
         $user = Auth::user();
-        
+
         $conversation = Conversation::find($id);
 
-        if (!$conversation || !$conversation->hasParticipant($user->id)) {
+        if (! $conversation || ! $conversation->hasParticipant($user->id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Conversa não encontrada ou acesso negado'
+                'message' => 'Conversa não encontrada ou acesso negado',
             ], 404);
         }
 
@@ -348,7 +348,7 @@ class ConversationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Você saiu da conversa'
+            'message' => 'Você saiu da conversa',
         ]);
     }
 
@@ -356,37 +356,36 @@ class ConversationController extends Controller
      * Busca usuários para iniciar conversa
      */
     public function searchUsers(Request $request): JsonResponse
-{
-    $query = $request->get('q', '');
-    $user = Auth::user();
+    {
+        $query = $request->get('q', '');
+        $user = Auth::user();
 
-    if (strlen($query) < 2) {
+        if (strlen($query) < 2) {
+            return response()->json([
+                'success' => true,
+                'data' => [],
+            ]);
+        }
+
+        $users = User::where('users.id', '!=', $user->id) // Prefira usar 'users.id' para evitar ambiguidade.
+            ->join('creator_profiles', 'users.id', '=', 'creator_profiles.user_id')
+            ->where(function ($q) use ($query) {
+                $q->where('users.name', 'LIKE', "%{$query}%")
+                    ->orWhere('creator_profiles.username', 'LIKE', "%{$query}%")
+                    ->orWhere('users.email', 'LIKE', "%{$query}%");
+            })
+            ->select([
+                'users.id',
+                'users.name',
+                'creator_profiles.username', // Selecione o username da tabela creator_profiles
+                'users.email',
+            ])
+            ->limit(10)
+            ->get();
+
         return response()->json([
             'success' => true,
-            'data' => []
+            'data' => $users,
         ]);
     }
-
-    $users = User::where('users.id', '!=', $user->id) // Prefira usar 'users.id' para evitar ambiguidade.
-        ->join('creator_profiles', 'users.id', '=', 'creator_profiles.user_id')
-        ->where(function ($q) use ($query) {
-            $q->where('users.name', 'LIKE', "%{$query}%")
-              ->orWhere('creator_profiles.username', 'LIKE', "%{$query}%")
-              ->orWhere('users.email', 'LIKE', "%{$query}%");
-        })
-        ->select([
-            'users.id', 
-            'users.name', 
-            'creator_profiles.username', // Selecione o username da tabela creator_profiles
-            'users.email', 
-        ])
-        ->limit(10)
-        ->get();
-
-    return response()->json([
-        'success' => true,
-        'data' => $users
-    ]);
 }
-}
-

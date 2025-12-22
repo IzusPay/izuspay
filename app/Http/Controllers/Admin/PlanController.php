@@ -13,12 +13,14 @@ class PlanController extends Controller
     public function index()
     {
         $plans = Plan::paginate(20);
+
         return view('admin.plans.index', compact('plans'));
     }
 
     public function create()
     {
         $products = Product::all();
+
         return view('associacao.plans.create_edit', compact('products'));
     }
 
@@ -71,6 +73,7 @@ class PlanController extends Controller
     public function destroy(PlanModel $plan)
     {
         $plan->delete();
+
         return redirect()->route('admin.plans.index');
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -35,7 +35,7 @@ class User extends Authenticatable
         'cep',
         'observacoes',
         'ultimo_acesso',
-        'email_verified_at'
+        'email_verified_at',
     ];
 
     /**
@@ -113,6 +113,7 @@ class User extends Authenticatable
     public function perfilAtual()
     {
         $userPerfil = $this->userPerfis()->where('is_atual', 1)->where('status', 1)->with('perfil')->first();
+
         return $userPerfil ? $userPerfil->perfil : null;
     }
 
@@ -136,6 +137,7 @@ class User extends Authenticatable
         $userPerfil = $this->userPerfis()->where('perfil_id', $perfilId)->where('status', 1)->first();
         if ($userPerfil) {
             $userPerfil->update(['is_atual' => 1]);
+
             return true;
         }
 
@@ -150,7 +152,7 @@ class User extends Authenticatable
         // Verifica se já existe
         $exists = $this->userPerfis()->where('perfil_id', $perfilId)->exists();
 
-        if (!$exists) {
+        if (! $exists) {
             // Se for definir como atual, remove outros atuais
             if ($isAtual) {
                 $this->userPerfis()->update(['is_atual' => 0]);
@@ -159,7 +161,7 @@ class User extends Authenticatable
             return $this->userPerfis()->create([
                 'perfil_id' => $perfilId,
                 'is_atual' => $isAtual ? 1 : 0,
-                'status' => $status
+                'status' => $status,
             ]);
         }
 
@@ -217,7 +219,6 @@ class User extends Authenticatable
         return $this->hasOne(DashboardSetting::class);
     }
 
-
     /**
      * Verifica se é membro
      */
@@ -268,19 +269,19 @@ class User extends Authenticatable
     public function scopeComPerfil($query, $perfilName)
     {
         // A lógica corrigida para evitar o erro 'pivot'
-        return $query->whereHas('perfis', function($q) use ($perfilName) {
+        return $query->whereHas('perfis', function ($q) use ($perfilName) {
             $q->where('name', $perfilName);
-        })->whereHas('userPerfis', function($q) {
+        })->whereHas('userPerfis', function ($q) {
             $q->where('status', 1);
         });
     }
 
     public function scopeBuscar($query, $termo)
     {
-        return $query->where(function($q) use ($termo) {
+        return $query->where(function ($q) use ($termo) {
             $q->where('name', 'like', "%{$termo}%")
-              ->orWhere('email', 'like', "%{$termo}%")
-              ->orWhere('documento', 'like', "%{$termo}%");
+                ->orWhere('email', 'like', "%{$termo}%")
+                ->orWhere('documento', 'like', "%{$termo}%");
         });
     }
 
@@ -289,7 +290,9 @@ class User extends Authenticatable
      */
     public function getDocumentoFormatadoAttribute()
     {
-        if (!$this->documento) return '';
+        if (! $this->documento) {
+            return '';
+        }
 
         $documento = preg_replace('/\D/', '', $this->documento);
 
@@ -304,7 +307,9 @@ class User extends Authenticatable
 
     public function getTelefoneFormatadoAttribute()
     {
-        if (!$this->telefone) return '';
+        if (! $this->telefone) {
+            return '';
+        }
 
         $telefone = preg_replace('/\D/', '', $this->telefone);
 
@@ -319,7 +324,9 @@ class User extends Authenticatable
 
     public function getCepFormatadoAttribute()
     {
-        if (!$this->cep) return '';
+        if (! $this->cep) {
+            return '';
+        }
 
         $cep = preg_replace('/\D/', '', $this->cep);
 
@@ -334,8 +341,9 @@ class User extends Authenticatable
     {
         $nomes = explode(' ', $this->name);
         if (count($nomes) >= 2) {
-            return $nomes[0] . ' ' . end($nomes);
+            return $nomes[0].' '.end($nomes);
         }
+
         return $this->name;
     }
 
@@ -346,38 +354,44 @@ class User extends Authenticatable
         foreach (array_slice($nomes, 0, 2) as $nome) {
             $iniciais .= strtoupper(substr($nome, 0, 1));
         }
+
         return $iniciais;
     }
 
     public function getAvatarUrlAttribute()
     {
         if ($this->avatar) {
-            return asset('storage/avatars/' . $this->avatar);
+            return asset('storage/avatars/'.$this->avatar);
         }
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=6366f1&color=ffffff&size=200';
+
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&background=6366f1&color=ffffff&size=200';
     }
 
     public function getPerfilAtualNomeAttribute()
     {
         $perfil = $this->perfilAtual();
+
         return $perfil ? $perfil->name : 'Sem perfil';
     }
 
     public function getBadgePerfilAttribute()
     {
         $perfil = $this->perfilAtual();
-        if (!$perfil) return '<span class="badge bg-secondary">Sem perfil</span>';
+        if (! $perfil) {
+            return '<span class="badge bg-secondary">Sem perfil</span>';
+        }
 
         $colors = [
             'Administrador' => 'danger',
             'Cliente' => 'primary',
             'Dono de Associação' => 'success',
             'Membro' => 'info',
-            'Moderador' => 'warning'
+            'Moderador' => 'warning',
         ];
 
         $color = $colors[$perfil->name] ?? 'secondary';
-        return '<span class="badge bg-' . $color . '">' . $perfil->name . '</span>';
+
+        return '<span class="badge bg-'.$color.'">'.$perfil->name.'</span>';
     }
 
     public function getBadgeStatusAttribute()
@@ -385,15 +399,16 @@ class User extends Authenticatable
         $colors = [
             'ativo' => 'success',
             'inativo' => 'danger',
-            'pendente' => 'warning'
+            'pendente' => 'warning',
         ];
 
         $color = $colors[$this->status] ?? 'secondary';
-        return '<span class="badge bg-' . $color . '">' . ucfirst($this->status) . '</span>';
+
+        return '<span class="badge bg-'.$color.'">'.ucfirst($this->status).'</span>';
     }
 
     public function apiTokens()
-{
-    return $this->hasMany(ApiToken::class);
-}
+    {
+        return $this->hasMany(ApiToken::class);
+    }
 }

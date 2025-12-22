@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CategoryModel;
-use App\Models\Perfil;
-use App\Models\PerfilModel;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -13,6 +11,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = CategoryModel::all();
+
         return view('admin.categories.index', compact('categories'));
     }
 

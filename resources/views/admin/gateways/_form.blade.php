@@ -8,6 +8,20 @@
         </div>
     </div>
     <div>
+        <label for="slug" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Serviço de pagamento</label>
+        <div class="mt-1">
+            <select id="slug" name="slug" class="block w-full px-4 py-3 bg-white dark:bg-black text-gray-900 dark:text-white border border-gray-300 dark:border-white/10 rounded-lg shadow-sm focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white" required>
+                @php
+                    $slugValue = old('slug', $gateway->slug ?? '');
+                    $options = ['witetec' => 'WiteTec', 'brpagg' => 'BrPagg', 'mercado-pago' => 'Mercado Pago'];
+                @endphp
+                @foreach($options as $value => $label)
+                    <option value="{{ $value }}" @selected($slugValue === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <div>
         <label for="logo_url" class="block text-sm font-medium text-slate-700 dark:text-slate-300">URL da Logo</label>
         <div class="mt-1">
             <input type="url" name="logo_url" id="logo_url" class="block w-full px-4 py-3 bg-white dark:bg-black text-gray-900 dark:text-white border border-gray-300 dark:border-white/10 rounded-lg shadow-sm focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white" value="{{ old('logo_url', $gateway->logo_url ?? '') }}" placeholder="https://...">
@@ -58,6 +72,11 @@
                                 <option value="text">Texto</option>
                                 <option value="password">Senha</option>
                             </select>
+                        </div>
+                        <div>
+                            <label :for="'field_default_' + index" class="text-xs font-medium text-slate-600 dark:text-slate-400">Valor (Default)</label>
+                            <input :id="'field_default_' + index" :type="field.type === 'password' ? 'password' : 'text'" x-model="field.default" placeholder="ex: valor padrão"
+                                   class="mt-1 block w-full text-sm px-3 py-2 bg-white dark:bg-black border border-gray-300 dark:border-white/10 rounded-md shadow-sm focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white">
                         </div>
                     </div>
                     <!-- Botão de Remover -->

@@ -6,10 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\MessageAttachment;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -21,13 +20,13 @@ class MessageController extends Controller
     public function index(Request $request, $conversationId): JsonResponse
     {
         $user = Auth::user();
-        
+
         $conversation = Conversation::find($conversationId);
 
-        if (!$conversation || !$conversation->hasParticipant($user->id)) {
+        if (! $conversation || ! $conversation->hasParticipant($user->id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Conversa não encontrada ou acesso negado'
+                'message' => 'Conversa não encontrada ou acesso negado',
             ], 404);
         }
 
@@ -51,15 +50,15 @@ class MessageController extends Controller
                 'user' => [
                     'id' => $message->user->id,
                     'name' => $message->user->name,
-                    'avatar' => $message->user->avatar ?? null
+                    'avatar' => $message->user->avatar ?? null,
                 ],
                 'attachments' => $message->attachment_info,
                 'reply_to' => $message->replyTo ? [
                     'id' => $message->replyTo->id,
                     'content' => $message->replyTo->formatted_content,
-                    'user_name' => $message->replyTo->user->name
+                    'user_name' => $message->replyTo->user->name,
                 ] : null,
-                'is_read' => $message->isReadBy($user->id)
+                'is_read' => $message->isReadBy($user->id),
             ];
         });
 
@@ -70,8 +69,8 @@ class MessageController extends Controller
                 'current_page' => $messages->currentPage(),
                 'last_page' => $messages->lastPage(),
                 'per_page' => $messages->perPage(),
-                'total' => $messages->total()
-            ]
+                'total' => $messages->total(),
+            ],
         ]);
     }
 
@@ -81,13 +80,13 @@ class MessageController extends Controller
     public function store(Request $request, $conversationId): JsonResponse
     {
         $user = Auth::user();
-        
+
         $conversation = Conversation::find($conversationId);
 
-        if (!$conversation || !$conversation->hasParticipant($user->id)) {
+        if (! $conversation || ! $conversation->hasParticipant($user->id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Conversa não encontrada ou acesso negado'
+                'message' => 'Conversa não encontrada ou acesso negado',
             ], 404);
         }
 
@@ -96,14 +95,14 @@ class MessageController extends Controller
             'type' => 'sometimes|in:text,image,video,file,gif',
             'reply_to_id' => 'sometimes|exists:messages,id',
             'attachments' => 'sometimes|array|max:5',
-            'attachments.*' => 'file|max:102400' // 100MB
+            'attachments.*' => 'file|max:102400', // 100MB
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -120,7 +119,7 @@ class MessageController extends Controller
             'user_id' => $user->id,
             'content' => $request->content,
             'type' => $messageType,
-            'reply_to_id' => $request->reply_to_id
+            'reply_to_id' => $request->reply_to_id,
         ]);
 
         // Processa anexos se existirem
@@ -145,20 +144,20 @@ class MessageController extends Controller
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
-                'avatar' => $user->avatar ?? null
+                'avatar' => $user->avatar ?? null,
             ],
             'attachments' => $message->attachment_info,
             'reply_to' => $message->replyTo ? [
                 'id' => $message->replyTo->id,
                 'content' => $message->replyTo->formatted_content,
-                'user_name' => $message->replyTo->user->name
-            ] : null
+                'user_name' => $message->replyTo->user->name,
+            ] : null,
         ];
 
         return response()->json([
             'success' => true,
             'data' => $messageData,
-            'message' => 'Mensagem enviada com sucesso'
+            'message' => 'Mensagem enviada com sucesso',
         ], 201);
     }
 
@@ -168,32 +167,32 @@ class MessageController extends Controller
     public function update(Request $request, $conversationId, $messageId): JsonResponse
     {
         $user = Auth::user();
-        
+
         $message = Message::inConversation($conversationId)->find($messageId);
 
-        if (!$message || $message->user_id !== $user->id) {
+        if (! $message || $message->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mensagem não encontrada ou sem permissão para editar'
+                'message' => 'Mensagem não encontrada ou sem permissão para editar',
             ], 404);
         }
 
         if ($message->type !== 'text') {
             return response()->json([
                 'success' => false,
-                'message' => 'Apenas mensagens de texto podem ser editadas'
+                'message' => 'Apenas mensagens de texto podem ser editadas',
             ], 400);
         }
 
         $validator = Validator::make($request->all(), [
-            'content' => 'required|string|max:5000'
+            'content' => 'required|string|max:5000',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -201,7 +200,7 @@ class MessageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Mensagem editada com sucesso'
+            'message' => 'Mensagem editada com sucesso',
         ]);
     }
 
@@ -211,13 +210,13 @@ class MessageController extends Controller
     public function destroy(Request $request, $conversationId, $messageId): JsonResponse
     {
         $user = Auth::user();
-        
+
         $message = Message::inConversation($conversationId)->find($messageId);
 
-        if (!$message || $message->user_id !== $user->id) {
+        if (! $message || $message->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mensagem não encontrada ou sem permissão para deletar'
+                'message' => 'Mensagem não encontrada ou sem permissão para deletar',
             ], 404);
         }
 
@@ -225,7 +224,7 @@ class MessageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Mensagem deletada com sucesso'
+            'message' => 'Mensagem deletada com sucesso',
         ]);
     }
 
@@ -235,26 +234,26 @@ class MessageController extends Controller
     public function markAsRead(Request $request, $conversationId): JsonResponse
     {
         $user = Auth::user();
-        
+
         $conversation = Conversation::find($conversationId);
 
-        if (!$conversation || !$conversation->hasParticipant($user->id)) {
+        if (! $conversation || ! $conversation->hasParticipant($user->id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Conversa não encontrada ou acesso negado'
+                'message' => 'Conversa não encontrada ou acesso negado',
             ], 404);
         }
 
         $validator = Validator::make($request->all(), [
             'message_ids' => 'sometimes|array',
-            'message_ids.*' => 'exists:messages,id'
+            'message_ids.*' => 'exists:messages,id',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -273,7 +272,7 @@ class MessageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Mensagens marcadas como lidas'
+            'message' => 'Mensagens marcadas como lidas',
         ]);
     }
 
@@ -283,13 +282,13 @@ class MessageController extends Controller
     public function search(Request $request, $conversationId): JsonResponse
     {
         $user = Auth::user();
-        
+
         $conversation = Conversation::find($conversationId);
 
-        if (!$conversation || !$conversation->hasParticipant($user->id)) {
+        if (! $conversation || ! $conversation->hasParticipant($user->id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Conversa não encontrada ou acesso negado'
+                'message' => 'Conversa não encontrada ou acesso negado',
             ], 404);
         }
 
@@ -298,7 +297,7 @@ class MessageController extends Controller
         if (strlen($query) < 2) {
             return response()->json([
                 'success' => true,
-                'data' => []
+                'data' => [],
             ]);
         }
 
@@ -317,15 +316,15 @@ class MessageController extends Controller
                 'created_at' => $message->created_at,
                 'user' => [
                     'id' => $message->user->id,
-                    'name' => $message->user->name
+                    'name' => $message->user->name,
                 ],
-                'is_own' => $message->user_id === $user->id
+                'is_own' => $message->user_id === $user->id,
             ];
         });
 
         return response()->json([
             'success' => true,
-            'data' => $messagesData
+            'data' => $messagesData,
         ]);
     }
 
@@ -338,7 +337,7 @@ class MessageController extends Controller
         $fileType = MessageAttachment::determineFileType($mimeType);
 
         // Valida tipo de arquivo
-        if (!MessageAttachment::isAllowedMimeType($mimeType)) {
+        if (! MessageAttachment::isAllowedMimeType($mimeType)) {
             throw new \Exception('Tipo de arquivo não permitido');
         }
 
@@ -351,10 +350,10 @@ class MessageController extends Controller
         // Gera nome único para o arquivo
         $fileName = $file->getClientOriginalName();
         $extension = $file->getClientOriginalExtension();
-        $uniqueName = Str::uuid() . '.' . $extension;
+        $uniqueName = Str::uuid().'.'.$extension;
 
         // Define diretório baseado no tipo
-        $directory = "messages/{$fileType}s/" . date('Y/m');
+        $directory = "messages/{$fileType}s/".date('Y/m');
         $filePath = $file->storeAs($directory, $uniqueName, 'public');
 
         // Prepara metadados
@@ -366,7 +365,7 @@ class MessageController extends Controller
             if ($imageInfo) {
                 $metadata['dimensions'] = [
                     'width' => $imageInfo[0],
-                    'height' => $imageInfo[1]
+                    'height' => $imageInfo[1],
                 ];
             }
         }
@@ -380,8 +379,7 @@ class MessageController extends Controller
             'mime_type' => $mimeType,
             'file_size' => $file->getSize(),
             'metadata' => $metadata,
-            'thumbnail_path' => $thumbnailPath
+            'thumbnail_path' => $thumbnailPath,
         ]);
     }
 }
-

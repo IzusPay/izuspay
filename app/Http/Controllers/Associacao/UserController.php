@@ -17,7 +17,7 @@ class UserController extends Controller
     {
         $users = User::with('perfis')->paginate(10);
         $perfis = PerfilModel::all();
-        
+
         return view('associacao.users.index', compact('users', 'perfis'));
     }
 
@@ -27,6 +27,7 @@ class UserController extends Controller
     public function create()
     {
         $perfis = PerfilModel::all();
+
         return view('associacao.users.create_edit', compact('perfis'));
     }
 
@@ -54,6 +55,7 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $perfis = PerfilModel::all();
+
         // O `user->load('perfis')` já é feito pelo Laravel ao resolver o modelo
         return view('associacao.users.create_edit', compact('user', 'perfis'));
     }
@@ -86,6 +88,7 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
+
         return redirect()->route('associacao.users.index')->with('success', 'Usuário excluído com sucesso!');
     }
 }

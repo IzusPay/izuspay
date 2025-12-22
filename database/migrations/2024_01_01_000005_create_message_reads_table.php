@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamp('read_at')->useCurrent();
             $table->timestamps();
-            
+
             $table->unique(['message_id', 'user_id']);
             $table->index(['user_id', 'read_at']);
         });
@@ -31,4 +31,3 @@ return new class extends Migration
         Schema::dropIfExists('message_reads');
     }
 };
-

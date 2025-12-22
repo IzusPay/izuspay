@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Builder; // Importar Builder para escopos
+use Illuminate\Support\Str; // Importar Builder para escopos
 
 class Sale extends Model
 {
@@ -54,7 +54,7 @@ class Sale extends Model
      * @var bool
      */
     public $incrementing = false;
-    
+
     /**
      * The "type" of the primary key.
      *
@@ -119,7 +119,7 @@ class Sale extends Model
      */
     public function getStatusBadge(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'paid' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">Pago</span>',
             'awaiting_payment' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">Pendente</span>',
             'cancelled' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">Cancelado</span>',
@@ -200,10 +200,8 @@ class Sale extends Model
     public function scopeForDailyChart(Builder $query): void
     {
         $query->where('status', 'paid')
-              ->selectRaw('DATE(created_at) as date, SUM(total_price) as total')
-              ->groupBy('date')
-              ->orderBy('date', 'ASC');
+            ->selectRaw('DATE(created_at) as date, SUM(total_price) as total')
+            ->groupBy('date')
+            ->orderBy('date', 'ASC');
     }
 }
-
-

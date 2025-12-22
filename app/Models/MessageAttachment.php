@@ -19,12 +19,12 @@ class MessageAttachment extends Model
         'mime_type',
         'file_size',
         'metadata',
-        'thumbnail_path'
+        'thumbnail_path',
     ];
 
     protected $casts = [
         'metadata' => 'array',
-        'file_size' => 'integer'
+        'file_size' => 'integer',
     ];
 
     /**
@@ -106,12 +106,12 @@ class MessageAttachment extends Model
     {
         $bytes = $this->file_size;
         $units = ['B', 'KB', 'MB', 'GB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**
@@ -122,7 +122,7 @@ class MessageAttachment extends Model
         if ($this->isImage() && isset($this->metadata['dimensions'])) {
             return $this->metadata['dimensions'];
         }
-        
+
         return null;
     }
 
@@ -134,7 +134,7 @@ class MessageAttachment extends Model
         if ($this->isVideo() && isset($this->metadata['duration'])) {
             return $this->metadata['duration'];
         }
-        
+
         return null;
     }
 
@@ -144,14 +144,14 @@ class MessageAttachment extends Model
     public function getFormattedDurationAttribute(): ?string
     {
         $duration = $this->getDuration();
-        
-        if (!$duration) {
+
+        if (! $duration) {
             return null;
         }
-        
+
         $minutes = floor($duration / 60);
         $seconds = $duration % 60;
-        
+
         return sprintf('%02d:%02d', $minutes, $seconds);
     }
 
@@ -161,17 +161,17 @@ class MessageAttachment extends Model
     public function deleteFile(): bool
     {
         $deleted = true;
-        
+
         // Deleta o arquivo principal
         if (Storage::exists($this->file_path)) {
             $deleted = Storage::delete($this->file_path);
         }
-        
+
         // Deleta a thumbnail se existir
         if ($this->thumbnail_path && Storage::exists($this->thumbnail_path)) {
             Storage::delete($this->thumbnail_path);
         }
-        
+
         return $deleted;
     }
 
@@ -183,11 +183,11 @@ class MessageAttachment extends Model
         if (str_starts_with($mimeType, 'image/')) {
             return 'image';
         }
-        
+
         if (str_starts_with($mimeType, 'video/')) {
             return 'video';
         }
-        
+
         return 'document';
     }
 
@@ -202,20 +202,20 @@ class MessageAttachment extends Model
             'image/png',
             'image/gif',
             'image/webp',
-            
+
             // Vídeos
             'video/mp4',
             'video/mpeg',
             'video/quicktime',
             'video/webm',
-            
+
             // Documentos
             'application/pdf',
             'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'text/plain'
+            'text/plain',
         ];
-        
+
         return in_array($mimeType, $allowedTypes);
     }
 
@@ -245,4 +245,3 @@ class MessageAttachment extends Model
         });
     }
 }
-

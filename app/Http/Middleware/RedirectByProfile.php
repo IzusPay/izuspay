@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\GamificationService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
-use App\Services\GamificationService;
 
 class RedirectByProfile
 {
@@ -20,21 +20,19 @@ class RedirectByProfile
     /**
      * Lida com uma requisição de entrada.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
         $user = Auth::user();
-        
+
         // Se não houver usuário autenticado, permite que a requisição continue.
-        if (!$user) {
+        if (! $user) {
             return $next($request);
         }
 
         $gamificationData = $this->gamificationService->getGamificationData($user);
-        
+
         View::share('globalGamificationData', $gamificationData);
 
         // Rotas que não devem ser redirecionadas (para evitar loops ou rotas públicas essenciais)
@@ -52,21 +50,22 @@ class RedirectByProfile
                 return $next($request);
             }
         }
-        
+
         // Redireciona com base no perfil do usuário
         $perfilAtual = $this->getPerfilAtual($user);
 
         // Se o usuário não tem um perfil ativo (por alguma razão de dados), desloga e redireciona para o login.
-        if (!$perfilAtual) {
+        if (! $perfilAtual) {
             Auth::logout();
+
             return redirect('/login')->with('error', 'Usuário sem perfil ativo. Entre em contato com o administrador.');
         }
 
         $redirectUrl = $this->getRedirectUrlByProfile($perfilAtual->name);
-        
+
         // Redireciona apenas se o usuário não estiver na área correta para seu perfil.
         // Isso previne redirecionamentos desnecessários e loops.
-        if ($redirectUrl && !$this->isAlreadyInCorrectArea($request, $perfilAtual->name)) {
+        if ($redirectUrl && ! $this->isAlreadyInCorrectArea($request, $perfilAtual->name)) {
             return redirect($redirectUrl);
         }
 
@@ -78,7 +77,7 @@ class RedirectByProfile
      * Obtém o perfil atual do usuário.
      * Assume que 'perfilAtual()' ou uma relação userPerfis existe.
      *
-     * @param \App\Models\User $user
+     * @param  \App\Models\User  $user
      * @return \App\Models\Perfil|null
      */
     private function getPerfilAtual($user)
@@ -101,7 +100,7 @@ class RedirectByProfile
     /**
      * Retorna a URL de redirecionamento baseada no nome do perfil.
      *
-     * @param string $perfilName
+     * @param  string  $perfilName
      * @return string|null
      */
     private function getRedirectUrlByProfile($perfilName)
@@ -111,7 +110,7 @@ class RedirectByProfile
             'Cliente' => '/cliente/dashboard',
             'Associacao' => '/associacao/dashboard',
             'Membro' => '/membro/dashboard',
-            'Moderador' => '/moderador/dashboard'
+            'Moderador' => '/moderador/dashboard',
         ];
 
         // Retorna a URL mapeada ou '/dashboard' como um padrão genérico
@@ -121,8 +120,7 @@ class RedirectByProfile
     /**
      * Verifica se o usuário já está na área correta com base no padrão da URL.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param string $perfilName
+     * @param  string  $perfilName
      * @return bool
      */
     private function isAlreadyInCorrectArea(Request $request, $perfilName)
@@ -137,7 +135,7 @@ class RedirectByProfile
         ];
 
         $pattern = $areaMap[$perfilName] ?? null;
-        
+
         return $pattern ? $request->is($pattern) : false;
     }
 }

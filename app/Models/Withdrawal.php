@@ -15,6 +15,9 @@ class Withdrawal extends Model
         'bank_account_id',
         'amount',
         'status',
+        'pix_key',
+        'pix_key_type',
+        'notes',
     ];
 
     public function wallet(): BelongsTo

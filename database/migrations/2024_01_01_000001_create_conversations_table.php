@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp('last_message_at')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            
+
             $table->index(['type', 'is_active']);
             $table->index('last_message_at');
         });
@@ -35,4 +35,3 @@ return new class extends Migration
         Schema::dropIfExists('conversations');
     }
 };
-

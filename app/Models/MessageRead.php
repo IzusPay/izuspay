@@ -13,11 +13,11 @@ class MessageRead extends Model
     protected $fillable = [
         'message_id',
         'user_id',
-        'read_at'
+        'read_at',
     ];
 
     protected $casts = [
-        'read_at' => 'datetime'
+        'read_at' => 'datetime',
     ];
 
     /**
@@ -66,20 +66,20 @@ class MessageRead extends Model
     public static function markMessagesAsRead(array $messageIds, int $userId): void
     {
         $existingReads = self::whereIn('message_id', $messageIds)
-                            ->where('user_id', $userId)
-                            ->pluck('message_id')
-                            ->toArray();
+            ->where('user_id', $userId)
+            ->pluck('message_id')
+            ->toArray();
 
         $newMessageIds = array_diff($messageIds, $existingReads);
 
-        if (!empty($newMessageIds)) {
+        if (! empty($newMessageIds)) {
             $reads = collect($newMessageIds)->map(function ($messageId) use ($userId) {
                 return [
                     'message_id' => $messageId,
                     'user_id' => $userId,
                     'read_at' => now(),
                     'created_at' => now(),
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ];
             })->toArray();
 
@@ -93,14 +93,14 @@ class MessageRead extends Model
     public static function getConversationReadStats(int $conversationId): array
     {
         $messageIds = Message::where('conversation_id', $conversationId)->pluck('id');
-        
+
         $totalMessages = $messageIds->count();
         $totalReads = self::whereIn('message_id', $messageIds)->count();
-        
+
         return [
             'total_messages' => $totalMessages,
             'total_reads' => $totalReads,
-            'read_percentage' => $totalMessages > 0 ? round(($totalReads / $totalMessages) * 100, 2) : 0
+            'read_percentage' => $totalMessages > 0 ? round(($totalReads / $totalMessages) * 100, 2) : 0,
         ];
     }
 
@@ -110,15 +110,14 @@ class MessageRead extends Model
     public static function getUnreadUsers(int $messageId, int $conversationId): array
     {
         $message = Message::find($messageId);
-        
-        if (!$message) {
+
+        if (! $message) {
             return [];
         }
 
         $conversationParticipants = $message->conversation->participants()->pluck('users.id');
         $usersWhoRead = self::where('message_id', $messageId)->pluck('user_id');
-        
+
         return $conversationParticipants->diff($usersWhoRead)->values()->toArray();
     }
 }
-

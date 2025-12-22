@@ -12,15 +12,15 @@ class ControllerController extends Controller
         $controllers = Controller::query();
 
         if ($request->filled('name')) {
-            $controllers->where('name', 'like', '%' . $request->name . '%');
+            $controllers->where('name', 'like', '%'.$request->name.'%');
         }
 
         if ($request->filled('ip')) {
-            $controllers->where('ip', 'like', '%' . $request->ip . '%');
+            $controllers->where('ip', 'like', '%'.$request->ip.'%');
         }
 
         if ($request->filled('device_id')) {
-            $controllers->where('device_id', 'like', '%' . $request->device_id . '%');
+            $controllers->where('device_id', 'like', '%'.$request->device_id.'%');
         }
 
         $controllers = $controllers->paginate(5); // Altere o valor para o número de itens por página
@@ -30,8 +30,7 @@ class ControllerController extends Controller
         ]);
     }
 
-
-    public function create( )
+    public function create()
     {
         return view('controllers.create');
     }
@@ -59,7 +58,7 @@ class ControllerController extends Controller
             'ip' => 'sometimes|ip',
             'port' => 'sometimes|integer',
             'type' => 'sometimes|string',
-            'id_device' => 'sometimes|string'
+            'id_device' => 'sometimes|string',
         ]);
 
         $request->validate([
@@ -75,6 +74,7 @@ class ControllerController extends Controller
     public function destroyController(Controller $controllers)
     {
         $controllers->delete();
+
         return redirect()->route('controllers.index')->with('success', 'Controlador removido com sucesso!');
     }
 }

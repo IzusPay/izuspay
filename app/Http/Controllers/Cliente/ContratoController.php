@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class ContratoController extends Controller
@@ -17,8 +16,8 @@ class ContratoController extends Controller
         $user = auth()->user();
         // Assume que há um contrato pendente para o usuário
         $contract = Contract::where('user_id', $user->id)
-                            ->where('status', 'pending')
-                            ->firstOrFail();
+            ->where('status', 'pending')
+            ->firstOrFail();
 
         return view('cliente.contrato.index', compact('contract'));
     }
@@ -30,14 +29,14 @@ class ContratoController extends Controller
     {
         $user = auth()->user();
         $contract = Contract::where('user_id', $user->id)
-                            ->where('status', 'pending')
-                            ->firstOrFail();
+            ->where('status', 'pending')
+            ->firstOrFail();
 
         $contract->update([
             'status' => 'signed',
             'signed_at' => now(),
         ]);
-        
+
         // Finalmente, atualiza o status do usuário para ativo
         $user->status = 'ativo';
         $user->save();

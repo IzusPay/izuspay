@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Conversation extends Model
@@ -20,12 +20,12 @@ class Conversation extends Model
         'image',
         'created_by',
         'last_message_at',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
         'last_message_at' => 'datetime',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
     ];
 
     /**
@@ -58,8 +58,8 @@ class Conversation extends Model
     public function participants(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'conversation_participants')
-                    ->withPivot(['role', 'joined_at', 'last_read_at', 'is_muted', 'is_active'])
-                    ->withTimestamps();
+            ->withPivot(['role', 'joined_at', 'last_read_at', 'is_muted', 'is_active'])
+            ->withTimestamps();
     }
 
     /**
@@ -120,7 +120,7 @@ class Conversation extends Model
         $this->participants()->attach($userId, [
             'role' => $role,
             'joined_at' => now(),
-            'is_active' => true
+            'is_active' => true,
         ]);
     }
 
@@ -138,7 +138,7 @@ class Conversation extends Model
     public function markAsReadForUser($userId): void
     {
         $this->participants()->updateExistingPivot($userId, [
-            'last_read_at' => now()
+            'last_read_at' => now(),
         ]);
     }
 
@@ -148,15 +148,15 @@ class Conversation extends Model
     public function getUnreadCountForUser($userId): int
     {
         $participant = $this->participants()->where('user_id', $userId)->first();
-        
-        if (!$participant || !$participant->pivot->last_read_at) {
+
+        if (! $participant || ! $participant->pivot->last_read_at) {
             return $this->messages()->count();
         }
 
         return $this->messages()
-                    ->where('created_at', '>', $participant->pivot->last_read_at)
-                    ->where('user_id', '!=', $userId)
-                    ->count();
+            ->where('created_at', '>', $participant->pivot->last_read_at)
+            ->where('user_id', '!=', $userId)
+            ->count();
     }
 
     /**
@@ -190,7 +190,7 @@ class Conversation extends Model
         $conversation = self::create([
             'type' => 'private',
             'created_by' => $user1Id,
-            'is_active' => true
+            'is_active' => true,
         ]);
 
         // Adiciona participantes
@@ -200,4 +200,3 @@ class Conversation extends Model
         return $conversation;
     }
 }
-

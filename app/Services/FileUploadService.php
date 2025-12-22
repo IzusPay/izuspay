@@ -4,12 +4,12 @@ namespace App\Services;
 
 use App\Models\Message;
 use App\Models\MessageAttachment;
+use FFMpeg\Coordinate\TimeCode;
+use FFMpeg\FFMpeg;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
-use FFMpeg\FFMpeg;
-use FFMpeg\Coordinate\TimeCode;
 
 class FileUploadService
 {
@@ -72,8 +72,8 @@ class FileUploadService
             }
         }
 
-        if (!$isAllowed) {
-            throw new \InvalidArgumentException('Tipo de arquivo não permitido: ' . $mimeType);
+        if (! $isAllowed) {
+            throw new \InvalidArgumentException('Tipo de arquivo não permitido: '.$mimeType);
         }
 
         // Verifica tamanho do arquivo
@@ -108,7 +108,8 @@ class FileUploadService
     private function generateUniqueFileName(UploadedFile $file): string
     {
         $extension = $file->getClientOriginalExtension();
-        return Str::uuid() . '.' . $extension;
+
+        return Str::uuid().'.'.$extension;
     }
 
     /**
@@ -118,6 +119,7 @@ class FileUploadService
     {
         $year = date('Y');
         $month = date('m');
+
         return "{$fileType}s/{$year}/{$month}";
     }
 
@@ -142,13 +144,13 @@ class FileUploadService
                 // Para vídeos, seria necessário usar FFMpeg para extrair metadados
                 // Por simplicidade, vamos apenas armazenar informações básicas
                 $metadata['format'] = $file->getMimeType();
-                
+
                 // Se FFMpeg estiver disponível, pode extrair duração, dimensões, etc.
                 // $metadata['duration'] = $this->getVideoDuration($file->getPathname());
             }
         } catch (\Exception $e) {
             // Se falhar ao extrair metadados, continua sem eles
-            \Log::warning('Falha ao extrair metadados do arquivo: ' . $e->getMessage());
+            \Log::warning('Falha ao extrair metadados do arquivo: '.$e->getMessage());
         }
 
         return $metadata;
@@ -159,7 +161,7 @@ class FileUploadService
      */
     private function generateThumbnail(string $filePath, string $fileType): ?string
     {
-        if (!in_array($fileType, ['image', 'video'])) {
+        if (! in_array($fileType, ['image', 'video'])) {
             return null;
         }
 
@@ -167,9 +169,9 @@ class FileUploadService
             $thumbnailSettings = config('filesystems.upload_settings.thumbnail_settings');
             $settings = $thumbnailSettings[$fileType];
 
-            $thumbnailFileName = 'thumb_' . basename($filePath, '.' . pathinfo($filePath, PATHINFO_EXTENSION)) . '.jpg';
-            $thumbnailDirectory = 'thumbnails/' . dirname($filePath);
-            $thumbnailPath = $thumbnailDirectory . '/' . $thumbnailFileName;
+            $thumbnailFileName = 'thumb_'.basename($filePath, '.'.pathinfo($filePath, PATHINFO_EXTENSION)).'.jpg';
+            $thumbnailDirectory = 'thumbnails/'.dirname($filePath);
+            $thumbnailPath = $thumbnailDirectory.'/'.$thumbnailFileName;
 
             // Cria diretório se não existir
             Storage::disk('public')->makeDirectory($thumbnailDirectory);
@@ -180,7 +182,7 @@ class FileUploadService
                 return $this->generateVideoThumbnail($filePath, $thumbnailPath, $settings);
             }
         } catch (\Exception $e) {
-            \Log::warning('Falha ao gerar thumbnail: ' . $e->getMessage());
+            \Log::warning('Falha ao gerar thumbnail: '.$e->getMessage());
         }
 
         return null;
@@ -217,15 +219,15 @@ class FileUploadService
         // Para gerar thumbnails de vídeo, seria necessário FFMpeg
         // Por simplicidade, vamos retornar null
         // Em produção, você implementaria algo como:
-        
+
         /*
         if (class_exists('FFMpeg\FFMpeg')) {
             $ffmpeg = FFMpeg::create();
             $video = $ffmpeg->open(Storage::disk('public')->path($filePath));
-            
+
             $frame = $video->frame(TimeCode::fromSeconds($settings['time']));
             $frame->save(Storage::disk('public')->path($thumbnailPath));
-            
+
             return $thumbnailPath;
         }
         */
@@ -239,7 +241,7 @@ class FileUploadService
     private function generateThumbnailWithGD(string $sourcePath, string $thumbnailPath, array $settings): void
     {
         $imageInfo = getimagesize($sourcePath);
-        if (!$imageInfo) {
+        if (! $imageInfo) {
             throw new \Exception('Não foi possível obter informações da imagem');
         }
 
@@ -317,7 +319,7 @@ class FileUploadService
      */
     public function getThumbnailUrl(MessageAttachment $attachment): ?string
     {
-        if (!$attachment->thumbnail_path) {
+        if (! $attachment->thumbnail_path) {
             return null;
         }
 
@@ -357,4 +359,3 @@ class FileUploadService
         return $attachments;
     }
 }
-

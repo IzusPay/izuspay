@@ -11,11 +11,11 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white dark:bg-black rounded-xl shadow-sm p-5 border border-slate-200 dark:border-slate-800">
             <p class="text-sm text-slate-600 dark:text-slate-300">Inativos</p>
-            <p class="text-3xl font-semibold text-slate-900 dark:text-white mt-1">0</p>
+            <p class="text-3xl font-semibold text-slate-900 dark:text-white mt-1">{{ $inactiveCount }}</p>
         </div>
         <div class="bg-white dark:bg-black rounded-xl shadow-sm p-5 border border-slate-200 dark:border-slate-800">
             <p class="text-sm text-slate-600 dark:text-slate-300">Ativos</p>
-            <p class="text-3xl font-semibold text-slate-900 dark:text-white mt-1">1</p>
+            <p class="text-3xl font-semibold text-slate-900 dark:text-white mt-1">{{ $activeCount }}</p>
         </div>
         <div class="bg-white dark:bg-black rounded-xl shadow-sm p-5 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <p class="text-sm text-slate-700 dark:text-slate-300">API de Webhooks – Receba notificações em tempo real dos eventos.</p>
@@ -47,22 +47,45 @@
                 </tr>
             </thead>
             <tbody class="bg-white dark:bg-black divide-y divide-gray-200 dark:divide-slate-800">
-                <tr class="hover:bg-gray-50 dark:hover:bg-slate-900">
-                    <td class="px-6 py-4 text-slate-700 dark:text-slate-300">https://seu-site.com/webhook</td>
-                    <td class="px-6 py-4 text-slate-700 dark:text-slate-300">Webhook principal</td>
-                    <td class="px-6 py-4">
-                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">Todos os Eventos</span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">Ativo</span>
-                    </td>
-                    <td class="px-6 py-4 text-slate-700 dark:text-slate-300">23/09/2025, 03:24</td>
-                    <td class="px-6 py-4 text-right">
-                        <button class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </td>
-                </tr>
+                @forelse($webhooks as $wh)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-slate-900">
+                        <td class="px-6 py-4 text-slate-700 dark:text-slate-300">{{ $wh->url }}</td>
+                        <td class="px-6 py-4 text-slate-700 dark:text-slate-300">{{ $wh->description }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">Todos os Eventos</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            @if($wh->is_active)
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">Ativo</span>
+                            @else
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300">Inativo</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 text-slate-700 dark:text-slate-300">{{ $wh->created_at->format('d/m/Y, H:i') }}</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-2">
+                                <form method="POST" action="{{ route('associacao.webhooks.toggle', $wh) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button class="px-3 py-1 text-xs rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800">
+                                        {{ $wh->is_active ? 'Desativar' : 'Ativar' }}
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ route('associacao.webhooks.destroy', $wh) }}" onsubmit="return confirm('Remover este webhook?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-slate-500 dark:text-slate-400">Nenhum webhook cadastrado.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -76,28 +99,19 @@
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
         </div>
-        <form class="p-5 space-y-4">
+        <form method="POST" action="{{ route('associacao.webhooks.store') }}" class="p-5 space-y-4">
+            @csrf
             <div>
                 <label class="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">URL do Endpoint *</label>
-                <input type="url" class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:border-black dark:focus:border-white focus:ring-0" placeholder="https://seu-site.com/webhook" required>
+                <input type="url" name="url" class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:border-black dark:focus:border-white focus:ring-0" placeholder="https://seu-site.com/webhook" required>
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Descrição *</label>
-                <input type="text" class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:border-black dark:focus:border-white focus:ring-0" placeholder="Descrição do webhook" required>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Tipo de Evento *</label>
-                <select class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:border-black dark:focus:border-white focus:ring-0" required>
-                    <option value="">Selecione o tipo de evento</option>
-                    <option value="transactions">Transações</option>
-                    <option value="withdrawals">Saques</option>
-                    <option value="disputes">Disputas</option>
-                    <option value="all">Todos os Eventos</option>
-                </select>
+                <input type="text" name="description" class="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:border-black dark:focus:border-white focus:ring-0" placeholder="Descrição do webhook">
             </div>
             <div class="flex justify-end gap-3 pt-2">
                 <button type="button" id="cancel-webhook-modal" class="px-4 py-2 text-sm text-gray-600 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800">Cancelar</button>
-                <button type="button" class="px-4 py-2 text-sm bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-black/10">Criar</button>
+                <button type="submit" class="px-4 py-2 text-sm bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-black/10">Criar</button>
             </div>
         </form>
     </div>

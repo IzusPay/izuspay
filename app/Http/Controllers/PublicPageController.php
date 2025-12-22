@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Association;
-use Illuminate\Http\Request;
 
 class PublicPageController extends Controller
 {
@@ -19,7 +18,8 @@ class PublicPageController extends Controller
         return view('lp', compact('association'));
     }
 
-    public function docs(){
+    public function docs()
+    {
         return view('docs');
     }
 }

@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::table('news', function (Blueprint $table) {
             // Adicionar coluna creator_profile_id (nullable para compatibilidade com dados existentes)
             $table->foreignId('creator_profile_id')->nullable()->after('user_id')->constrained('creator_profiles')->onDelete('set null');
-            
+
             // Adicionar coluna category se não existir
-            if (!Schema::hasColumn('news', 'category')) {
+            if (! Schema::hasColumn('news', 'category')) {
                 $table->string('category')->nullable()->after('tags');
             }
-            
+
             // Adicionar índices para melhor performance
             $table->index('creator_profile_id');
             $table->index(['status', 'published_at']);
@@ -36,16 +36,15 @@ return new class extends Migration
             // Remover índices
             $table->dropIndex(['creator_profile_id']);
             $table->dropIndex(['status', 'published_at']);
-            
+
             if (Schema::hasColumn('news', 'category')) {
                 $table->dropIndex(['category']);
                 $table->dropColumn('category');
             }
-            
+
             // Remover foreign key e coluna
             $table->dropForeign(['creator_profile_id']);
             $table->dropColumn('creator_profile_id');
         });
     }
 };
-

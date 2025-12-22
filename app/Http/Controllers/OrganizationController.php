@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Organization;
 use App\Models\OrganizationModel;
 use Illuminate\Http\Request;
 
@@ -11,23 +10,25 @@ class OrganizationController extends Controller
     public function index()
     {
         $organizacoes = OrganizationModel::all();
+
         return view('organizations.index', compact('organizacoes'));
     }
 
     public function create()
     {
         return view('organizations.create');
-    }public function store(Request $request)
+    }
+
+    public function store(Request $request)
     {
         OrganizationModel::create([
             'name' => $request->name,
             'description' => $request->description,
-            'status' => 1, 
+            'status' => 1,
         ]);
-    
+
         return redirect()->route('organizacoes.index')->with('success', 'Organização criada com sucesso!');
     }
-    
 
     public function edit(OrganizationModel $organizacao)
     {

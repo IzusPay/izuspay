@@ -24,7 +24,7 @@ return new class extends Migration
             $table->boolean('is_deleted')->default(false);
             $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
-            
+
             $table->index(['conversation_id', 'created_at']);
             $table->index(['user_id', 'type']);
             $table->index('reply_to_id');
@@ -39,4 +39,3 @@ return new class extends Migration
         Schema::dropIfExists('messages');
     }
 };
-

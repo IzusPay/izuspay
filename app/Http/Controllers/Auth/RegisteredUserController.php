@@ -41,7 +41,7 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-        
+
         UserPerfilModel::create([
             'user_id' => $user->id,
             'perfil_id' => 2,

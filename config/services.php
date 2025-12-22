@@ -39,5 +39,13 @@ return [
         'url' => env('WITETEC_API_URL'),
         'webhook_secret' => env('WITETEC_WEBHOOK_SECRET'),
     ],
+    'brpagg' => [
+        'url' => env('BRPAGG_API_URL', 'https://api.brpagg.com.br'),
+        'username' => env('BRPAGG_USERNAME'),
+        'password' => env('BRPAGG_PASSWORD'),
+        'api_key' => env('BRPAGG_API_KEY'),
+        'secret_key' => env('BRPAGG_SECRET_KEY'),
+        'company_id' => env('BRPAGG_COMPANY_ID'),
+    ],
 
 ];

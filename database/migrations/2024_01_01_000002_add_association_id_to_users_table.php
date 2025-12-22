@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('telefone')->nullable()->after('email');
             $table->string('documento')->nullable()->after('telefone'); // CPF
             $table->enum('status', ['ativo', 'inativo', 'pendente'])->default('ativo')->after('documento');
-            
+
             $table->foreign('association_id')->references('id')->on('associations')->onDelete('cascade');
             $table->index(['association_id', 'tipo']);
         });

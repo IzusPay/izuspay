@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // Adiciona o campo para o token, que pode ser nulo e deve ser único.
             $table->string('api_token', 80)->after('password')
-                                          ->unique()
-                                          ->nullable()
-                                          ->default(null);
+                ->unique()
+                ->nullable()
+                ->default(null);
         });
     }
 

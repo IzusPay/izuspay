@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Subscription;
 use App\Models\SubscriptionModel;
+use App\Models\User;
 use App\Models\UserPerfilModel;
 use App\Models\WebhookLog;
 use Illuminate\Http\Request;
@@ -64,7 +63,7 @@ class WebhookController extends Controller
             'user_id' => $user->id,
             'perfil_id' => 2,
             'is_atual' => 1,
-            'status' => 1
+            'status' => 1,
         ]);
     }
 
@@ -84,7 +83,7 @@ class WebhookController extends Controller
                 $user = User::where('email', $request['Customer']['email'])->first();
 
                 // Se o usuário não existir, cria o usuário, a assinatura e o perfil
-                if (!$user) {
+                if (! $user) {
                     $user = User::create([
                         'name' => $request['Customer']['full_name'],
                         'email' => $request['Customer']['email'],
@@ -96,7 +95,7 @@ class WebhookController extends Controller
                         'user_id' => $user->id,
                         'perfil_id' => 2,
                         'is_atual' => 1,
-                        'status' => 1
+                        'status' => 1,
                     ]);
                 }
 
@@ -109,7 +108,7 @@ class WebhookController extends Controller
                     'payment_method' => $request['payment_method'],
                     'paid_at' => now(),
                 ]);
-            
+
                 // Atualiza o log como processado
                 $log->update(['status' => 'processed']);
             } else {
@@ -129,4 +128,3 @@ class WebhookController extends Controller
         }
     }
 }
-

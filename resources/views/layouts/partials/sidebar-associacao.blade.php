@@ -19,16 +19,24 @@
         </div>
     </div>
 
-    {{-- Seção Minha carteira com azul neon --}}
-    <div class="px-4 py-4 border-b border-gray-200 dark:border-white/5">
+    <div class="px-4 py-4 border-b border-gray-200 dark:border-white/5" x-data="{ showWallet: true }" x-init="showWallet = localStorage.getItem('assoc_showWallet') !== '0'">
         <div class="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-xl p-4 border border-cyan-400/20">
-            <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Minha carteira</p>
+            <div class="flex items-center justify-between mb-1">
+                <p class="text-xs text-gray-600 dark:text-gray-400">Minha carteira</p>
+                <button @click="showWallet = !showWallet; localStorage.setItem('assoc_showWallet', showWallet ? '1' : '0')" :title="showWallet ? 'Ocultar' : 'Mostrar'" class="p-1 rounded text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10">
+                    <i data-lucide="eye" class="w-4 h-4" x-show="showWallet"></i>
+                    <i data-lucide="eye-off" class="w-4 h-4" x-show="!showWallet"></i>
+                </button>
+            </div>
             <p class="text-2xl font-bold text-black dark:text-white">
-                @if(isset($globalGamificationData))
-                    R$ {{ number_format($globalGamificationData['currentRevenue'], 2, ',', '.') }}
-                @else
-                    R$ 0,00
-                @endif
+                <span x-show="showWallet">
+                    @if(isset($globalGamificationData))
+                        R$ {{ number_format($globalGamificationData['currentRevenue'], 2, ',', '.') }}
+                    @else
+                        R$ 0,00
+                    @endif
+                </span>
+                <span x-show="!showWallet">R$ ••••••••</span>
             </p>
         </div>
     </div>
@@ -47,6 +55,7 @@
                 ['route' => 'associacao.vendas.index', 'label' => 'Extrato', 'icon' => 'shopping-cart'],
                 ['route' => 'associacao.disputas.index', 'label' => 'Disputas', 'icon' => 'shield-alert'],
                 ['route' => 'api-keys.index', 'label' => 'Integrações', 'icon' => 'plug'],
+                ['route' => 'associacao.products.index', 'label' => 'Link de Pagamento', 'icon' => 'link-2'],
                 ['route' => 'associacao.webhooks.index', 'label' => 'Webhooks', 'icon' => 'settings'],
             ];
         @endphp

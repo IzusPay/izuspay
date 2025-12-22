@@ -55,7 +55,7 @@
 
         .register-graphic-section {
             flex: 1;
-            background: #000000;
+            background: linear-gradient(135deg, #969696ff 0%, #000000ff 100%);
             display: none;
         }
 
@@ -176,11 +176,28 @@
         }
 
         @media (min-width: 1024px) {
+            .register-container {
+                padding-right: 50vw;
+            }
             .register-graphic-section {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 2rem;
+                position: fixed;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                width: 50vw;
+            }
+            .graphic-img {
+                height: auto;
+                object-fit: contain;
+                filter: drop-shadow(0 10px 20px rgba(0,0,0,0.35));
+            }
+            .register-form-section {
+                flex: 0 0 50vw;
+                min-height: 100vh;
+                overflow-y: auto;
             }
         }
     </style>
@@ -221,10 +238,18 @@
                     
                     <div class="form-grid">
                         <div class="form-group">
+                            <label for="tipo" class="form-label">Tipo de Cadastro</label>
+                            <select id="tipo" name="tipo" class="form-input" required>
+                                <option value="">Selecione</option>
+                                <option value="pf" {{ old('tipo') === 'pf' ? 'selected' : '' }}>Pessoa Física (CPF)</option>
+                                <option value="cnpj" {{ old('tipo') === 'cnpj' ? 'selected' : '' }}>Pessoa Jurídica (CNPJ)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="name" class="form-label">Nome Completo</label>
                             <input type="text" 
                                    id="name" 
-                                   name="name" 
+                                   name="nome" 
                                    value="{{ old('name') }}" 
                                    class="form-input" 
                                    required 
@@ -235,7 +260,7 @@
                             <label for="email" class="form-label">E-mail</label>
                             <input type="email" 
                                    id="email" 
-                                   name="email" 
+                                    name="email" 
                                    value="{{ old('email') }}" 
                                    class="form-input" 
                                    required>
@@ -245,7 +270,7 @@
                             <label for="phone" class="form-label">Telefone</label>
                             <input type="tel" 
                                    id="phone" 
-                                   name="phone" 
+                                   name="telefone" 
                                    value="{{ old('phone') }}" 
                                    class="form-input" 
                                    required>
@@ -255,54 +280,32 @@
                             <label for="document" class="form-label">CPF/CNPJ</label>
                             <input type="text" 
                                    id="document" 
-                                   name="document" 
+                                   name="documento" 
                                    value="{{ old('document') }}" 
                                    class="form-input" 
                                    required>
                         </div>
                     </div>
                     
-                    <h3 class="text-md font-semibold text-gray-900 mt-8 mb-4">Dados da Empresa</h3>
-                    
+                    <h3 class="text-md font-semibold text-gray-900 mt-8 mb-4">Segurança</h3>
                     <div class="form-grid">
-                        <div class="form-group md:col-span-2">
-                            <label for="association_name" class="form-label">Nome da Empresa</label>
-                            <input type="text" 
-                                   id="association_name" 
-                                   name="association_name" 
-                                   value="{{ old('association_name') }}" 
-                                   class="form-input" 
-                                   required>
-                        </div>
-                        
                         <div class="form-group">
-                            <label for="association_document" class="form-label">CNPJ da Empresa</label>
-                            <input type="text" 
-                                   id="association_document" 
-                                   name="association_document" 
-                                   value="{{ old('association_document') }}" 
-                                   class="form-input" 
-                                   required>
+                            <label for="password" class="form-label">Senha</label>
+                            <div class="relative">
+                                <input type="password" id="password" name="password" class="form-input" required>
+                                <button type="button" onclick="togglePassword('password')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
-                        
                         <div class="form-group">
-                            <label for="association_phone" class="form-label">Telefone da Empresa</label>
-                            <input type="tel" 
-                                   id="association_phone" 
-                                   name="association_phone" 
-                                   value="{{ old('association_phone') }}" 
-                                   class="form-input" 
-                                   required>
-                        </div>
-                        
-                        <div class="form-group md:col-span-2">
-                            <label for="association_email" class="form-label">E-mail da Empresa</label>
-                            <input type="email" 
-                                   id="association_email" 
-                                   name="association_email" 
-                                   value="{{ old('association_email') }}" 
-                                   class="form-input" 
-                                   required>
+                            <label for="password_confirmation" class="form-label">Confirmar Senha</label>
+                            <div class="relative">
+                                <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" required>
+                                <button type="button" onclick="togglePassword('password_confirmation')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
@@ -314,7 +317,7 @@
                             <div class="flex">
                                 <input type="text" 
                                        id="zipcode" 
-                                       name="zipcode" 
+                                       name="cep" 
                                        value="{{ old('zipcode') }}" 
                                        class="form-input" 
                                        required>
@@ -330,7 +333,7 @@
                             <label for="street" class="form-label">Logradouro</label>
                             <input type="text" 
                                    id="street" 
-                                   name="street" 
+                                   name="endereco" 
                                    value="{{ old('street') }}" 
                                    class="form-input" 
                                    required>
@@ -340,7 +343,7 @@
                             <label for="number" class="form-label">Número</label>
                             <input type="text" 
                                    id="number" 
-                                   name="number" 
+                                   name="numero" 
                                    value="{{ old('number') }}" 
                                    class="form-input" 
                                    required>
@@ -350,7 +353,7 @@
                             <label for="complement" class="form-label">Complemento</label>
                             <input type="text" 
                                    id="complement" 
-                                   name="complement" 
+                                   name="complemento" 
                                    value="{{ old('complement') }}" 
                                    class="form-input">
                         </div>
@@ -359,7 +362,7 @@
                             <label for="neighborhood" class="form-label">Bairro</label>
                             <input type="text" 
                                    id="neighborhood" 
-                                   name="neighborhood" 
+                                   name="bairro" 
                                    value="{{ old('neighborhood') }}" 
                                    class="form-input" 
                                    required>
@@ -369,7 +372,7 @@
                             <label for="city" class="form-label">Cidade</label>
                             <input type="text" 
                                    id="city" 
-                                   name="city" 
+                                   name="cidade" 
                                    value="{{ old('city') }}" 
                                    class="form-input" 
                                    required>
@@ -378,37 +381,37 @@
                         <div class="form-group">
                             <label for="state" class="form-label">Estado</label>
                             <select id="state" 
-                                    name="state" 
+                                    name="estado" 
                                     class="form-input"
                                     required>
                                 <option value="">Selecione um estado</option>
-                                <option value="AC" {{ old('state') == 'AC' ? 'selected' : '' }}>Acre</option>
-                                <option value="AL" {{ old('state') == 'AL' ? 'selected' : '' }}>Alagoas</option>
-                                <option value="AP" {{ old('state') == 'AP' ? 'selected' : '' }}>Amapá</option>
-                                <option value="AM" {{ old('state') == 'AM' ? 'selected' : '' }}>Amazonas</option>
-                                <option value="BA" {{ old('state') == 'BA' ? 'selected' : '' }}>Bahia</option>
-                                <option value="CE" {{ old('state') == 'CE' ? 'selected' : '' }}>Ceará</option>
-                                <option value="DF" {{ old('state') == 'DF' ? 'selected' : '' }}>Distrito Federal</option>
-                                <option value="ES" {{ old('state') == 'ES' ? 'selected' : '' }}>Espírito Santo</option>
-                                <option value="GO" {{ old('state') == 'GO' ? 'selected' : '' }}>Goiás</option>
-                                <option value="MA" {{ old('state') == 'MA' ? 'selected' : '' }}>Maranhão</option>
-                                <option value="MT" {{ old('state') == 'MT' ? 'selected' : '' }}>Mato Grosso</option>
-                                <option value="MS" {{ old('state') == 'MS' ? 'selected' : '' }}>Mato Grosso do Sul</option>
-                                <option value="MG" {{ old('state') == 'MG' ? 'selected' : '' }}>Minas Gerais</option>
-                                <option value="PA" {{ old('state') == 'PA' ? 'selected' : '' }}>Pará</option>
-                                <option value="PB" {{ old('state') == 'PB' ? 'selected' : '' }}>Paraíba</option>
-                                <option value="PR" {{ old('state') == 'PR' ? 'selected' : '' }}>Paraná</option>
-                                <option value="PE" {{ old('state') == 'PE' ? 'selected' : '' }}>Pernambuco</option>
-                                <option value="PI" {{ old('state') == 'PI' ? 'selected' : '' }}>Piauí</option>
-                                <option value="RJ" {{ old('state') == 'RJ' ? 'selected' : '' }}>Rio de Janeiro</option>
-                                <option value="RN" {{ old('state') == 'RN' ? 'selected' : '' }}>Rio Grande do Norte</option>
-                                <option value="RS" {{ old('state') == 'RS' ? 'selected' : '' }}>Rio Grande do Sul</option>
-                                <option value="RO" {{ old('state') == 'RO' ? 'selected' : '' }}>Rondônia</option>
-                                <option value="RR" {{ old('state') == 'RR' ? 'selected' : '' }}>Roraima</option>
-                                <option value="SC" {{ old('state') == 'SC' ? 'selected' : '' }}>Santa Catarina</option>
-                                <option value="SP" {{ old('state') == 'SP' ? 'selected' : '' }}>São Paulo</option>
-                                <option value="SE" {{ old('state') == 'SE' ? 'selected' : '' }}>Sergipe</option>
-                                <option value="TO" {{ old('state') == 'TO' ? 'selected' : '' }}>Tocantins</option>
+                                <option value="AC" {{ old('estado') == 'AC' ? 'selected' : '' }}>Acre</option>
+                                <option value="AL" {{ old('estado') == 'AL' ? 'selected' : '' }}>Alagoas</option>
+                                <option value="AP" {{ old('estado') == 'AP' ? 'selected' : '' }}>Amapá</option>
+                                <option value="AM" {{ old('estado') == 'AM' ? 'selected' : '' }}>Amazonas</option>
+                                <option value="BA" {{ old('estado') == 'BA' ? 'selected' : '' }}>Bahia</option>
+                                <option value="CE" {{ old('estado') == 'CE' ? 'selected' : '' }}>Ceará</option>
+                                <option value="DF" {{ old('estado') == 'DF' ? 'selected' : '' }}>Distrito Federal</option>
+                                <option value="ES" {{ old('estado') == 'ES' ? 'selected' : '' }}>Espírito Santo</option>
+                                <option value="GO" {{ old('estado') == 'GO' ? 'selected' : '' }}>Goiás</option>
+                                <option value="MA" {{ old('estado') == 'MA' ? 'selected' : '' }}>Maranhão</option>
+                                <option value="MT" {{ old('estado') == 'MT' ? 'selected' : '' }}>Mato Grosso</option>
+                                <option value="MS" {{ old('estado') == 'MS' ? 'selected' : '' }}>Mato Grosso do Sul</option>
+                                <option value="MG" {{ old('estado') == 'MG' ? 'selected' : '' }}>Minas Gerais</option>
+                                <option value="PA" {{ old('estado') == 'PA' ? 'selected' : '' }}>Pará</option>
+                                <option value="PB" {{ old('estado') == 'PB' ? 'selected' : '' }}>Paraíba</option>
+                                <option value="PR" {{ old('estado') == 'PR' ? 'selected' : '' }}>Paraná</option>
+                                <option value="PE" {{ old('estado') == 'PE' ? 'selected' : '' }}>Pernambuco</option>
+                                <option value="PI" {{ old('estado') == 'PI' ? 'selected' : '' }}>Piauí</option>
+                                <option value="RJ" {{ old('estado') == 'RJ' ? 'selected' : '' }}>Rio de Janeiro</option>
+                                <option value="RN" {{ old('estado') == 'RN' ? 'selected' : '' }}>Rio Grande do Norte</option>
+                                <option value="RS" {{ old('estado') == 'RS' ? 'selected' : '' }}>Rio Grande do Sul</option>
+                                <option value="RO" {{ old('estado') == 'RO' ? 'selected' : '' }}>Rondônia</option>
+                                <option value="RR" {{ old('estado') == 'RR' ? 'selected' : '' }}>Roraima</option>
+                                <option value="SC" {{ old('estado') == 'SC' ? 'selected' : '' }}>Santa Catarina</option>
+                                <option value="SP" {{ old('estado') == 'SP' ? 'selected' : '' }}>São Paulo</option>
+                                <option value="SE" {{ old('estado') == 'SE' ? 'selected' : '' }}>Sergipe</option>
+                                <option value="TO" {{ old('estado') == 'TO' ? 'selected' : '' }}>Tocantins</option>
                             </select>
                         </div>
                     </div>
@@ -443,7 +446,7 @@
         
         <!-- Seção gráfica (visível apenas em telas grandes) -->
         <div class="register-graphic-section">
-            <!-- Aqui você pode adicionar uma imagem ou ilustração -->
+            <img src="{{ asset('img/izuspay-login.png') }}" alt="Izuspay" class="graphic-img">
         </div>
     </div>
     

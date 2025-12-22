@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Associacao;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\DashboardSetting;
+use Illuminate\Http\Request;
 
 class DashboardSettingsController extends Controller
 {
     public function saveLayout(Request $request)
     {
         $request->validate([
-            'layout' => 'required|array'
+            'layout' => 'required|array',
         ]);
 
         DashboardSetting::updateOrCreate(

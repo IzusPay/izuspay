@@ -16,9 +16,9 @@ class PagamentoController extends Controller
         $user = auth()->user();
         // Assume que há uma venda com status 'awaiting_payment'
         $pendingSale = Sale::where('user_id', $user->id)
-                           ->where('status', 'awaiting_payment')
-                           ->with('plan')
-                           ->firstOrFail();
+            ->where('status', 'awaiting_payment')
+            ->with('plan')
+            ->firstOrFail();
 
         return view('cliente.pagamento.index', compact('pendingSale'));
     }

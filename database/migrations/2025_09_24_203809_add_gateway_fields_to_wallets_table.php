@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('wallets', function (Blueprint $table) {
             // Relacionamento com o gateway escolhido pelo cliente
             $table->foreignId('gateway_id')->nullable()->after('association_id')->constrained('gateways')->nullOnDelete();
-            
+
             // Armazena as credenciais (ex: access_token, private_key) de forma criptografada
             $table->text('gateway_credentials')->nullable()->after('gateway_id');
         });

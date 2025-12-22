@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-use Vinkla\Hashids\Facades\Hashids as HashidsFacade; 
 use Hashids\Hashids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Plan extends Model
@@ -38,11 +37,11 @@ class Plan extends Model
     protected static function booted(): void
     {
         static::creating(function (Plan $plan) {
-            $hashids = new Hashids(config('app.key'), 8); 
-            $plan->hash_id = $hashids->encode(time()); 
+            $hashids = new Hashids(config('app.key'), 8);
+            $plan->hash_id = $hashids->encode(time());
         });
     }
-    
+
     // Define o relacionamento com a associação
     public function association(): BelongsTo
     {
@@ -81,7 +80,7 @@ class Plan extends Model
      */
     public function getFormattedPriceAttribute(): string
     {
-        return 'R$ ' . number_format($this->price_in_reais, 2, ',', '.');
+        return 'R$ '.number_format($this->price_in_reais, 2, ',', '.');
     }
 
     /**

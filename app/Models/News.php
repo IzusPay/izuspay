@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class News extends Model
 {
@@ -51,7 +50,7 @@ class News extends Model
     public function scopePublished($query)
     {
         return $query->where('status', 'published')
-                    ->where('published_at', '<=', now());
+            ->where('published_at', '<=', now());
     }
 
     /**
@@ -59,9 +58,9 @@ class News extends Model
      */
     public function scopePublic($query)
     {
-        return $query->where(function($q) {
+        return $query->where(function ($q) {
             $q->where('is_private', false)
-              ->orWhereNull('is_private');
+                ->orWhereNull('is_private');
         });
     }
 
@@ -81,9 +80,7 @@ class News extends Model
         return $query->where('type', $type);
     }
 
-
     // ==================== MÉTODOS ====================
-
 
     /**
      * Verificar se é conteúdo privado
@@ -98,7 +95,7 @@ class News extends Model
      */
     public function isPublic(): bool
     {
-        return !$this->isPrivate();
+        return ! $this->isPrivate();
     }
 
     /**
@@ -151,9 +148,9 @@ class News extends Model
     public function getFeaturedImageUrlAttribute(): string
     {
         if ($this->featured_image) {
-            return asset('storage/' . $this->featured_image);
+            return asset('storage/'.$this->featured_image);
         }
-        
+
         return asset('images/default-news.jpg');
     }
 
@@ -165,7 +162,7 @@ class News extends Model
         if ($value) {
             return $value;
         }
-        
+
         return Str::limit(strip_tags($this->content), 150);
     }
 
@@ -175,6 +172,7 @@ class News extends Model
     public function getReadingTimeAttribute(): int
     {
         $wordCount = str_word_count(strip_tags($this->content));
+
         return max(1, ceil($wordCount / 200)); // 200 palavras por minuto
     }
 
@@ -183,8 +181,8 @@ class News extends Model
      */
     public function getFormattedDateAttribute(): string
     {
-        return $this->published_at ? 
-            $this->published_at->format('d/m/Y \à\s H:i') : 
+        return $this->published_at ?
+            $this->published_at->format('d/m/Y \à\s H:i') :
             $this->created_at->format('d/m/Y \à\s H:i');
     }
 
@@ -194,6 +192,7 @@ class News extends Model
     public function getRelativeDateAttribute(): string
     {
         $date = $this->published_at ?: $this->created_at;
+
         return $date->diffForHumans();
     }
 
@@ -205,11 +204,11 @@ class News extends Model
         if ($this->creatorProfile) {
             return $this->creatorProfile->display_name;
         }
-        
+
         if ($this->author) {
             return $this->author->name;
         }
-        
+
         return 'Admin';
     }
 
@@ -221,12 +220,12 @@ class News extends Model
         if ($this->creatorProfile) {
             return $this->creatorProfile->profile_image_url;
         }
-        
+
         if ($this->author) {
-            return "https://ui-avatars.com/api/?name=" . urlencode($this->author->name) . "&background=22c55e&color=fff&size=200";
+            return 'https://ui-avatars.com/api/?name='.urlencode($this->author->name).'&background=22c55e&color=fff&size=200';
         }
-        
-        return "https://ui-avatars.com/api/?name=Admin&background=22c55e&color=fff&size=200";
+
+        return 'https://ui-avatars.com/api/?name=Admin&background=22c55e&color=fff&size=200';
     }
 
     // ==================== SCOPES ====================
@@ -286,8 +285,8 @@ class News extends Model
     {
         return $query->where(function ($q) use ($term) {
             $q->where('title', 'like', "%{$term}%")
-              ->orWhere('content', 'like', "%{$term}%")
-              ->orWhere('excerpt', 'like', "%{$term}%");
+                ->orWhere('content', 'like', "%{$term}%")
+                ->orWhere('excerpt', 'like', "%{$term}%");
         });
     }
 
@@ -297,7 +296,7 @@ class News extends Model
     public function scopeLatest($query)
     {
         return $query->orderBy('published_at', 'desc')
-                    ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', 'desc');
     }
 
     /**
@@ -305,7 +304,7 @@ class News extends Model
      */
     public function scopeFromFollowedCreators($query, $userId)
     {
-        return $query->whereHas('creatorProfile.followers', function($q) use ($userId) {
+        return $query->whereHas('creatorProfile.followers', function ($q) use ($userId) {
             $q->where('user_id', $userId);
         });
     }
@@ -320,30 +319,30 @@ class News extends Model
         parent::boot();
 
         static::creating(function ($news) {
-            if (!$news->slug) {
-                $news->slug = Str::slug($news->title) . '-' . $news->id;
-                
+            if (! $news->slug) {
+                $news->slug = Str::slug($news->title).'-'.$news->id;
+
                 // Garantir que o slug seja único
                 $originalSlug = $news->slug;
                 $counter = 1;
-                
+
                 while (static::where('slug', $news->slug)->exists()) {
-                    $news->slug = $originalSlug . '-' . $counter;
+                    $news->slug = $originalSlug.'-'.$counter;
                     $counter++;
                 }
             }
         });
 
         static::updating(function ($news) {
-            if ($news->isDirty('title') && !$news->isDirty('slug')) {
+            if ($news->isDirty('title') && ! $news->isDirty('slug')) {
                 $news->slug = Str::slug($news->title);
-                
+
                 // Garantir que o slug seja único
                 $originalSlug = $news->slug;
                 $counter = 1;
-                
+
                 while (static::where('slug', $news->slug)->where('id', '!=', $news->id)->exists()) {
-                    $news->slug = $originalSlug . '-' . $counter;
+                    $news->slug = $originalSlug.'-'.$counter;
                     $counter++;
                 }
             }
@@ -362,8 +361,8 @@ class News extends Model
                 if ($creatorProfile) {
                     // Recalcular contador de posts publicados
                     $publishedCount = static::where('creator_profile_id', $creatorProfile->id)
-                                           ->where('status', 'published')
-                                           ->count();
+                        ->where('status', 'published')
+                        ->count();
                     $creatorProfile->update(['posts_count' => $publishedCount]);
                 }
             }
@@ -441,8 +440,8 @@ class News extends Model
      */
     public function isPublished(): bool
     {
-        return $this->status === 'published' && 
-               $this->published_at && 
+        return $this->status === 'published' &&
+               $this->published_at &&
                $this->published_at <= now();
     }
 
@@ -467,15 +466,15 @@ class News extends Model
      */
     public function hasCreator(): bool
     {
-        return !is_null($this->creator_profile_id);
+        return ! is_null($this->creator_profile_id);
     }
-    
+
     /**
      * Obter badge do status
      */
     public function getStatusBadge(): string
     {
-        $statusBadge = match($this->status) {
+        $statusBadge = match ($this->status) {
             'published' => '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Publicada</span>',
             'draft' => '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">Rascunho</span>',
             'archived' => '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">Arquivada</span>',
@@ -489,13 +488,12 @@ class News extends Model
         return $statusBadge;
     }
 
-
     /**
      * Obter cor do status
      */
     public function getStatusColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'published' => 'green',
             'draft' => 'yellow',
             'archived' => 'gray',

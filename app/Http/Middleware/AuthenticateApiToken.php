@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
-use App\Models\User; // Importe o seu model User
+use Symfony\Component\HttpFoundation\Response; // Importe o seu model User
 
 class AuthenticateApiToken
 {
@@ -21,7 +21,7 @@ class AuthenticateApiToken
         $token = $request->bearerToken();
 
         // Se não houver token, retorne um erro 401 (Não Autorizado).
-        if (!$token) {
+        if (! $token) {
             return response()->json(['message' => 'Token de autenticação não fornecido.'], 401);
         }
 
@@ -31,7 +31,7 @@ class AuthenticateApiToken
         $user = User::where('api_token', $hashedToken)->first();
 
         // 3. Verificar se o usuário foi encontrado e se está ativo.
-        if (!$user || $user->status !== 'ativo') {
+        if (! $user || $user->status !== 'ativo') {
             // Se não encontrar o usuário ou ele estiver inativo, retorne um erro 401.
             return response()->json(['message' => 'Não autorizado. Token inválido ou usuário inativo.'], 401);
         }

@@ -74,11 +74,8 @@ class Association extends Model
         return $this->hasMany(Fee::class);
     }
 
-
     /**
      * Calcula e retorna um array detalhado com os valores da carteira.
-     *
-     * @return array
      */
     public function getBalanceDetailsAttribute(): array
     {
@@ -91,12 +88,13 @@ class Association extends Model
         // 2. Total de Taxas
         $totalFees = $this->sales->where('status', 'paid')->sum(function ($sale) {
             $feeConfig = $this->fees->where('payment_method', $sale->payment_method)->first();
-            
+
             // Valores padrão se não houver taxa configurada
             $percentage = $feeConfig->percentage_fee ?? 4.99;
             $fixed = $feeConfig->fixed_fee ?? 0.40;
 
             $feeForSale = ($sale->total_price * ($percentage / 100)) + $fixed;
+
             return $feeForSale;
         });
 
@@ -106,34 +104,40 @@ class Association extends Model
         // 4. Total Transferido (Saques aprovados/concluídos)
         $totalWithdrawn = $this->withdrawals->whereIn('status', ['completed', 'approved'])->sum('amount');
 
-        // 5. Saldo Disponível para Saque (Líquido - Transferido)
+        // 5. Saldo Disponível para Saque (Líquido - Transferido), nunca negativo
         // Aqui você pode adicionar regras de liberação (ex: D+14, D+30)
-        $available = $totalNet - $totalWithdrawn;
+        $available = max(0, $totalNet - $totalWithdrawn);
 
-        // 6. Aguardando Liberação (Vendas recentes que ainda não podem ser sacadas)
-        // Exemplo simples: vendas nos últimos 14 dias. Adapte à sua regra.
+        // 6. Aguardando Liberação (D+14): calcular valor LÍQUIDO das vendas recentes
         $pendingRelease = $this->sales
             ->where('status', 'paid')
             ->where('created_at', '>', now()->subDays(14))
-            ->sum('total_price'); // Este seria o valor bruto, o ideal é calcular o líquido.
+            ->sum(function ($sale) {
+                $feeConfig = $this->fees->where('payment_method', $sale->payment_method)->first();
+                $percentage = $feeConfig->percentage_fee ?? 4.99;
+                $fixed = $feeConfig->fixed_fee ?? 0.40;
+                $feeForSale = ($sale->total_price * ($percentage / 100)) + $fixed;
+
+                return max(0, $sale->total_price - $feeForSale);
+            });
 
         // 7. Retido (Chargebacks, disputas, etc.)
         $retained = $this->sales->whereIn('status', ['chargeback', 'in_dispute'])->sum('total_price');
 
-        // 8. Aguardando Aprovação de Saque
+        // 8. Aguardando Aprovação de Saque (pendentes)
         $pendingWithdrawal = $this->withdrawals->where('status', 'pending')->sum('amount');
 
         return [
             'total_gross' => $totalGross,
             'total_withdrawn' => $totalWithdrawn,
-            'available' => $available,
+            'available' => max(0, $totalNet - $pendingRelease - $totalWithdrawn - $pendingWithdrawal),
             'pending_release' => $pendingRelease,
             'retained' => $retained,
             'pending_withdrawal' => $pendingWithdrawal,
             'last_update' => now()->diffForHumans(),
         ];
     }
-    
+
     /**
      * Membros da associação
      */
@@ -147,11 +151,11 @@ class Association extends Model
         return $this->hasOne(Wallet::class);
     }
 
-     public function sales(): HasMany // <<<<<<< ADICIONE ESTE MÉTODO
+    public function sales(): HasMany // <<<<<<< ADICIONE ESTE MÉTODO
     {
         return $this->hasMany(Sale::class);
     }
-    
+
     /**
      * Contas bancárias da associação
      */
@@ -162,19 +166,17 @@ class Association extends Model
 
     /**
      * Retorna os detalhes das taxas para a associação.
-     * 
+     *
      * NOTA: Atualmente, estes valores são fixos (hardcoded).
      * O ideal é que estes dados venham de uma tabela de configurações
      * ou de um relacionamento com a associação.
-     *
-     * @return array
      */
     public function getFeeDetailsAttribute(): array
     {
         // Lógica para buscar as taxas da associação.
         // Por enquanto, vamos retornar valores padrão.
         // Você pode substituir esta lógica para buscar do banco de dados.
-        
+
         if (isset($this->configuracoes['fees'])) {
             // Se você já armazena as taxas em uma coluna JSON 'configuracoes'
             return $this->configuracoes['fees'];
@@ -215,14 +217,16 @@ class Association extends Model
      */
     public function getDocumentoFormatadoAttribute(): string
     {
-        if (!$this->documento) return '';
-        
+        if (! $this->documento) {
+            return '';
+        }
+
         if (strlen($this->documento) === 11) {
             return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $this->documento);
         } elseif (strlen($this->documento) === 14) {
             return preg_replace('/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/', '$1.$2.$3/$4-$5', $this->documento);
         }
-        
+
         return $this->documento;
     }
 
@@ -231,16 +235,18 @@ class Association extends Model
      */
     public function getTelefoneFormatadoAttribute(): string
     {
-        if (!$this->telefone) return '';
-        
+        if (! $this->telefone) {
+            return '';
+        }
+
         $telefone = preg_replace('/\D/', '', $this->telefone);
-        
+
         if (strlen($telefone) === 11) {
             return preg_replace('/(\d{2})(\d{5})(\d{4})/', '($1) $2-$3', $telefone);
         } elseif (strlen($telefone) === 10) {
             return preg_replace('/(\d{2})(\d{4})(\d{4})/', '($1) $2-$3', $telefone);
         }
-        
+
         return $this->telefone;
     }
 
@@ -249,8 +255,10 @@ class Association extends Model
      */
     public function getCepFormatadoAttribute(): string
     {
-        if (!$this->cep) return '';
-        
+        if (! $this->cep) {
+            return '';
+        }
+
         return preg_replace('/(\d{5})(\d{3})/', '$1-$2', $this->cep);
     }
 
@@ -259,15 +267,15 @@ class Association extends Model
      */
     public function getEnderecoCompletoAttribute(): string
     {
-        $endereco = $this->endereco . ', ' . $this->numero;
-        
+        $endereco = $this->endereco.', '.$this->numero;
+
         if ($this->complemento) {
-            $endereco .= ' - ' . $this->complemento;
+            $endereco .= ' - '.$this->complemento;
         }
-        
-        $endereco .= ' - ' . $this->bairro . ', ' . $this->cidade . '/' . $this->estado;
-        $endereco .= ' - CEP: ' . $this->cep_formatado;
-        
+
+        $endereco .= ' - '.$this->bairro.', '.$this->cidade.'/'.$this->estado;
+        $endereco .= ' - CEP: '.$this->cep_formatado;
+
         return $endereco;
     }
 
@@ -312,8 +320,8 @@ class Association extends Model
     {
         return $query->where(function ($q) use ($termo) {
             $q->where('nome', 'like', "%{$termo}%")
-              ->orWhere('documento', 'like', "%{$termo}%")
-              ->orWhere('email', 'like', "%{$termo}%");
+                ->orWhere('documento', 'like', "%{$termo}%")
+                ->orWhere('email', 'like', "%{$termo}%");
         });
     }
 
@@ -372,7 +380,7 @@ class Association extends Model
      */
     public function getCorStatus(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'ativa' => 'success',
             'inativa' => 'danger',
             'pendente' => 'warning',
@@ -386,7 +394,7 @@ class Association extends Model
      */
     public function getBadgeStatus(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'ativa' => '<span class="badge bg-success">Ativa</span>',
             'inativa' => '<span class="badge bg-danger">Inativa</span>',
             'pendente' => '<span class="badge bg-warning">Pendente</span>',
@@ -400,7 +408,7 @@ class Association extends Model
      */
     public function getBadgeTipo(): string
     {
-        return match($this->tipo) {
+        return match ($this->tipo) {
             'pf' => '<span class="badge bg-info">Pessoa Física</span>',
             'cnpj' => '<span class="badge bg-primary">Pessoa Jurídica</span>',
             default => '<span class="badge bg-secondary">Indefinido</span>'
@@ -412,7 +420,7 @@ class Association extends Model
     {
         return $this->hasMany(Plan::class);
     }
-    
+
     // Relacionamento com os produtos
     public function products(): HasMany
     {
@@ -446,21 +454,21 @@ class Association extends Model
             $originalSlug = $association->slug;
             $counter = 1;
             while (static::where('slug', $association->slug)->exists()) {
-                $association->slug = $originalSlug . '-' . $counter;
+                $association->slug = $originalSlug.'-'.$counter;
                 $counter++;
             }
         });
 
         static::updating(function ($association) {
             // Se o nome foi alterado e o slug não foi manualmente editado, gera um novo slug
-            if ($association->isDirty('nome') && !$association->isDirty('slug')) {
+            if ($association->isDirty('nome') && ! $association->isDirty('slug')) {
                 $association->slug = Str::slug($association->nome);
 
                 // Garante que o slug seja único
                 $originalSlug = $association->slug;
                 $counter = 1;
                 while (static::where('slug', $association->slug)->where('id', '!=', $association->id)->exists()) {
-                    $association->slug = $originalSlug . '-' . $counter;
+                    $association->slug = $originalSlug.'-'.$counter;
                     $counter++;
                 }
             }
@@ -468,12 +476,12 @@ class Association extends Model
     }
 
     public function associationDocuments()
-{
-    return $this->hasManyThrough(
-        Documentation::class,
-        User::class,
-        'association_id',
-        'user_id'
-    );
-}
+    {
+        return $this->hasManyThrough(
+            Documentation::class,
+            User::class,
+            'association_id',
+            'user_id'
+        );
+    }
 }

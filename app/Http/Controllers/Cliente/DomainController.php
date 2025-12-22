@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Domain;
 use App\Models\DomainModel;
-use App\Models\Page;
 use App\Models\PageModel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DomainController extends Controller
@@ -15,6 +13,7 @@ class DomainController extends Controller
     public function index()
     {
         $domains = DomainModel::where('user_id', Auth::user()->id)->get();
+
         return view('cliente.domains.index', compact('domains'));
     }
 

@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Subscription extends Model
 {
@@ -33,7 +33,7 @@ class Subscription extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class);
@@ -43,7 +43,7 @@ class Subscription extends Model
     {
         return $this->belongsTo(Association::class);
     }
-    
+
     public function sale(): BelongsTo
     {
         return $this->belongsTo(Sale::class);

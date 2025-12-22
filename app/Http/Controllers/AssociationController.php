@@ -3,18 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Association;
+use App\Models\CreatorProfile;
 use App\Models\Documentation;
 use App\Models\DocumentType;
 use App\Models\User;
-use App\Models\CreatorProfile;
-use App\Models\PerfilModel;
 use App\Models\UserPerfilModel;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class AssociationController extends Controller
 {
@@ -80,13 +79,20 @@ class AssociationController extends Controller
             Wallet::create([
                 'association_id' => $association->id,
                 'balance' => 0,
-                'gateway_id' => 1
+                'gateway_id' => 1,
             ]);
 
             $defaultFees = [
-                ['payment_method' => 'pix',         'percentage_fee' => 4.99, 'fixed_fee' => 1.49],
-                ['payment_method' => 'credit_card', 'percentage_fee' => 4.99, 'fixed_fee' => 0.40],
-                ['payment_method' => 'boleto',      'percentage_fee' => 0.00, 'fixed_fee' => 3.49],
+                [
+                    'payment_method' => 'pix',
+                    'percentage_fee' => 4.99,
+                    'fixed_fee' => 1.49,
+                ],
+                [
+                    'payment_method' => 'withdrawal',
+                    'percentage_fee' => 0.00,
+                    'fixed_fee' => 5.00,
+                ],
             ];
 
             // Cria um registro de taxa para cada método de pagamento.
@@ -112,7 +118,7 @@ class AssociationController extends Controller
                 'bio' => 'bio',
                 'category' => 'tecnologia',
                 'website' => 'https://www.google.com',
-                'location' => $request->cidade . ', ' . $request->estado,
+                'location' => $request->cidade.', '.$request->estado,
                 'is_verified' => false,
                 'is_active' => true,
                 'followers_count' => 0,
@@ -130,18 +136,18 @@ class AssociationController extends Controller
             $tipoConta = $request->tipo;
 
             $requiredDocumentTypes = DocumentType::where('is_required', true)
-                                                ->where('is_active', true)
-                                                ->get();
+                ->where('is_active', true)
+                ->get();
 
             foreach ($requiredDocumentTypes as $documentType) {
                 if ($tipoConta === 'pf' && Str::contains($documentType->name, 'CNPJ')) {
                     continue;
                 }
-                
+
                 Documentation::create([
                     'user_id' => $user->id,
                     'document_type_id' => $documentType->id,
-                    'file_path' => null, 
+                    'file_path' => null,
                     'status' => 'missing', // Define o status como 'Faltando'
                     'rejection_reason' => 'Documento ainda não enviado durante o cadastro.',
                 ]);
@@ -155,8 +161,8 @@ class AssociationController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            \Log::error('Erro no cadastro de criador: ' . $e->getMessage());
+
+            \Log::error('Erro no cadastro de criador: '.$e->getMessage());
 
             return back()
                 ->withErrors(['error' => 'Não foi possível realizar o cadastro. Por favor, tente novamente.'])

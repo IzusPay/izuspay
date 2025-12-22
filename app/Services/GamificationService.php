@@ -11,13 +11,13 @@ class GamificationService
     public static function getGamificationData($userId = null)
     {
         $user = User::find(auth()->user()->id);
-        
-        if (!$user || !$user->association_id) {
+
+        if (! $user || ! $user->association_id) {
             return null;
         }
 
         $associationId = $user->association_id;
-        
+
         // Calcular métricas
         $totalRevenue = Sale::where('association_id', $associationId)->where('status', 'paid')->sum('total_price');
         $totalSales = Sale::where('association_id', $associationId)->where('status', 'paid')->count();
@@ -106,16 +106,32 @@ class GamificationService
     {
         $achievements = [];
 
-        if ($revenue >= 10000) $achievements[] = ['name' => 'Primeira Receita', 'icon' => 'dollar-sign', 'unlocked' => true];
-        if ($revenue >= 100000) $achievements[] = ['name' => 'Seis Dígitos', 'icon' => 'trending-up', 'unlocked' => true];
-        if ($revenue >= 1000000) $achievements[] = ['name' => 'Milionário', 'icon' => 'crown', 'unlocked' => true];
+        if ($revenue >= 10000) {
+            $achievements[] = ['name' => 'Primeira Receita', 'icon' => 'dollar-sign', 'unlocked' => true];
+        }
+        if ($revenue >= 100000) {
+            $achievements[] = ['name' => 'Seis Dígitos', 'icon' => 'trending-up', 'unlocked' => true];
+        }
+        if ($revenue >= 1000000) {
+            $achievements[] = ['name' => 'Milionário', 'icon' => 'crown', 'unlocked' => true];
+        }
 
-        if ($sales >= 10) $achievements[] = ['name' => 'Vendedor Iniciante', 'icon' => 'shopping-cart', 'unlocked' => true];
-        if ($sales >= 100) $achievements[] = ['name' => 'Vendedor Expert', 'icon' => 'award', 'unlocked' => true];
-        if ($sales >= 1000) $achievements[] = ['name' => 'Máquina de Vendas', 'icon' => 'zap', 'unlocked' => true];
+        if ($sales >= 10) {
+            $achievements[] = ['name' => 'Vendedor Iniciante', 'icon' => 'shopping-cart', 'unlocked' => true];
+        }
+        if ($sales >= 100) {
+            $achievements[] = ['name' => 'Vendedor Expert', 'icon' => 'award', 'unlocked' => true];
+        }
+        if ($sales >= 1000) {
+            $achievements[] = ['name' => 'Máquina de Vendas', 'icon' => 'zap', 'unlocked' => true];
+        }
 
-        if ($members >= 50) $achievements[] = ['name' => 'Comunidade Ativa', 'icon' => 'users', 'unlocked' => true];
-        if ($members >= 500) $achievements[] = ['name' => 'Grande Comunidade', 'icon' => 'globe', 'unlocked' => true];
+        if ($members >= 50) {
+            $achievements[] = ['name' => 'Comunidade Ativa', 'icon' => 'users', 'unlocked' => true];
+        }
+        if ($members >= 500) {
+            $achievements[] = ['name' => 'Grande Comunidade', 'icon' => 'globe', 'unlocked' => true];
+        }
 
         return $achievements;
     }
@@ -132,7 +148,7 @@ class GamificationService
                     'target' => $milestone,
                     'current' => $revenue,
                     'progress' => ($revenue / $milestone) * 100,
-                    'description' => 'Receita de R$ ' . number_format($milestone, 0, ',', '.')
+                    'description' => 'Receita de R$ '.number_format($milestone, 0, ',', '.'),
                 ];
                 break;
             }
@@ -146,7 +162,7 @@ class GamificationService
         $firstName = explode(' ', trim($fullName))[0];
 
         $response = Http::get('https://api.genderize.io', [
-            'name' => $firstName
+            'name' => $firstName,
         ]);
 
         if ($response->ok()) {
