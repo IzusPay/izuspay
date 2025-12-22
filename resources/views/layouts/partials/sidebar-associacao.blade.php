@@ -30,11 +30,10 @@
             </div>
             <p class="text-2xl font-bold text-black dark:text-white">
                 <span x-show="showWallet">
-                    @if(isset($globalGamificationData))
-                        R$ {{ number_format($globalGamificationData['currentRevenue'], 2, ',', '.') }}
-                    @else
-                        R$ 0,00
-                    @endif
+                    @php
+                        $availableBalance = optional(auth()->user()->association)->balanceDetails['available'] ?? 0;
+                    @endphp
+                    R$ {{ number_format($availableBalance, 2, ',', '.') }}
                 </span>
                 <span x-show="!showWallet">R$ ••••••••</span>
             </p>
