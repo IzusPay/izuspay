@@ -22,6 +22,79 @@ class PaymentController extends Controller
     }
 
     /**
+     * Lista transações do vendedor autenticado (paginação).
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $apiUser = Auth::user();
+        $page = (int) ($request->input('page', 1));
+        $page = max(1, $page);
+        $perPage = (int) ($request->input('limit', 10));
+        $perPage = max(1, min($perPage, 100));
+
+        $statusInput = strtolower((string) $request->input('status', ''));
+        $statusMap = [
+            'pending' => 'awaiting_payment',
+            'paid' => 'paid',
+            'failed' => 'failed',
+            'refunded' => 'refunded',
+            'expired' => 'expired',
+        ];
+        $statusFilter = $statusMap[$statusInput] ?? null;
+
+        $methodInput = strtoupper((string) $request->input('paymentMethod', ''));
+        $methodMap = [
+            'PIX' => 'pix',
+        ];
+        $methodFilter = $methodMap[$methodInput] ?? null;
+
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+        $isValidDate = function ($v) {
+            return is_string($v) && preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $v);
+        };
+
+        $sales = Sale::where('association_id', $apiUser->association_id)
+            ->when($statusFilter, function ($q) use ($statusFilter) {
+                $q->where('status', $statusFilter);
+            })
+            ->when($methodFilter, function ($q) use ($methodFilter) {
+                $q->where('payment_method', $methodFilter);
+            })
+            ->when($isValidDate($startDate), function ($q) use ($startDate) {
+                $q->whereDate('created_at', '>=', $startDate);
+            })
+            ->when($isValidDate($endDate), function ($q) use ($endDate) {
+                $q->whereDate('created_at', '<=', $endDate);
+            })
+            ->latest()
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        $items = collect($sales->items())->map(function (Sale $sale) {
+            return [
+                'transaction_id' => $sale->transaction_hash,
+                'status' => $sale->status,
+                'amount' => (float) $sale->total_price,
+                'method' => $sale->payment_method,
+                'created_at' => $sale->created_at->toIso8601String(),
+                'updated_at' => $sale->updated_at->toIso8601String(),
+            ];
+        });
+
+        return response()->json([
+            'data' => $items,
+            'meta' => [
+                'page' => $sales->currentPage(),
+                'limit' => $sales->perPage(),
+                'current_page' => $sales->currentPage(),
+                'last_page' => $sales->lastPage(),
+                'per_page' => $sales->perPage(),
+                'total' => $sales->total(),
+            ],
+        ]);
+    }
+
+    /**
      * Cria uma nova transação de pagamento via API.
      */
     public function create(Request $request): JsonResponse

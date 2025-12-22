@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\GoatPaymentController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\SellerWalletController;
+use App\Http\Controllers\Api\WebhookEndpointApiController;
 use App\Http\Controllers\Api\WithdrawalApiController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\WebhookController;
@@ -27,10 +29,19 @@ Route::post('/witetec/postback', [CheckoutController::class, 'handlePostback'])-
 Route::post('/brpagg/postback', [CheckoutController::class, 'handleBrPaggPostback'])->name('api.brpagg.postback');
 
 Route::middleware('auth.api_token')->group(function () {
+    Route::get('/transactions', [PaymentController::class, 'index']);
     Route::post('/transactions', [PaymentController::class, 'create']);
     Route::get('/transactions/{transactionId}', [PaymentController::class, 'show']);
 
     Route::get('/withdrawals', [WithdrawalApiController::class, 'index']);
     Route::post('/withdrawals', [WithdrawalApiController::class, 'store']);
     Route::get('/withdrawals/{withdrawal}', [WithdrawalApiController::class, 'show']);
+
+    Route::get('/seller-wallet/gestao', [SellerWalletController::class, 'gestao']);
+
+    Route::get('/webhooks', [WebhookEndpointApiController::class, 'index']);
+    Route::post('/webhooks', [WebhookEndpointApiController::class, 'store']);
+    Route::get('/webhooks/{webhook}', [WebhookEndpointApiController::class, 'show']);
+    Route::put('/webhooks/{webhook}', [WebhookEndpointApiController::class, 'update']);
+    Route::delete('/webhooks/{webhook}', [WebhookEndpointApiController::class, 'destroy']);
 });

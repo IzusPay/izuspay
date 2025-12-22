@@ -66,6 +66,14 @@ Route::get('/cookies', function () {
 });
 
 Route::get('/docs', [PublicPageController::class, 'docs'])->name('show.docs');
+Route::get('/docs/api', function () {
+    $path = resource_path('views/api-docs.html');
+    if (! file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->make(file_get_contents($path), 200, ['Content-Type' => 'text/html']);
+})->name('docs.api');
 
 // Rotas de Checkout
 

@@ -402,15 +402,212 @@ Content-Type: application/json</code></pre>
 
             <section id="webhooks">
                 <h2>Webhooks</h2>
-                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/webhooks</span></div>
-                <div class="code-block"><div class="code-header"><span>REQUEST BODY</span></div><div class="code-body"><pre><code class="language-json">{
+                <div class="endpoint"><span class="endpoint-method post">POST</span><span class="endpoint-url">@{{BASE_URL}}/api/webhooks</span></div>
+                <div class="doc-panels">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Request</span>
+                            <span class="chip post">POST /api/webhooks</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>cURL</span></div>
+                                <div class="code-body">
+<pre><code class="language-bash">curl --location --request POST '@{{BASE_URL}}/api/webhooks' \
+--header 'Authorization: Bearer SEU_TOKEN' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
   "url": "https://seller.example.com/webhook-endpoint",
-  "description": "Production webhook for transaction events",
-  "eventType": "WITHDRAWAL"
-}</code></pre></div></div>
-                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/webhooks/{id}</span></div>
-                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/webhooks</span></div>
-                <div class="endpoint"><span class="endpoint-method get">DELETE</span><span class="endpoint-url">@{{BASE_URL}}/webhooks/{id}</span></div>
+  "description": "Principal",
+  "is_active": true
+}'</code></pre>
+                                </div>
+                            </div>
+                            <table class="schema-table" style="margin-top:12px">
+                                <thead><tr><th>Body Param</th><th>Tipo</th><th>Obrigatório</th></tr></thead>
+                                <tbody>
+                                    <tr><td>url</td><td>string (url)</td><td>sim</td></tr>
+                                    <tr><td>description</td><td>string</td><td>não</td></tr>
+                                    <tr><td>is_active</td><td>boolean</td><td>não</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Response</span>
+                            <span class="chip post">201 Created</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>application/json</span></div>
+                                <div class="code-body">
+<pre><code class="language-json">{
+  "data": { "id": 1, "url": "https://seller.example.com/webhook-endpoint", "description": "Principal", "is_active": true }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/api/webhooks</span></div>
+                <div class="doc-panels">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Request</span>
+                            <span class="chip get">GET /api/webhooks</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>cURL</span></div>
+                                <div class="code-body">
+<pre><code class="language-bash">curl --location --request GET '@{{BASE_URL}}/api/webhooks?page=1&amp;limit=15' \
+--header 'Authorization: Bearer SEU_TOKEN' \
+--header 'Accept: application/json'</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Response</span>
+                            <span class="chip get">200 OK</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>application/json</span></div>
+                                <div class="code-body">
+<pre><code class="language-json">{
+  "data": [
+    { "id": 1, "url": "https://seller.example.com/webhook-endpoint", "description": "Principal", "is_active": true }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 15,
+    "current_page": 1,
+    "last_page": 1,
+    "per_page": 15,
+    "total": 1
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint"><span class="endpoint-method get">GET</span><span class="endpoint-url">@{{BASE_URL}}/api/webhooks/{id}</span></div>
+                <div class="doc-panels">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Request</span>
+                            <span class="chip get">GET /api/webhooks/{id}</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>cURL</span></div>
+                                <div class="code-body">
+<pre><code class="language-bash">curl --location --request GET '@{{BASE_URL}}/api/webhooks/1' \
+--header 'Authorization: Bearer SEU_TOKEN' \
+--header 'Accept: application/json'</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Response</span>
+                            <span class="chip get">200 OK</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>application/json</span></div>
+                                <div class="code-body">
+<pre><code class="language-json">{
+  "data": { "id": 1, "url": "https://seller.example.com/webhook-endpoint", "description": "Principal", "is_active": true }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint"><span class="endpoint-method post">PUT</span><span class="endpoint-url">@{{BASE_URL}}/api/webhooks/{id}</span></div>
+                <div class="doc-panels">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Request</span>
+                            <span class="chip post">PUT /api/webhooks/{id}</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>cURL</span></div>
+                                <div class="code-body">
+<pre><code class="language-bash">curl --location --request PUT '@{{BASE_URL}}/api/webhooks/1' \
+--header 'Authorization: Bearer SEU_TOKEN' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+  "description": "Secundário",
+  "is_active": false
+}'</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Response</span>
+                            <span class="chip post">200 OK</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>application/json</span></div>
+                                <div class="code-body">
+<pre><code class="language-json">{
+  "data": { "id": 1, "url": "https://seller.example.com/webhook-endpoint", "description": "Secundário", "is_active": false }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint"><span class="endpoint-method delete">DELETE</span><span class="endpoint-url">@{{BASE_URL}}/api/webhooks/{id}</span></div>
+                <div class="doc-panels">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Request</span>
+                            <span class="chip delete">DELETE /api/webhooks/{id}</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>cURL</span></div>
+                                <div class="code-body">
+<pre><code class="language-bash">curl --location --request DELETE '@{{BASE_URL}}/api/webhooks/1' \
+--header 'Authorization: Bearer SEU_TOKEN' \
+--header 'Accept: application/json'</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Response</span>
+                            <span class="chip delete">204 No Content</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="code-block">
+                                <div class="code-header"><span>Sem corpo</span></div>
+                                <div class="code-body">
+<pre><code class="language-json"> </code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section id="two-factor-auth">
