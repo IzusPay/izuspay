@@ -2,9 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\ApiToken;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Symfony\Component\HttpFoundation\Response; // Importe o seu model User
 
 class AuthenticateApiToken
@@ -31,11 +34,19 @@ class AuthenticateApiToken
         $user = User::where('api_token', $hashedToken)->first();
 
         if (! $user) {
-            return response()->json(['message' => 'Não autorizado. Token inválido.'], 401);
+            $record = ApiToken::where('active', true)->get()->first(function ($t) use ($token) {
+                try {
+                    return Crypt::decryptString($t->token) === $token;
+                } catch (\Throwable $e) {
+                    return false;
+                }
+            });
+            if (! $record) {
+                return response()->json(['message' => 'Não autorizado. Token inválido.'], 401);
+            }
+            $user = $record->user;
         }
-        // 4. Autenticar o usuário para esta requisição.
-        // Isso permite que você use Auth::user() nos seus controllers de API.
-        auth()->login($user);
+        Auth::login($user);
 
         // 5. Se tudo estiver OK, permita que a requisição continue.
         return $next($request);
