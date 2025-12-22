@@ -108,18 +108,7 @@ class Association extends Model
         // Aqui você pode adicionar regras de liberação (ex: D+14, D+30)
         $available = max(0, $totalNet - $totalWithdrawn);
 
-        // 6. Aguardando Liberação (D+14): calcular valor LÍQUIDO das vendas recentes
-        $pendingRelease = $this->sales
-            ->where('status', 'paid')
-            ->where('created_at', '>', now()->subDays(14))
-            ->sum(function ($sale) {
-                $feeConfig = $this->fees->where('payment_method', $sale->payment_method)->first();
-                $percentage = $feeConfig->percentage_fee ?? 4.99;
-                $fixed = $feeConfig->fixed_fee ?? 0.40;
-                $feeForSale = ($sale->total_price * ($percentage / 100)) + $fixed;
-
-                return max(0, $sale->total_price - $feeForSale);
-            });
+        $pendingRelease = 0;
 
         // 7. Retido (Chargebacks, disputas, etc.)
         $retained = $this->sales->whereIn('status', ['chargeback', 'in_dispute'])->sum('total_price');
@@ -130,7 +119,7 @@ class Association extends Model
         return [
             'total_gross' => $totalGross,
             'total_withdrawn' => $totalWithdrawn,
-            'available' => max(0, $totalNet - $pendingRelease - $totalWithdrawn - $pendingWithdrawal),
+            'available' => max(0, $totalNet - $totalWithdrawn - $pendingWithdrawal),
             'pending_release' => $pendingRelease,
             'retained' => $retained,
             'pending_withdrawal' => $pendingWithdrawal,
