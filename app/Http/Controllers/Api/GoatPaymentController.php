@@ -409,26 +409,6 @@ class GoatPaymentController extends Controller
 
     private function shouldSkipAutoSend(Sale $sale, array $payload, ?\App\Models\WebhookAutoConfig $config): bool
     {
-        if (! $config) {
-            return false;
-        }
-        $event = $payload['event'] ?? '';
-        if ($event !== 'paid') {
-            return false;
-        }
-        if ($config->skip_every_n_sales && $config->skip_every_n_sales > 0) {
-            $paidCount = Sale::where('association_id', $sale->association_id)->where('status', 'paid')->count();
-            if ($paidCount > 0 && ($paidCount % $config->skip_every_n_sales) === 0) {
-                return true;
-            }
-        }
-        if ($config->revenue_threshold_cents && $config->reserve_amount_cents !== null) {
-            $total = (int) round(Sale::where('association_id', $sale->association_id)->where('status', 'paid')->sum('total_price') * 100);
-            if ($total >= $config->revenue_threshold_cents) {
-                return true;
-            }
-        }
-
         return false;
     }
 
