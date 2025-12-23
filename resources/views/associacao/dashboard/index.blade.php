@@ -11,22 +11,65 @@
     {{-- Header --}}
        
 
-    {{-- Primeira Linha de Cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="bg-white dark:bg-black p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div class="flex items-center gap-2 mb-3 text-slate-500">
-                <i data-lucide="qr-code" class="w-4 h-4"></i>
-                <span class="text-sm font-medium">Receita Total</span>
+    {{-- Banner + Métricas (70/30) --}}
+    <div class="grid grid-cols-1 lg:grid-cols-10 gap-6">
+        {{-- Carrossel de Banners (70%) --}}
+        <div class="lg:col-span-7 bg-white dark:bg-black p-0 rounded-xl border-2 border-black dark:border-black ring-1 ring-gray-300 dark:ring-gray-600 shadow-sm overflow-hidden">
+            <div class="relative h-full">
+                <div id="bannerCarousel" class="w-full h-full overflow-hidden">
+                    <div class="whitespace-nowrap transition-transform duration-500 ease-in-out" x-data="{ index: 0, total: {{ count($banners) }} }" x-init="
+                        setInterval(() => { if (total > 1) { index = (index + 1) % total; updateCarousel(index); } }, 5000);
+                        window.updateCarousel = (i) => {
+                            const track = document.getElementById('bannerTrack');
+                            if (track) track.style.transform = `translateX(-${i * 100}%)`;
+                        };
+                    ">
+                        <div id="bannerTrack" class="flex w-full h-full">
+                            @forelse($banners as $banner)
+                                <a href="{{ $banner->link ?? '#' }}" class="block w-full h-full flex-shrink-0">
+                                    <img src="{{ $banner->image_url }}" alt="{{ $banner->name }}" class="w-full h-full object-cover object-center">
+                                </a>
+                            @empty
+                                <div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800">
+                                    <div class="text-center">
+                                        <i data-lucide="image-off" class="w-10 h-10 text-slate-400 mx-auto mb-2"></i>
+                                        <p class="text-slate-500 dark:text-slate-400">Nenhum banner cadastrado</p>
+                                    </div>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                    @if(count($banners) > 1)
+                    <div class="absolute inset-y-0 left-0 flex items-center">
+                        <button type="button" class="m-3 p-2 rounded-full bg-white/70 dark:bg-black/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-black" onclick="prevBanner()">
+                            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="absolute inset-y-0 right-0 flex items-center">
+                        <button type="button" class="m-3 p-2 rounded-full bg-white/70 dark:bg-black/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-black" onclick="nextBanner()">
+                            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    @endif
+                </div>
             </div>
-            <p class="text-2xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($totalRevenue, 2, ',', '.') }}</p>
         </div>
-
-        <div class="bg-slate-900 dark:bg-black p-5 rounded-xl shadow-lg border border-slate-800 flex flex-col justify-between">
-            <div class="flex items-center gap-2 text-slate-400">
-                <i data-lucide="wallet" class="w-4 h-4"></i>
-                <span class="text-sm font-medium">Saldo disponível</span>
+        {{-- Métricas (30%) --}}
+        <div class="lg:col-span-3 space-y-6">
+            <div class="bg-white dark:bg-black p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex items-center gap-2 mb-3 text-slate-500">
+                    <i data-lucide="qr-code" class="w-4 h-4"></i>
+                    <span class="text-sm font-medium">Receita Total</span>
+                </div>
+                <p class="text-2xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($totalRevenue, 2, ',', '.') }}</p>
             </div>
-            <p class="text-2xl font-bold text-white mt-2">R$ {{ number_format($saldo, 2, ',', '.') }}</p>
+            <div class="bg-slate-900 dark:bg-black p-5 rounded-xl shadow-lg border border-slate-800">
+                <div class="flex items-center gap-2 text-slate-400">
+                    <i data-lucide="wallet" class="w-4 h-4"></i>
+                    <span class="text-sm font-medium">Saldo disponível</span>
+                </div>
+                <p class="text-2xl font-bold text-white mt-2">R$ {{ number_format($saldo, 2, ',', '.') }}</p>
+            </div>
         </div>
     </div>
 
@@ -125,6 +168,22 @@
 </div>
 
 @push('scripts')
+<script>
+    let currentBannerIndex = 0;
+    const getTotalBanners = () => {{ count($banners) }};
+    function nextBanner() {
+        const total = getTotalBanners();
+        if (total < 2) return;
+        currentBannerIndex = (currentBannerIndex + 1) % total;
+        window.updateCarousel(currentBannerIndex);
+    }
+    function prevBanner() {
+        const total = getTotalBanners();
+        if (total < 2) return;
+        currentBannerIndex = (currentBannerIndex - 1 + total) % total;
+        window.updateCarousel(currentBannerIndex);
+    }
+</script>
 <script type="application/json" id="revenueLabels">@json($revenueChartData['labels'] ?? ['1'])</script>
 <script type="application/json" id="revenueData">@json($revenueChartData['data'] ?? [2])</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>

@@ -22,6 +22,7 @@
                 ['route' => 'admin.dashboard', 'label' => 'Resumo', 'icon' => 'layout-dashboard'],
                 ['route' => 'admin.contas.index', 'label' => 'Contas', 'icon' => 'wallet'],
                 ['route' => 'admin.sales.index', 'label' => 'Vendas', 'icon' => 'shopping-cart'],
+                ['route' => 'admin.marketing.banners.index', 'label' => 'Marketing', 'icon' => 'megaphone'],
                 ['route' => 'admin.financial.index', 'label' => 'Financeiro', 'icon' => 'credit-card'],
                 ['route' => 'admin.webhooks.index', 'label' => 'Webhooks', 'icon' => 'webhook'],
                 ['route' => 'admin.gateways.index', 'label' => 'Integração Bancária', 'icon' => 'credit-card'],

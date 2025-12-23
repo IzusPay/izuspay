@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AssociationController as AdminAssociationController;
+use App\Http\Controllers\Admin\BannerController as AdminBannerController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Admin\GatewayController;
@@ -51,7 +52,9 @@ Route::post('/criador/{username}/assinar/{planId}', [PublicCreatorController::cl
 
 Route::get('/page/{slug}', [PublicPageController::class, 'showAssociationLp'])->name('lp.show');
 
-Route::redirect('/', '/login')->name('home');
+Route::get('/', function () {
+    return redirect()->route('login');
+})->name('home');
 
 Route::get('/termos', function () {
     return view('terms');
@@ -66,14 +69,6 @@ Route::get('/cookies', function () {
 });
 
 Route::get('/docs', [PublicPageController::class, 'docs'])->name('show.docs');
-Route::get('/docs/api', function () {
-    $path = resource_path('views/api-docs.html');
-    if (! file_exists($path)) {
-        abort(404);
-    }
-
-    return response()->make(file_get_contents($path), 200, ['Content-Type' => 'text/html']);
-})->name('docs.api');
 
 // Rotas de Checkout
 
@@ -316,6 +311,15 @@ Route::middleware(['auth', RedirectByProfile::class])->prefix('admin')->group(fu
     Route::get('/contas', [AdminAssociationController::class, 'index'])->name('admin.contas.index');
     Route::get('/contas/{association}', [AdminAssociationController::class, 'show'])->name('admin.contas.show');
     Route::put('/contas/{association}/settings', [AdminAssociationController::class, 'updateSettings'])->name('admin.associations.updateSettings');
+
+    Route::prefix('/marketing/banners')->name('admin.marketing.banners.')->group(function () {
+        Route::get('/', [AdminBannerController::class, 'index'])->name('index');
+        Route::get('/create', [AdminBannerController::class, 'create'])->name('create');
+        Route::post('/', [AdminBannerController::class, 'store'])->name('store');
+        Route::get('/{banner}/edit', [AdminBannerController::class, 'edit'])->name('edit');
+        Route::put('/{banner}', [AdminBannerController::class, 'update'])->name('update');
+        Route::delete('/{banner}', [AdminBannerController::class, 'destroy'])->name('destroy');
+    });
 
     Route::get('users', [AdminUserController::class, 'index'])->name('admin.users.index');
     Route::get('users/create', [UserController::class, 'create'])->name('admin.users.create');

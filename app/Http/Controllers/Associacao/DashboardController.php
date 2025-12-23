@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Associacao;
 
 use App\Http\Controllers\Controller;
+use App\Models\Banner;
 use App\Models\News;
 use App\Models\Plan;
 use App\Models\Sale;
@@ -303,6 +304,11 @@ class DashboardController extends Controller
 
         $transacoes = $totalSales;
 
+        $banners = Banner::where('association_id', $associationId)
+            ->where('status', 'active')
+            ->orderByDesc('id')
+            ->get();
+
         return view('associacao.dashboard.index', compact(
             'totalUsers', 'totalMembers', 'totalClients',
             'docsPendingUploadCount', 'docsUnderReviewCount', 'paymentPendingCount',
@@ -325,7 +331,8 @@ class DashboardController extends Controller
             'transacoes',
             'pixHoje',
             'cartaoHoje',
-            'boletoHoje'
+            'boletoHoje',
+            'banners'
         ));
     }
 

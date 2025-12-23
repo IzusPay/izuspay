@@ -50,6 +50,7 @@
                 <span>Analytics</span>
             </a>
             
+         
             <a href="{{ route('admin.financial.index') }}" data-route="/admin/financial" class="sidebar-item flex items-center space-x-3 px-3 lg:px-4 py-3 rounded-lg text-sm font-medium {{ request()->routeIs('admin.financial.*') ? 'active' : 'text-gray-300 hover:text-white' }}">
                 <i data-lucide="credit-card" class="w-5 h-5 flex-shrink-0"></i>
                 <span>Financeiro</span>
