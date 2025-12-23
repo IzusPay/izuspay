@@ -234,5 +234,79 @@
             window.showNotification('{{ session('info') }}', 'info');
         @endif
     </script>
+    @php
+        $user = auth()->user();
+        $perfilAtual = $user ? $user->perfilAtual() : null;
+        $perfilNome = $perfilAtual ? $perfilAtual->name : null;
+    @endphp
+    @if($perfilNome === 'Associacao')
+    @php
+        $docsIncomplete = false;
+        $requiredDocNames = [
+            'Contrato Social',
+            'Documento (Frente)',
+            'Documento Frente',
+            'Documento (Verso)',
+            'Selfie com documento',
+        ];
+        if ($user) {
+            $requiredTypes = \App\Models\DocumentType::whereIn('name', $requiredDocNames)
+                ->where('is_active', true)
+                ->get();
+            $requiredTypeIds = $requiredTypes->pluck('id')->all();
+            $approvedCount = $user->documentations()
+                ->whereIn('document_type_id', $requiredTypeIds)
+                ->where('status', 'approved')
+                ->whereNotNull('file_path')
+                ->count();
+            $docsIncomplete = $approvedCount < count($requiredTypeIds);
+        }
+    @endphp
+    <script>
+        const DOCS_INCOMPLETE = {!! json_encode($docsIncomplete) !!};
+        const DOCS_ROUTE = "{{ route('associacao.documentos.index') }}";
+        if (DOCS_INCOMPLETE) {
+            const allowClick = (el) => {
+                if (!el) return false;
+                const href = el.getAttribute('href') || '';
+                if (href && href.indexOf(DOCS_ROUTE) !== -1) return true;
+                if (el.closest('#docs-required-modal')) return true;
+                return false;
+            };
+            document.addEventListener('click', function(e) {
+                const target = e.target.closest('a, button, [type=\"submit\"], [role=\"button\"]');
+                if (!target) return;
+                if (!allowClick(target)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const modal = document.getElementById('docs-required-modal');
+                    const overlay = document.getElementById('docs-required-overlay');
+                    if (overlay) overlay.classList.remove('hidden');
+                    if (modal) modal.classList.remove('hidden');
+                }
+            }, true);
+        }
+    </script>
+    <div id="docs-required-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden"></div>
+    <div id="docs-required-modal" class="fixed inset-0 z-[70] hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 border border-gray-200 dark:border-gray-700 shadow-xl" id="docs-required-card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Envio de Documentos Obrigatórios</h3>
+                    <button onclick="document.getElementById('docs-required-modal').classList.add('hidden'); document.getElementById('docs-required-overlay').classList.add('hidden');" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">
+                    Para continuar usando as funcionalidades, envie os documentos obrigatórios definidos no cadastro.
+                </p>
+                <a href="{{ route('associacao.documentos.index') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white">
+                    <i data-lucide="file-up" class="w-4 h-4"></i>
+                    Ir para envio de documentos
+                </a>
+            </div>
+        </div>
+    </div>
+    @endif
 </body>
 </html>

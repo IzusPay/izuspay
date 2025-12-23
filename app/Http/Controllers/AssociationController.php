@@ -12,6 +12,7 @@ use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -133,22 +134,24 @@ class AssociationController extends Controller
                 'status' => 1,
             ]);
 
-            $tipoConta = $request->tipo;
+            $documentNames = [
+                'Contrato Social',
+                'Documento Frente',
+                'Documento Verso',
+                'Selfie com documento',
+            ];
 
-            $requiredDocumentTypes = DocumentType::where('is_required', true)
-                ->where('is_active', true)
-                ->get();
-
-            foreach ($requiredDocumentTypes as $documentType) {
-                if ($tipoConta === 'pf' && Str::contains($documentType->name, 'CNPJ')) {
-                    continue;
-                }
+            foreach ($documentNames as $name) {
+                $docType = DocumentType::firstOrCreate(
+                    ['name' => $name],
+                    ['is_required' => true, 'is_active' => true]
+                );
 
                 Documentation::create([
                     'user_id' => $user->id,
-                    'document_type_id' => $documentType->id,
+                    'document_type_id' => $docType->id,
                     'file_path' => null,
-                    'status' => 'missing', // Define o status como 'Faltando'
+                    'status' => 'missing',
                     'rejection_reason' => 'Documento ainda não enviado durante o cadastro.',
                 ]);
             }
@@ -162,7 +165,7 @@ class AssociationController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            \Log::error('Erro no cadastro de criador: '.$e->getMessage());
+            Log::error('Erro no cadastro de criador: '.$e->getMessage());
 
             return back()
                 ->withErrors(['error' => 'Não foi possível realizar o cadastro. Por favor, tente novamente.'])

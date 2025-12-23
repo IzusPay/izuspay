@@ -102,7 +102,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/documentos/pendentes', [DocumentationController::class, 'pendingDocs'])->name('admin.documentos.pending');
 });
 
-Route::middleware(['auth', RedirectByProfile::class])->prefix('associacao')->group(function () {
+Route::middleware(['auth', RedirectByProfile::class, 'assoc.active'])->prefix('associacao')->group(function () {
 
     Route::post('/configuracoes/documentos/{documentType}/upload', [ConfiguracoesController::class, 'upload'])
         ->name('associacao.documents.upload');

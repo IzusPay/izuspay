@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'auth.api_token' => \App\Http\Middleware\AuthenticateApiToken::class,
+            'assoc.active' => \App\Http\Middleware\EnsureAssociationActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Documentation;
 use App\Models\DocumentType;
 use App\Models\User;
-use Auth;
-use Illuminate\Http\Request; // Importe a nova model
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class DocumentationController extends Controller
@@ -16,8 +16,8 @@ class DocumentationController extends Controller
     {
         $user = auth()->user();
         $submittedDocs = $user->documentations()->with('documentType')->get()->keyBy('document_type_id');
-        $requiredTypes = DocumentType::where('association_id', $user->association_id)
-            ->where('is_active', true)
+        $requiredTypes = DocumentType::where('is_active', true)
+            ->where('is_required', true)
             ->get();
 
         return view('associacao.documentos.index', compact('submittedDocs', 'requiredTypes'));
@@ -97,8 +97,8 @@ class DocumentationController extends Controller
             ->unique('document_type_id')
             ->keyBy('document_type_id');
 
-        $documentTypes = DocumentType::where('association_id', $user->association_id)
-            ->where('is_active', true)
+        $documentTypes = DocumentType::where('is_active', true)
+            ->where('is_required', true)
             ->get();
 
         return view('associacao.documentos.show', compact('user', 'submittedDocs', 'documentTypes'));
@@ -157,9 +157,7 @@ class DocumentationController extends Controller
      */
     private function checkUserDocumentStatus(User $user)
     {
-        $requiredTypes = DocumentType::where('association_id', $user->association_id)
-            ->where('is_required', true)
-            ->get();
+        $requiredTypes = DocumentType::where('is_required', true)->get();
 
         $allRequiredDocsApproved = true;
         foreach ($requiredTypes as $type) {
@@ -199,9 +197,7 @@ class DocumentationController extends Controller
         }
 
         // Verifica se todos os documentos obrigatórios estão aprovados
-        $requiredTypes = DocumentType::where('association_id', $user->association_id)
-            ->where('is_required', true)
-            ->get();
+        $requiredTypes = DocumentType::where('is_required', true)->get();
 
         $allRequiredDocsApproved = true;
         if ($requiredTypes->count() > 0) {
