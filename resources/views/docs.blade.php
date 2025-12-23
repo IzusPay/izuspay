@@ -107,7 +107,7 @@
         <p>A API usa autenticação via Bearer Token. Inclua o cabeçalho <span class="kbd">Authorization: Bearer &lt;seu_token&gt;</span> em todas as rotas protegidas, além de <span class="kbd">Accept: application/json</span>.</p>
       </div>
       <pre><code>curl -H "Authorization: Bearer SEU_TOKEN" -H "Accept: application/json" \
-https://seu-dominio.com/api/transactions</code></pre>
+https://izuspay.com.br/api/transactions</code></pre>
     </div>
 
     <div class="section" id="transacoes">
