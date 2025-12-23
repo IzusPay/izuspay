@@ -102,7 +102,7 @@
       <div>
     <div class="section" id="introducao">
       <h2>Introdução</h2>
-      <p>Base da API: <code>https://seu-dominio.com</code></p>
+      <p>Base da API: <code>https://izuspay.com.br</code></p>
       <div class="block">
         <p>A API usa autenticação via Bearer Token. Inclua o cabeçalho <span class="kbd">Authorization: Bearer &lt;seu_token&gt;</span> em todas as rotas protegidas, além de <span class="kbd">Accept: application/json</span>.</p>
       </div>
@@ -126,7 +126,7 @@ https://izuspay.com.br/api/transactions</code></pre>
         </tbody>
       </table>
       <pre><code>curl -H "Authorization: Bearer SEU_TOKEN" \
-"https://seu-dominio.com/api/transactions?status=paid&amp;paymentMethod=PIX&amp;startDate=2025-12-01&amp;endDate=2025-12-31&amp;page=1&amp;limit=20"</code></pre>
+"https://izuspay.com.br/api/transactions?status=paid&amp;paymentMethod=PIX&amp;startDate=2025-12-01&amp;endDate=2025-12-31&amp;page=1&amp;limit=20"</code></pre>
       <pre><code>{
   "data": [
     {
@@ -208,7 +208,7 @@ https://izuspay.com.br/api/transactions</code></pre>
       <div class="endpoint" id="ep-webhooks-index"><span class="verb">GET</span> <span class="path">/api/webhooks</span></div>
       <p class="muted">Lista endpoints de webhook da associação (paginação opcional com <code>page</code>, <code>limit</code>).</p>
       <pre><code>curl -H "Authorization: Bearer SEU_TOKEN" -H "Accept: application/json" \
-https://seu-dominio.com/api/webhooks?page=1&amp;limit=15</code></pre>
+https://izuspay.com.br/api/webhooks?page=1&amp;limit=15</code></pre>
       <pre><code>{
   "data": [
     { "id": 1, "url": "https://example.com/webhook", "description": "Principal", "is_active": true }
@@ -226,7 +226,7 @@ https://seu-dominio.com/api/webhooks?page=1&amp;limit=15</code></pre>
   "description": "Principal",
   "is_active": true
 }' \
-https://seu-dominio.com/api/webhooks</code></pre>
+https://izuspay.com.br/api/webhooks</code></pre>
       <pre><code>{
   "url": "https://example.com/webhook",
   "description": "Principal",
@@ -239,7 +239,7 @@ https://seu-dominio.com/api/webhooks</code></pre>
       <div class="endpoint" id="ep-webhooks-show"><span class="verb">GET</span> <span class="path">/api/webhooks/{webhook}</span></div>
       <p class="muted">Consulta um endpoint.</p>
       <pre><code>curl -H "Authorization: Bearer SEU_TOKEN" -H "Accept: application/json" \
-https://seu-dominio.com/api/webhooks/1</code></pre>
+https://izuspay.com.br/api/webhooks/1</code></pre>
       <pre><code>{
   "data": { "id": 1, "url": "https://example.com/webhook", "description": "Principal", "is_active": true }
 }</code></pre>
@@ -251,7 +251,7 @@ https://seu-dominio.com/api/webhooks/1</code></pre>
   "description": "Secundário",
   "is_active": false
 }' \
-https://seu-dominio.com/api/webhooks/1</code></pre>
+https://izuspay.com.br/api/webhooks/1</code></pre>
       <pre><code>{
   "description": "Secundário",
   "is_active": false
@@ -263,7 +263,7 @@ https://seu-dominio.com/api/webhooks/1</code></pre>
       <div class="endpoint" id="ep-webhooks-delete"><span class="verb">DELETE</span> <span class="path">/api/webhooks/{webhook}</span></div>
       <p class="muted">Remove um endpoint.</p>
       <pre><code>curl -X DELETE -H "Authorization: Bearer SEU_TOKEN" -H "Accept: application/json" \
-https://seu-dominio.com/api/webhooks/1</code></pre>
+https://izuspay.com.br/api/webhooks/1</code></pre>
       <pre><code>204 No Content</code></pre>
     </div>
 
@@ -272,7 +272,7 @@ https://seu-dominio.com/api/webhooks/1</code></pre>
       <div class="endpoint" id="ep-withdrawals-index"><span class="verb">GET</span> <span class="path">/api/withdrawals</span></div>
       <p class="muted">Lista saques com paginação.</p>
       <pre><code>curl -H "Authorization: Bearer SEU_TOKEN" \
-https://seu-dominio.com/api/withdrawals</code></pre>
+https://izuspay.com.br/api/withdrawals</code></pre>
       <pre><code>{
   "data": [
     {
@@ -302,7 +302,7 @@ https://seu-dominio.com/api/withdrawals</code></pre>
   "pix_key": "11999999999",
   "pix_key_type": "phone"
 }' \
-https://seu-dominio.com/api/withdrawals</code></pre>
+https://izuspay.com.br/api/withdrawals</code></pre>
       <pre><code>{
   "id": 101,
   "amount": 150,
@@ -327,7 +327,7 @@ https://seu-dominio.com/api/withdrawals</code></pre>
       <div class="endpoint" id="ep-withdrawals-show"><span class="verb">GET</span> <span class="path">/api/withdrawals/{withdrawal}</span></div>
       <p class="muted">Consulta detalhes do saque (taxa e líquido).</p>
       <pre><code>curl -H "Authorization: Bearer SEU_TOKEN" \
-https://seu-dominio.com/api/withdrawals/101</code></pre>
+https://izuspay.com.br/api/withdrawals/101</code></pre>
       <pre><code>{
   "id": 101,
   "amount": 150,
