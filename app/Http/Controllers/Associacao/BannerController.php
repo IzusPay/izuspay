@@ -13,7 +13,7 @@ class BannerController extends Controller
      */
     public function index()
     {
-        $banners = Banner::where('association_id', auth()->user()->association_id)
+        $banners = Banner::where('created_by_admin', true)
             ->paginate(10);
 
         return view('associacao.banners.index', compact('banners'));
@@ -24,7 +24,7 @@ class BannerController extends Controller
      */
     public function create()
     {
-        return view('associacao.banners.create_edit');
+        abort(403);
     }
 
     /**
@@ -32,12 +32,7 @@ class BannerController extends Controller
      */
     public function store(Request $request)
     {
-        $request['association_id'] = auth()->user()->association_id;
-
-        Banner::create($request->all());
-
-        return redirect()->route('associacao.banners.index')
-            ->with('success', 'Banner criado com sucesso!');
+        abort(403);
     }
 
     /**
@@ -45,11 +40,7 @@ class BannerController extends Controller
      */
     public function edit(Banner $banner)
     {
-        if ($banner->association_id !== auth()->user()->association_id) {
-            abort(403, 'Acesso negado.');
-        }
-
-        return view('associacao.banners.create_edit', compact('banner'));
+        abort(403);
     }
 
     /**
@@ -57,14 +48,7 @@ class BannerController extends Controller
      */
     public function update(Request $request, Banner $banner)
     {
-        if ($banner->association_id !== auth()->user()->association_id) {
-            abort(403, 'Acesso negado.');
-        }
-
-        $banner->update($request->all());
-
-        return redirect()->route('associacao.banners.index')
-            ->with('success', 'Banner atualizado com sucesso!');
+        abort(403);
     }
 
     /**
@@ -72,13 +56,6 @@ class BannerController extends Controller
      */
     public function destroy(Banner $banner)
     {
-        if ($banner->association_id !== auth()->user()->association_id) {
-            abort(403, 'Acesso negado.');
-        }
-
-        $banner->delete();
-
-        return redirect()->route('associacao.banners.index')
-            ->with('success', 'Banner excluído com sucesso!');
+        abort(403);
     }
 }

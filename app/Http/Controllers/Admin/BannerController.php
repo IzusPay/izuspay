@@ -12,7 +12,7 @@ class BannerController extends Controller
 {
     public function index()
     {
-        $banners = Banner::with('association')->latest()->paginate(12);
+        $banners = Banner::latest()->paginate(12);
 
         return view('admin.marketing.banners.index', compact('banners'));
     }
@@ -31,10 +31,9 @@ class BannerController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        $associationIds = Association::pluck('id');
-        foreach ($associationIds as $associationId) {
-            Banner::create($validated + ['association_id' => $associationId]);
-        }
+        Banner::create($validated + [
+            'created_by_admin' => true,
+        ]);
 
         return redirect()->route('admin.marketing.banners.index')
             ->with('success', 'Banner criado com sucesso!');

@@ -32,7 +32,7 @@
                 </div>
                 <div class="space-y-1">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $banner->name }}</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Associação: {{ $banner->association->nome ?? '—' }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Visibilidade: Global</p>
                     <p class="text-xs">
                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                             {{ $banner->status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-300' }}">

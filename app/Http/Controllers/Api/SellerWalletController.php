@@ -28,3 +28,4 @@ class SellerWalletController extends Controller
         ]);
     }
 }
+

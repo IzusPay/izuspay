@@ -304,7 +304,7 @@ class DashboardController extends Controller
 
         $transacoes = $totalSales;
 
-        $banners = Banner::where('association_id', $associationId)
+        $banners = Banner::where('created_by_admin', true)
             ->where('status', 'active')
             ->orderByDesc('id')
             ->get();

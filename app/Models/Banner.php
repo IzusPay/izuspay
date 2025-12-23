@@ -16,6 +16,7 @@ class Banner extends Model
         'image_url',
         'link',
         'status',
+        'created_by_admin',
     ];
 
     public function association(): BelongsTo
