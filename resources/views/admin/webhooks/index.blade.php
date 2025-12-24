@@ -54,6 +54,45 @@
         </div>
     </div>
 
+    <!-- Filtros -->
+    <div class="mt-6 bg-white dark:bg-black rounded-xl shadow-sm p-4 border border-gray-200 dark:border-white/10">
+        <form method="GET" action="{{ route('admin.webhooks.index') }}" class="flex items-end gap-4">
+            <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Evento</label>
+                <select name="event" class="rounded-lg bg-white dark:bg-black border border-gray-300 dark:border-white/10 px-3 py-2 text-sm text-slate-900 dark:text-white">
+                    <option value="">Todos</option>
+                    <option value="waiting_payment" @if(request('event')==='waiting_payment') selected @endif>Aguardando pagamento</option>
+                    <option value="paid" @if(request('event')==='paid') selected @endif>Pago</option>
+                    <option value="refused" @if(request('event')==='refused') selected @endif>Recusado</option>
+                    <option value="canceled" @if(request('event')==='canceled') selected @endif>Cancelado</option>
+                    <option value="refunded" @if(request('event')==='refunded') selected @endif>Estornado</option>
+                    <option value="chargeback" @if(request('event')==='chargeback') selected @endif>Chargeback</option>
+                    <option value="failed" @if(request('event')==='failed') selected @endif>Falhou</option>
+                    <option value="expired" @if(request('event')==='expired') selected @endif>Expirado</option>
+                    <option value="in_analysis" @if(request('event')==='in_analysis') selected @endif>Em análise</option>
+                    <option value="in_protest" @if(request('event')==='in_protest') selected @endif>Em protesto</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Status</label>
+                <select name="status" class="rounded-lg bg-white dark:bg.black border border-gray-300 dark:border-white/10 px-3 py-2 text-sm text-slate-900 dark:text-white">
+                    <option value="">Todos</option>
+                    <option value="pending" @if(request('status')==='pending') selected @endif>Pendente</option>
+                    <option value="sent" @if(request('status')==='sent') selected @endif>Enviado</option>
+                    <option value="failed" @if(request('status')==='failed') selected @endif>Falhou</option>
+                    <option value="approved" @if(request('status')==='approved') selected @endif>Aprovado</option>
+                    <option value="rejected" @if(request('status')==='rejected') selected @endif>Rejeitado</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+                    Filtrar
+                </button>
+            </div>
+        </form>
+        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Observação: eventos de “aguardando pagamento” são enviados automaticamente e geralmente aparecem com status “Enviado”.</p>
+    </div>
+
     <!-- Tabela -->
     <div class="mt-8 flex flex-col">
         <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">

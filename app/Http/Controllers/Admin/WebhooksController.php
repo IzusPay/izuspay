@@ -18,6 +18,9 @@ class WebhooksController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->get('status'));
         }
+        if ($request->filled('event')) {
+            $query->where('event', $request->get('event'));
+        }
         $deliveries = $query->limit(100)->get();
         $webhooks = $deliveries->map(function ($d) {
             $payloadExcerpt = substr(json_encode($d->payload), 0, 120);
