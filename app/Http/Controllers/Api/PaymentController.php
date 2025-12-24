@@ -8,6 +8,7 @@ use App\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 // Removido: use Illuminate\Validation\ValidationException; (não é mais necessário)
@@ -116,6 +117,70 @@ class PaymentController extends Controller
 
         try {
             $paymentData = $this->paymentService->createTransactionFromApi($apiUser, $validatedData);
+
+            $sale = Sale::where('transaction_hash', $paymentData['transaction_hash'])->first();
+            if ($sale) {
+                $amountCents = (int) round($sale->total_price * 100);
+                $payload = [
+                    'id' => $sale->transaction_hash,
+                    'type' => 'transaction',
+                    'event' => 'waiting_payment',
+                    'metadata' => [
+                        'sale_id' => $sale->id,
+                    ],
+                    'amount' => $amountCents,
+                    'method' => strtoupper($sale->payment_method),
+                    'created_at' => $sale->created_at ? $sale->created_at->toIso8601String() : now()->toIso8601String(),
+                    'updated_at' => $sale->updated_at ? $sale->updated_at->toIso8601String() : now()->toIso8601String(),
+                    'status' => 'waiting_payment',
+                    'customer' => $sale->user ? [
+                        'name' => $sale->user->name,
+                        'email' => $sale->user->email,
+                        'phone' => preg_replace('/\D/', '', $sale->user->phone ?? ''),
+                        'document' => preg_replace('/\D/', '', $sale->user->documento ?? ''),
+                    ] : null,
+                    'items' => [[
+                        'title' => $validatedData['items'][0]['title'] ?? 'Item',
+                        'amount' => $amountCents,
+                        'quantity' => (int) ($validatedData['items'][0]['quantity'] ?? 1),
+                        'tangible' => (bool) ($validatedData['items'][0]['tangible'] ?? false),
+                    ]],
+                ];
+                $endpoints = \App\Models\WebhookEndpoint::where('association_id', $sale->association_id)
+                    ->where('is_active', true)
+                    ->get();
+                foreach ($endpoints as $endpoint) {
+                    try {
+                        $delivery = \App\Models\WebhookDelivery::create([
+                            'association_id' => $sale->association_id,
+                            'endpoint_url' => $endpoint->url,
+                            'endpoint_description' => $endpoint->description,
+                            'event' => $payload['event'],
+                            'status' => 'pending',
+                            'is_manual' => false,
+                            'payload' => $payload,
+                        ]);
+                        Http::withHeaders(['Content-Type' => 'application/json'])->post($endpoint->url, $payload);
+                        $delivery->update(['status' => 'sent', 'response_status' => 200]);
+                    } catch (\Throwable $e) {
+                        Log::error('Falha ao encaminhar webhook de waiting_payment (API)', [
+                            'url' => $endpoint->url,
+                            'sale_id' => $sale->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                        \App\Models\WebhookDelivery::create([
+                            'association_id' => $sale->association_id,
+                            'endpoint_url' => $endpoint->url,
+                            'endpoint_description' => $endpoint->description,
+                            'event' => $payload['event'],
+                            'status' => 'failed',
+                            'is_manual' => false,
+                            'payload' => $payload,
+                            'error_message' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            }
 
             return response()->json([
                 'success' => true,

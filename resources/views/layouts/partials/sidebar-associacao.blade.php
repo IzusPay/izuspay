@@ -54,6 +54,7 @@
                 ['route' => 'associacao.vendas.index', 'label' => 'Extrato', 'icon' => 'shopping-cart'],
                 ['route' => 'associacao.disputas.index', 'label' => 'Disputas', 'icon' => 'shield-alert'],
                 ['route' => 'api-keys.index', 'label' => 'Integrações', 'icon' => 'plug'],
+                ['route' => 'associacao.eventos.index', 'label' => 'Eventos', 'icon' => 'calendar'],
                 ['route' => 'associacao.products.index', 'label' => 'Link de Pagamento', 'icon' => 'link-2'],
                 ['route' => 'associacao.webhooks.index', 'label' => 'Webhooks', 'icon' => 'settings'],
             ];

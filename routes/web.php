@@ -30,12 +30,14 @@ use App\Http\Controllers\Associacao\RelatoriosController;
 use App\Http\Controllers\Associacao\SaleController;
 use App\Http\Controllers\Associacao\UserController as AssociacaoUserController;
 use App\Http\Controllers\Associacao\WithdrawalController;
+use App\Http\Controllers\Associacao\EventController as AssociacaoEventController;
 use App\Http\Controllers\AssociationController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Cliente\ClienteController;
 use App\Http\Controllers\Cliente\DocumentosController;
 use App\Http\Controllers\Cliente\NewsController as ClienteNewsController;
 use App\Http\Controllers\Cliente\PagamentoController;
+use App\Http\Controllers\Cliente\EventController as ClienteEventController;
 use App\Http\Controllers\CreatorProfileController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\OrganizationController;
@@ -160,6 +162,16 @@ Route::middleware(['auth', RedirectByProfile::class])->prefix('associacao')->gro
     Route::delete('/noticias/{news}', [NewsController::class, 'destroy'])->name('associacao.news.destroy');
     Route::patch('/noticias/{news}/toggle-publish', [NewsController::class, 'togglePublish'])->name('associacao.news.toggle-publish');
     Route::patch('/noticias/{news}/toggle-featured', [NewsController::class, 'toggleFeatured'])->name('associacao.news.toggle-featured');
+
+    Route::prefix('eventos')->name('associacao.eventos.')->group(function () {
+        Route::get('/', [AssociacaoEventController::class, 'index'])->name('index');
+        Route::get('/criar', [AssociacaoEventController::class, 'create'])->name('create');
+        Route::post('/', [AssociacaoEventController::class, 'store'])->name('store');
+        Route::get('/{evento}/editar', [AssociacaoEventController::class, 'edit'])->name('edit');
+        Route::put('/{evento}', [AssociacaoEventController::class, 'update'])->name('update');
+        Route::delete('/{evento}', [AssociacaoEventController::class, 'destroy'])->name('destroy');
+        Route::post('/{evento}/ticket-types', [AssociacaoEventController::class, 'addTicketType'])->name('add-ticket-type');
+    });
 
     Route::get('/products', [ProductController::class, 'index'])->name('associacao.products.index');
     Route::get('/products/create', [ProductController::class, 'create'])->name('associacao.products.create');
@@ -404,8 +416,8 @@ Route::middleware(['auth', RedirectByProfile::class])->prefix('cliente')->group(
 
     // Notícias
     Route::prefix('noticias')->name('cliente.news.')->group(function () {
-        Route::get('/', [NewsController::class, 'all'])->name('index');
-        Route::get('/{id}', [NewsController::class, 'show'])->name('show');
+        Route::get('/', [ClienteNewsController::class, 'all'])->name('index');
+        Route::get('/{id}', [ClienteNewsController::class, 'show'])->name('show');
     });
 
     // Novas rotas para criadores de conteúdo
@@ -427,6 +439,12 @@ Route::middleware(['auth', RedirectByProfile::class])->prefix('cliente')->group(
 
         // Seguir/deixar de seguir (AJAX)
         Route::post('/{username}/toggle-follow', [CreatorProfileController::class, 'toggleFollow'])->name('toggle-follow');
+    });
+
+    Route::prefix('eventos')->name('cliente.eventos.')->group(function () {
+        Route::get('/', [ClienteEventController::class, 'index'])->name('index');
+        Route::get('/{evento}', [ClienteEventController::class, 'show'])->name('show');
+        Route::post('/{evento}/comprar', [ClienteEventController::class, 'buy'])->name('buy');
     });
 
 });

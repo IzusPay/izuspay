@@ -13,6 +13,7 @@ class DocumentType extends Model
         'name',
         'is_required',
         'is_active',
+        'association_id',
     ];
 
     protected $casts = [
@@ -23,5 +24,10 @@ class DocumentType extends Model
     public function documentations()
     {
         return $this->hasMany(Documentation::class);
+    }
+
+    public function association()
+    {
+        return $this->belongsTo(Association::class);
     }
 }

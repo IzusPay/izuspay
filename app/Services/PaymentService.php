@@ -3,7 +3,10 @@
 namespace App\Services;
 
 use App\Models\Gateway;
+use App\Models\Event;
 use App\Models\Product;
+use App\Models\TicketOrder;
+use App\Models\TicketType;
 use App\Models\Sale;
 use App\Models\User;
 use App\Services\Gateways\BrPaggService;
@@ -99,6 +102,98 @@ class PaymentService
                 // Log de erro crítico se, por algum motivo, o vendedor não tiver uma carteira.
                 Log::critical("Venda #{$sale->id} paga, mas a association #{$sale->association_id} não possui uma carteira para creditar o saldo.");
             }
+
+            return [
+                'transaction_hash' => $gatewayResponse['transaction_id'],
+                'pix_qr_code' => $gatewayResponse['pix_qr_code'] ?? null,
+            ];
+        });
+    }
+
+    public function createEventTransaction(Event $event, TicketType $type, int $quantity, array $customerData): array
+    {
+        return DB::transaction(function () use ($event, $type, $quantity, $customerData) {
+            $association = $event->association()->with('wallet.gateway')->first();
+            $wallet = $association->wallet;
+            if (! $wallet || ! $wallet->gateway) {
+                throw new \Exception('Nenhum gateway de pagamento configurado para o vendedor.');
+            }
+            $totalAmount = $type->price * $quantity;
+            $candidates = $this->getGatewayCandidates($association);
+            $gatewayResponse = null;
+            $email = $customerData['email'] ?? '';
+            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $customerData['email'] = 'cliente@email.com';
+            }
+            $tmpProduct = new Product([
+                'name' => $event->title.' - '.$type->name,
+                'price' => $totalAmount,
+                'association_id' => $association->id,
+                'tipo_produto' => 1,
+            ]);
+            foreach ($candidates as $g) {
+                try {
+                    $gatewayService = $this->getGatewayService($g->slug);
+                    $credentials = $this->buildGatewayCredentials($wallet, $g);
+                    if (empty($credentials)) {
+                        throw new \Exception("Credenciais não configuradas para o gateway '{$g->name}'.");
+                    }
+                    $gatewayResponse = $gatewayService->createCharge($tmpProduct, $customerData, $credentials);
+                    break;
+                } catch (\Throwable $e) {
+                    Log::warning("Falha ao criar cobrança no gateway '{$g->slug}': ".$e->getMessage());
+                    continue;
+                }
+            }
+            if (! $gatewayResponse) {
+                throw new \Exception('Nenhum gateway disponível conseguiu processar a cobrança.');
+            }
+            $user = User::firstOrCreate(
+                ['email' => $customerData['email']],
+                [
+                    'name' => $customerData['name'],
+                    'phone' => preg_replace('/\D/', '', $customerData['phone'] ?? ''),
+                    'documento' => preg_replace('/\D/', '', $customerData['document'] ?? ''),
+                    'password' => Hash::make(Str::random(16)),
+                    'association_id' => $association->id,
+                    'tipo' => 'cliente',
+                    'status' => 'active',
+                ]
+            );
+            $feeConfig = $association->fees()->where('payment_method', 'pix')->first();
+            $percentageFee = $feeConfig->percentage_fee ?? 4.99;
+            $fixedFee = $feeConfig->fixed_fee ?? 0.40;
+            $totalFee = ($totalAmount * ($percentageFee / 100)) + $fixedFee;
+            $netAmount = $totalAmount - $totalFee;
+            $sale = Sale::create([
+                'user_id' => $user->id,
+                'product_id' => null,
+                'association_id' => $association->id,
+                'status' => 'awaiting_payment',
+                'total_price' => $totalAmount,
+                'payment_method' => 'pix',
+                'transaction_hash' => $gatewayResponse['transaction_id'],
+                'fee_percentage' => $percentageFee,
+                'fee_fixed' => $fixedFee,
+                'fee_total' => $totalFee,
+                'net_amount' => $netAmount,
+            ]);
+            if ($wallet) {
+                $wallet->increment('balance', $sale->net_amount);
+                Log::info("Creditado R$ {$sale->net_amount} na carteira #{$wallet->id} referente à venda #{$sale->id}.");
+            } else {
+                Log::critical("Venda #{$sale->id} paga, mas a association #{$sale->association_id} não possui uma carteira para creditar o saldo.");
+            }
+            TicketOrder::create([
+                'association_id' => $association->id,
+                'event_id' => $event->id,
+                'ticket_type_id' => $type->id,
+                'sale_id' => $sale->id,
+                'user_id' => $user->id,
+                'quantity' => $quantity,
+                'unit_price' => $type->price,
+                'status' => 'awaiting_payment',
+            ]);
 
             return [
                 'transaction_hash' => $gatewayResponse['transaction_id'],

@@ -245,6 +245,21 @@ class CheckoutController extends Controller
 
             $payload = $this->buildWebhookPayload($sale, 'paid', null);
             $this->forwardWebhooks($sale, $payload);
+
+            $order = \App\Models\TicketOrder::where('sale_id', $sale->id)->first();
+            if ($order && $order->status !== 'paid') {
+                $order->update(['status' => 'paid']);
+                $ticketsToCreate = $order->quantity;
+                for ($i = 0; $i < $ticketsToCreate; $i++) {
+                    \App\Models\Ticket::create([
+                        'ticket_order_id' => $order->id,
+                        'ticket_type_id' => $order->ticket_type_id,
+                        'owner_user_id' => $order->user_id,
+                        'qr_token' => (string) \Illuminate\Support\Str::uuid(),
+                        'status' => 'issued',
+                    ]);
+                }
+            }
         });
     }
 

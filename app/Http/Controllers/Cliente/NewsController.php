@@ -4,87 +4,92 @@ namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
 use App\Models\CreatorProfile;
+use App\Models\Event;
 use App\Models\News;
+use App\Models\Sale;
 use App\Models\Subscription;
+use App\Models\TicketOrder;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NewsController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
+        $now = Carbon::now();
+        $thirtyDaysAgo = $now->copy()->subDays(30);
 
-        // Buscar criadores que o usuário segue
-        $followingCreators = CreatorProfile::whereHas('followers', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-            ->active()
-            ->limit(10)
-            ->get();
+        $totalSpent = Sale::where('user_id', $user->id)
+            ->where('status', 'paid')
+            ->sum('total_price');
 
-        // Buscar criadores com assinaturas ativas através das vendas
-        $subscribedCreatorIds = Subscription::where('user_id', $user->id)
+        $subscriptionsCount = Subscription::where('user_id', $user->id)
             ->where('status', 'active')
-            ->where('renews_at', '>', Carbon::now())
-            ->whereHas('sale', function ($query) {
-                $query->where('status', 'paid')
-                    ->whereNotNull('plan_id');
-            })
-            ->with('sale.plan.association.creatorProfile')
-            ->get()
-            ->pluck('sale.plan.association.creatorProfile.id')
-            ->filter()
-            ->unique();
+            ->where('renews_at', '>', $now)
+            ->count();
 
-        $subscribedCreators = CreatorProfile::whereIn('id', $subscribedCreatorIds)
-            ->active()
-            ->get();
+        $eventsPurchased = TicketOrder::where('user_id', $user->id)
+            ->where('status', 'paid')
+            ->count();
 
-        $accessibleCreatorIds = $followingCreators->pluck('id')
-            ->merge($subscribedCreators->pluck('id'))
-            ->unique();
+        $pixHoje = Sale::where('user_id', $user->id)
+            ->where('status', 'paid')
+            ->where('payment_method', 'pix')
+            ->whereDate('updated_at', $now->toDateString())
+            ->sum('total_price');
+        $cartaoHoje = Sale::where('user_id', $user->id)
+            ->where('status', 'paid')
+            ->where('payment_method', 'credit_card')
+            ->whereDate('updated_at', $now->toDateString())
+            ->sum('total_price');
+        $boletoHoje = Sale::where('user_id', $user->id)
+            ->where('status', 'paid')
+            ->where('payment_method', 'boleto')
+            ->whereDate('updated_at', $now->toDateString())
+            ->sum('total_price');
 
-        // Buscar notícias dos criadores acessíveis
-        if ($accessibleCreatorIds->count() > 0) {
-            $news = News::with(['author', 'creatorProfile'])
-                ->where('status', 'published')
-                ->where(function ($query) use ($accessibleCreatorIds) {
-                    $query->whereIn('creator_profile_id', $accessibleCreatorIds)
-                        ->orWhereNull('creator_profile_id')
-                        ->orWhere('creator_profile_id', 0);
-                })
-                ->where(function ($q) {
-                    $q->where('is_private', 0)
-                        ->orWhereNull('is_private');
-                })
-                ->latest()
-                ->take(20)
-                ->get();
-
-        } else {
-            // Se não segue ninguém e não tem assinaturas, mostrar apenas conteúdo público
-            $news = News::with(['author', 'creatorProfile'])
-                ->where('status', 'published')
-                ->where(function ($query) {
-                    $query->where('is_private', false)
-                        ->orWhereNull('is_private');
-                })
-                ->latest()
-                ->take(6)
-                ->get();
+        $labels = [];
+        $data = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $day = $now->copy()->subDays($i)->toDateString();
+            $labels[] = Carbon::parse($day)->format('d/m');
+            $daySum = Sale::where('user_id', $user->id)
+                ->where('status', 'paid')
+                ->whereDate('updated_at', $day)
+                ->sum('total_price');
+            $data[] = (float) $daySum;
         }
+        $revenueChartData = ['labels' => $labels, 'data' => $data];
+        $averageTicket = Sale::where('user_id', $user->id)
+            ->where('status', 'paid')
+            ->avg('total_price') ?? 0;
+        $transacoes = Sale::where('user_id', $user->id)->count();
 
-        // Buscar criadores sugeridos para seguir
-        $suggestedCreators = CreatorProfile::whereDoesntHave('followers', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-            ->active()
-            ->orderBy('followers_count', 'desc')
+        $banners = [];
+        $afiliados = $subscriptionsCount;
+        $saldo = 0.0;
+
+        $latestEvents = Event::where('status', 'published')
+            ->orderBy('starts_at', 'desc')
             ->limit(8)
             ->get();
 
-        return view('cliente.dashboard-mobile', compact('news', 'followingCreators', 'suggestedCreators'));
+        return view('cliente.dashboard', compact(
+            'banners',
+            'totalSpent',
+            'saldo',
+            'pixHoje',
+            'cartaoHoje',
+            'boletoHoje',
+            'revenueChartData',
+            'averageTicket',
+            'afiliados',
+            'transacoes',
+            'eventsPurchased',
+            'latestEvents'
+        ));
     }
 
     private function userHasAccessToCreator($userId, $creatorId)
@@ -113,7 +118,7 @@ class NewsController extends Controller
 
     public function profile($username)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $creator = CreatorProfile::withCount(['posts', 'followers', 'following'])
             ->where('username', $username)
@@ -189,7 +194,7 @@ class NewsController extends Controller
      */
     public function show($id)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $news = News::with(['author', 'creatorProfile'])
             ->where('status', 'published')
