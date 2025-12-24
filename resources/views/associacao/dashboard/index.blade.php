@@ -6,7 +6,7 @@
 @endpush
 
 @section('content')
-<div x-data="{ showRevenueChart: true, showRelatorioDiario: true }" x-init="showRevenueChart = localStorage.getItem('assoc_showRevenueChart') !== '0'; showRelatorioDiario = localStorage.getItem('assoc_showRelatorioDiario') !== '0'" class="container mx-auto p-4 lg:p-8 space-y-6 text-slate-800 dark:text-slate-200">
+<div x-data="{ showRevenueChart: true, showRelatorioDiario: true }" x-init="showRevenueChart = localStorage.getItem('assoc_showRevenueChart') !== '0'; showRelatorioDiario = localStorage.getItem('assoc_showRelatorioDiario') !== '0'" class="min-h-screen w-full max-w-7xl mx-auto p-6 lg:p-10 space-y-6 text-white dashboard-bg" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%);">
     
     {{-- Header --}}
        
@@ -14,7 +14,7 @@
     {{-- Banner + Métricas (70/30) --}}
     <div class="grid grid-cols-1 lg:grid-cols-10 gap-6">
         {{-- Carrossel de Banners (70%) --}}
-        <div class="lg:col-span-7 bg-white dark:bg-black p-0 rounded-xl border-2 border-black dark:border-black ring-1 ring-gray-300 dark:ring-gray-600 shadow-sm overflow-hidden">
+        <div class="lg:col-span-7 p-0 rounded-2xl border border-slate-800 shadow-xl overflow-hidden ring-1 ring-white/10 hover:ring-[var(--accent)]/40 transition cursor-pointer card-bg" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);">
             <div class="relative h-full">
                 <div id="bannerCarousel" class="w-full h-full overflow-hidden">
                     <div class="whitespace-nowrap transition-transform duration-500 ease-in-out" x-data="{ index: 0, total: {{ count($banners) }} }" x-init="
@@ -30,10 +30,10 @@
                                     <img src="{{ $banner->image_url }}" alt="{{ $banner->name }}" class="w-full h-full object-cover object-center">
                                 </a>
                             @empty
-                                <div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800">
+                                <div class="w-full h-full flex items-center justify-center bg-[#0f172a]">
                                     <div class="text-center">
                                         <i data-lucide="image-off" class="w-10 h-10 text-slate-400 mx-auto mb-2"></i>
-                                        <p class="text-slate-500 dark:text-slate-400">Nenhum banner cadastrado</p>
+                                        <p class="text-white/70">Nenhum banner cadastrado</p>
                                     </div>
                                 </div>
                             @endforelse
@@ -56,15 +56,15 @@
         </div>
         {{-- Métricas (30%) --}}
         <div class="lg:col-span-3 space-y-6">
-            <div class="bg-white dark:bg-black p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                <div class="flex items-center gap-2 mb-3 text-slate-500">
+            <div class="p-5 rounded-2xl shadow-lg border border-slate-800 flex items-center justify-between ring-1 ring-white/10 hover:ring-[var(--accent)]/40 transition cursor-pointer active:scale-[0.98] card-bg" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%);">
+                <div class="flex items-center gap-2 mb-3 text-white/70">
                     <i data-lucide="qr-code" class="w-4 h-4"></i>
                     <span class="text-sm font-medium">Receita Total</span>
                 </div>
-                <p class="text-2xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($totalRevenue, 2, ',', '.') }}</p>
+                <p class="text-2xl font-bold text-white">R$ {{ number_format($totalRevenue, 2, ',', '.') }}</p>
             </div>
-            <div class="bg-slate-900 dark:bg-black p-5 rounded-xl shadow-lg border border-slate-800">
-                <div class="flex items-center gap-2 text-slate-400">
+            <div class="p-5 rounded-2xl shadow-lg border border-slate-800 flex items-center justify-between ring-1 ring-white/10 hover:ring-[var(--accent)]/40 transition cursor-pointer active:scale-[0.98] card-bg" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%);">
+                <div class="flex items-center gap-2 text-white/70">
                     <i data-lucide="wallet" class="w-4 h-4"></i>
                     <span class="text-sm font-medium">Saldo disponível</span>
                 </div>
@@ -75,30 +75,30 @@
 
     {{-- Segunda Linha: Gráfico e Perfil --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 bg-white dark:bg-black p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="lg:col-span-2 p-6 rounded-2xl border border-slate-800 shadow-lg ring-1 ring-white/10 hover:ring-[var(--accent)]/40 transition cursor-pointer active:scale-[0.99] card-bg" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%);">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300">Gráfico de Vendas <span class="text-slate-400 font-normal">(Últimos 30 Dias)</span></h3>
+                <h3 class="text-sm font-semibold text-white">Gráfico de Vendas <span class="text-white/50 font-normal">(Últimos 30 Dias)</span></h3>
             </div>
             <div class="h-[250px]" x-show="showRevenueChart">
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
 
-        <div class="bg-white dark:bg-black p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center text-center">
-            <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center border border-slate-100 dark:border-slate-700 mb-4">
-                <i data-lucide="building-2" class="w-10 h-10 text-slate-400"></i>
+        <div class="p-6 rounded-2xl border border-slate-800 shadow-lg flex flex-col items-center justify-center text-center ring-1 ring-white/10 hover:ring-[var(--accent)]/40 transition cursor-pointer active:scale-[0.99] card-bg" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%);">
+            <div class="w-20 h-20 rounded-full flex items-center justify-center border border-slate-700 mb-4 bg-[#0b1220]">
+                <i data-lucide="building-2" class="w-10 h-10 text-white/70"></i>
             </div>
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white">{{ request()->user()->company_name ?? 'Associação' }}</h2>
-            <p class="text-xs text-slate-400 dark:text-slate-400 mb-6">CNPJ: {{ request()->user()->cnpj ?? '—' }}</p>
+            <h2 class="text-xl font-bold text-white">{{ request()->user()->company_name ?? 'Associação' }}</h2>
+            <p class="text-xs text-white/60 mb-6">CNPJ: {{ request()->user()->cnpj ?? '—' }}</p>
             
-            <div class="grid grid-cols-2 w-full pt-4 border-t border-slate-50 dark:border-slate-800">
+            <div class="grid grid-cols-2 w-full pt-4 border-t border-white/10">
                 <div>
-                    <p class="text-xs text-slate-400 dark:text-slate-400">Afiliados</p>
-                    <p class="text-lg font-bold text-slate-900 dark:text-white">{{ $afiliados }}</p>
+                    <p class="text-xs text-white/60">Afiliados</p>
+                    <p class="text-lg font-bold text-white">{{ $afiliados }}</p>
                 </div>
                 <div>
-                    <p class="text-xs text-slate-400 dark:text-slate-400">Transações</p>
-                    <p class="text-lg font-bold text-slate-900 dark:text-white">{{ $transacoes }}</p>
+                    <p class="text-xs text-white/60">Transações</p>
+                    <p class="text-lg font-bold text-white">{{ $transacoes }}</p>
                 </div>
             </div>
         </div>
@@ -106,35 +106,35 @@
 
     {{-- Terceira Linha: Relatório Diário e Ticket Médio --}}
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div class="lg:col-span-3 bg-white dark:bg-black p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="lg:col-span-3 p-6 rounded-2xl border border-slate-800 shadow-lg ring-1 ring-white/10 hover:ring-[var(--accent)]/40 transition cursor-pointer active:scale-[0.99] card-bg" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%);">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300">Relatório Diário</h3>
+                <h3 class="text-sm font-semibold text-white">Relatório Diário</h3>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" x-show="showRelatorioDiario">
-                <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
-                    <p class="text-xs text-slate-500 dark:text-slate-300 mb-1">Pix (Hoje)</p>
-                    <p class="text-xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($pixHoje, 2, ',', '.') }}</p>
+                <div class="p-4 rounded-xl border border-slate-700 shadow-lg ring-1 ring-white/10 hover:ring-[var(--accent)]/40 transition cursor-pointer active:scale-[0.98] card-bg" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%);">
+                    <p class="text-xs text-white/70 mb-1">Pix (Hoje)</p>
+                    <p class="text-xl font-bold text-white">R$ {{ number_format($pixHoje, 2, ',', '.') }}</p>
                 </div>
-                <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
-                    <p class="text-xs text-slate-500 dark:text-slate-300 mb-1">Cartão (Hoje)</p>
-                    <p class="text-xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($cartaoHoje, 2, ',', '.') }}</p>
+                <div class="p-4 rounded-xl border border-slate-700 shadow-lg ring-1 ring-white/10 hover:ring-[var(--accent)]/40 transition cursor-pointer active:scale-[0.98] card-bg" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%);">
+                    <p class="text-xs text-white/70 mb-1">Cartão (Hoje)</p>
+                    <p class="text-xl font-bold text-white">R$ {{ number_format($cartaoHoje, 2, ',', '.') }}</p>
                 </div>
-                <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
-                    <p class="text-xs text-slate-500 dark:text-slate-300 mb-1">Boleto (Hoje)</p>
-                    <p class="text-xl font-bold text-slate-900 dark:text-white">R$ {{ number_format($boletoHoje, 2, ',', '.') }}</p>
+                <div class="p-4 rounded-xl border border-slate-700 shadow-lg ring-1 ring-white/10 hover:ring-[var(--accent)]/40 transition cursor-pointer active:scale-[0.98] card-bg" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%);">
+                    <p class="text-xs text-white/70 mb-1">Boleto (Hoje)</p>
+                    <p class="text-xl font-bold text-white">R$ {{ number_format($boletoHoje, 2, ',', '.') }}</p>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white dark:bg-black p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <p class="text-xs text-slate-500 dark:text-slate-300 mb-1 text-center">Ticket médio</p>
-            <p class="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">R$ {{ number_format($averageTicket, 2, ',', '.') }}</p>
+        <div class="p-6 rounded-2xl border border-slate-800 shadow-lg ring-1 ring-white/10 hover:ring-[var(--accent)]/40 transition cursor-pointer active:scale-[0.99] card-bg" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%);">
+            <p class="text-xs text-white/70 mb-1 text-center">Ticket médio</p>
+            <p class="text-2xl font-bold text-white text-center mb-4">R$ {{ number_format($averageTicket, 2, ',', '.') }}</p>
             <div class="flex items-end justify-center gap-1 h-16">
-                <div class="w-2 bg-slate-200 rounded-t h-[40%]"></div>
-                <div class="w-2 bg-slate-800 rounded-t h-[80%]"></div>
-                <div class="w-2 bg-slate-400 rounded-t h-[60%]"></div>
-                <div class="w-2 bg-slate-900 rounded-t h-[100%]"></div>
-                <div class="w-2 bg-slate-300 rounded-t h-[50%]"></div>
+                <div class="w-2 rounded-t h-[40%]" style="background: linear-gradient(180deg, #22d3ee, #7c3aed);"></div>
+                <div class="w-2 rounded-t h-[80%]" style="background: linear-gradient(180deg, #a78bfa, #22d3ee);"></div>
+                <div class="w-2 rounded-t h-[60%]" style="background: linear-gradient(180deg, #7c3aed, #a78bfa);"></div>
+                <div class="w-2 rounded-t h-[100%]" style="background: linear-gradient(180deg, #22d3ee, #a21caf);"></div>
+                <div class="w-2 rounded-t h-[50%]" style="background: linear-gradient(180deg, #a78bfa, #22d3ee);"></div>
             </div>
         </div>
     </div>
@@ -206,12 +206,12 @@
                 datasets: [{
                     label: 'Vendas',
                     data: revenueData,
-                    borderColor: '#1e293b',
-                    backgroundColor: 'rgba(30, 41, 59, 0.05)',
-                    borderWidth: 2,
-                    tension: 0, // Linhas retas como na imagem
+                    borderColor: '#ff4d8d',
+                    backgroundColor: 'rgba(255, 77, 141, 0.08)',
+                    borderWidth: 3,
+                    tension: 0.4,
                     pointBackgroundColor: '#fff',
-                    pointBorderColor: '#1e293b',
+                    pointBorderColor: '#ff4d8d',
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     fill: true
@@ -224,12 +224,12 @@
                 scales: {
                     y: { 
                         beginAtZero: true, 
-                        grid: { borderDash: [5, 5], color: '#f1f5f9' },
-                        ticks: { font: { size: 10 }, color: '#94a3b8' }
+                        grid: { borderDash: [5, 5], color: '#1f2937' },
+                        ticks: { font: { size: 10 }, color: '#9ca3af' }
                     },
                     x: { 
                         grid: { display: false },
-                        ticks: { font: { size: 10 }, color: '#94a3b8' }
+                        ticks: { font: { size: 10 }, color: '#9ca3af' }
                     }
                 }
             }

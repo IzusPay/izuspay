@@ -31,6 +31,17 @@ class CheckoutController extends Controller
         return view('checkout-product', compact('product'));
     }
 
+    public function showPix(string $transactionHash)
+    {
+        $sale = Sale::where('transaction_hash', $transactionHash)->firstOrFail();
+        $planName = session('plan_name') ?? ($sale->product ? $sale->product->name : 'Pagamento');
+        $pixQrCode = session('pix_qr_code') ?? '';
+        $pixQrCodeImage = session('pix_qr_code_image') ?? ($pixQrCode ? ('https://api.qrserver.com/v1/create-qr-code/?size=256x256&data='.urlencode($pixQrCode)) : '/placeholder.svg');
+        $totalPrice = (int) round(($sale->total_price ?? 0) * 100);
+
+        return view('pix-payment', compact('planName', 'pixQrCode', 'pixQrCodeImage', 'totalPrice', 'transactionHash'));
+    }
+
     public function store(StoreCheckoutRequest $request, string $hash_id): JsonResponse
     {
         $product = Product::where('hash_id', $hash_id)->firstOrFail();

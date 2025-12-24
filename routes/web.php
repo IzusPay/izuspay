@@ -31,6 +31,7 @@ use App\Http\Controllers\Associacao\SaleController;
 use App\Http\Controllers\Associacao\UserController as AssociacaoUserController;
 use App\Http\Controllers\Associacao\WithdrawalController;
 use App\Http\Controllers\Associacao\EventController as AssociacaoEventController;
+use App\Http\Controllers\Associacao\QrReaderController;
 use App\Http\Controllers\AssociationController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Cliente\ClienteController;
@@ -55,7 +56,8 @@ Route::post('/criador/{username}/assinar/{planId}', [PublicCreatorController::cl
 Route::get('/page/{slug}', [PublicPageController::class, 'showAssociationLp'])->name('lp.show');
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    $events = \App\Models\Event::where('status', 'published')->orderBy('starts_at', 'asc')->get();
+    return view('cliente.eventos.index', compact('events'));
 })->name('home');
 
 Route::get('/termos', function () {
@@ -78,6 +80,8 @@ Route::get('/checkout/{hash_id}', [CheckoutController::class, 'show'])->name('ch
 Route::post('/checkout/{hash_id}', [CheckoutController::class, 'store'])->name('checkout.store');
 
 Route::get('/checkout/success/{sale}', [CheckoutController::class, 'showSuccess'])->name('checkout.success');
+Route::get('/checkout/pix/{transaction}', [CheckoutController::class, 'showPix'])->name('checkout.pix');
+Route::get('/api/goat-payments/check-transaction-status', [CheckoutController::class, 'checkTransactionStatus'])->name('api.check-transaction-status');
 
 Route::get('/checkout/product/{hash_id}', [CheckoutController::class, 'show'])->name('checkout.product.show');
 Route::post('/checkout/product/{hash_id}', [CheckoutController::class, 'store'])->name('checkout.product.store');
@@ -153,6 +157,11 @@ Route::middleware(['auth', RedirectByProfile::class])->prefix('associacao')->gro
         })->name('new');
     });
 
+    Route::prefix('qr-reader')->name('associacao.qr-reader.')->group(function () {
+        Route::get('/', [QrReaderController::class, 'index'])->name('index');
+        Route::post('/validate', [QrReaderController::class, 'validateToken'])->name('validate');
+    });
+
     Route::get('/noticias', [NewsController::class, 'index'])->name('associacao.news.index');
     Route::get('/noticias/create', [NewsController::class, 'create'])->name('associacao.news.create');
     Route::post('/noticias', [NewsController::class, 'store'])->name('associacao.news.store');
@@ -163,15 +172,17 @@ Route::middleware(['auth', RedirectByProfile::class])->prefix('associacao')->gro
     Route::patch('/noticias/{news}/toggle-publish', [NewsController::class, 'togglePublish'])->name('associacao.news.toggle-publish');
     Route::patch('/noticias/{news}/toggle-featured', [NewsController::class, 'toggleFeatured'])->name('associacao.news.toggle-featured');
 
-    Route::prefix('eventos')->name('associacao.eventos.')->group(function () {
-        Route::get('/', [AssociacaoEventController::class, 'index'])->name('index');
-        Route::get('/criar', [AssociacaoEventController::class, 'create'])->name('create');
-        Route::post('/', [AssociacaoEventController::class, 'store'])->name('store');
-        Route::get('/{evento}/editar', [AssociacaoEventController::class, 'edit'])->name('edit');
-        Route::put('/{evento}', [AssociacaoEventController::class, 'update'])->name('update');
-        Route::delete('/{evento}', [AssociacaoEventController::class, 'destroy'])->name('destroy');
-        Route::post('/{evento}/ticket-types', [AssociacaoEventController::class, 'addTicketType'])->name('add-ticket-type');
-    });
+        Route::prefix('eventos')->name('associacao.eventos.')->group(function () {
+            Route::get('/', [AssociacaoEventController::class, 'index'])->name('index');
+            Route::get('/criar', [AssociacaoEventController::class, 'create'])->name('create');
+            Route::post('/', [AssociacaoEventController::class, 'store'])->name('store');
+            Route::get('/{evento}', [AssociacaoEventController::class, 'show'])->name('show');
+            Route::get('/{evento}/editar', [AssociacaoEventController::class, 'edit'])->name('edit');
+            Route::put('/{evento}', [AssociacaoEventController::class, 'update'])->name('update');
+            Route::delete('/{evento}', [AssociacaoEventController::class, 'destroy'])->name('destroy');
+            Route::post('/{evento}/ticket-types', [AssociacaoEventController::class, 'addTicketType'])->name('add-ticket-type');
+            Route::post('/{evento}/orders/{order}/mark-paid', [AssociacaoEventController::class, 'markOrderPaid'])->name('mark-order-paid');
+        });
 
     Route::get('/products', [ProductController::class, 'index'])->name('associacao.products.index');
     Route::get('/products/create', [ProductController::class, 'create'])->name('associacao.products.create');
@@ -248,6 +259,12 @@ Route::middleware(['auth', RedirectByProfile::class])->prefix('associacao')->gro
         Route::put('/{documentType}', [DocumentTypeController::class, 'update'])->name('update');
         Route::delete('/{documentType}', [DocumentTypeController::class, 'destroy'])->name('destroy');
     });
+
+    Route::post('/ui/color', function (\Illuminate\Http\Request $request) {
+        $color = $request->input('color');
+        session(['assoc_ui_color' => $color]);
+        return response()->json(['ok' => true, 'color' => $color]);
+    })->name('associacao.ui.color');
 
     // Rotas de Aprovação/Reprovação ajustadas para os novos parâmetros
     // Route::patch('/documentos/usuario/{user}/aprovar/{documentType}', [DocumentationController::class, 'approve'])->name('associacao.documentos.approve');

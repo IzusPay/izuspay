@@ -39,6 +39,9 @@
                             {{ optional($evento->starts_at)->format('d/m/Y H:i') }} - {{ optional($evento->ends_at)->format('d/m/Y H:i') }}
                         </div>
                         <div class="flex items-center justify-end gap-2 pt-3">
+                            <a href="{{ route('associacao.eventos.show', $evento) }}" class="px-3 py-2 rounded-lg bg-slate-900 text-white dark:bg.white dark:text-black hover:bg-slate-800 dark:hover:bg-black/10 text-sm">
+                                Detalhes
+                            </a>
                             <a href="{{ route('associacao.eventos.edit', $evento) }}" class="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 text-sm">
                                 Editar
                             </a>

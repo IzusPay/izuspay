@@ -61,10 +61,35 @@
         .dark ::-webkit-scrollbar-track { background: #1f2937; }
         ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #1e40af; }
+        /* Scrollbar do sidebar com cor de destaque */
+        #sidebar nav { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
+        #sidebar nav::-webkit-scrollbar { width: 8px; }
+        #sidebar nav::-webkit-scrollbar-track { background: rgba(255,255,255,0.08); }
+        #sidebar nav::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 9999px; }
+        #sidebar nav::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+        .icon-base { color: var(--brand-dark); }
+        .dark .icon-base { color: #ffffff; }
+        .icon-accent { color: var(--accent); }
+        :root { --brand-dark: #0e131f; }
+        html:not(.dark) body { background: #ffffff !important; }
+        html:not(.dark) #sidebar { background: #ffffff !important; border-color: #e5e7eb !important; }
+        html:not(.dark) .dashboard-bg { background: #ffffff !important; }
+        html:not(.dark) .card-bg { background: #ffffff !important; border-color: #e5e7eb !important; }
+        html:not(.dark) #sidebar, html:not(.dark) .dashboard-bg { color: var(--brand-dark); }
+        html:not(.dark) .card-bg .text-white { color: var(--brand-dark) !important; }
+        html:not(.dark) .card-bg .text-white\/70 { color: #334155 !important; }
+        html:not(.dark) .card-bg .text-white\/50 { color: #475569 !important; }
+        html:not(.dark) #sidebar .text-white, 
+        html:not(.dark) #sidebar .text-white\/70, 
+        html:not(.dark) #sidebar .text-slate-300 { color: var(--brand-dark) !important; }
+        html:not(.dark) #sidebar .bg-[#0f1627], 
+        html:not(.dark) #sidebar .bg-[#1b2a44] { background: #f8fafc !important; }
+        html:not(.dark) #sidebar .border-slate-800 { border-color: #e5e7eb !important; }
+        html:not(.dark) #sidebar a { color: var(--brand-dark) !important; }
     </style>
     @stack('styles')
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+<body class="transition-colors duration-200" style="background: linear-gradient(135deg, #0e131f 0%, #1b1724 50%, #0e131f 100%);">
     <div class="flex h-screen relative">
         @if(auth()->check())
             @php
@@ -72,11 +97,10 @@
                 $perfilNome = $perfilAtual ? $perfilAtual->name : null;
             @endphp
             
-            {{-- O ID 'sidebar' é crucial para o JavaScript funcionar --}}
             @if($perfilNome === 'Administrador')
                 @include('layouts.partials.sidebar-admin')
             @elseif($perfilNome === 'Cliente')
-                @include('layouts.partials.sidebar-client')
+                @include('layouts.partials.floating-client-menu')
             @elseif($perfilNome === 'Associacao')
                 @include('layouts.partials.sidebar-associacao')
             @elseif($perfilNome === 'Membro')
@@ -84,6 +108,9 @@
             @elseif($perfilNome === 'Moderador')
                 @include('layouts.partials.sidebar-moderador')
             @endif
+        @endif
+        @if(!auth()->check())
+            @include('layouts.partials.floating-client-menu')
         @endif
 
         <!-- Mobile Overlay -->
@@ -97,22 +124,26 @@
                 @endphp
                 
                 {{-- Inclui o header correto baseado no perfil --}}
-                @if($perfilNome === 'Administrador')
-                    @include('layouts.partials.header-admin')
-                @elseif($perfilNome === 'Cliente')
-                    @include('layouts.partials.header-client')
-                @elseif($perfilNome === 'Associacao')
-                    @include('layouts.partials.header-associacao')
-                @elseif($perfilNome === 'Membro')
-                    @include('layouts.partials.header-member')
-                @elseif($perfilNome === 'Moderador')
-                    @include('layouts.partials.header-moderador')
+                @if(request()->routeIs('associacao.dashboard') || request()->routeIs('dashboard'))
+                    {{-- sem header no dashboard da associação --}}
                 @else
-                    @include('layouts.partials.header-default')
+                    @if($perfilNome === 'Administrador')
+                        @include('layouts.partials.header-admin')
+                    @elseif($perfilNome === 'Cliente')
+                        @include('layouts.partials.header-client')
+                    @elseif($perfilNome === 'Associacao')
+                        @include('layouts.partials.header-associacao')
+                    @elseif($perfilNome === 'Membro')
+                        @include('layouts.partials.header-member')
+                    @elseif($perfilNome === 'Moderador')
+                        @include('layouts.partials.header-moderador')
+                    @else
+                        @include('layouts.partials.header-default')
+                    @endif
                 @endif
             @endif
 
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-900 p-4 md:p-6">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto">
                 @yield('content')
             </main>
         </div>

@@ -5,12 +5,14 @@ namespace App\Services;
 use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 
 class GamificationService
 {
     public static function getGamificationData($userId = null)
     {
-        $user = User::find(auth()->user()->id);
+        $user = Auth::user();
 
         if (! $user || ! $user->association_id) {
             return null;
@@ -161,14 +163,19 @@ class GamificationService
     {
         $firstName = explode(' ', trim($fullName))[0];
 
-        $response = Http::get('https://api.genderize.io', [
-            'name' => $firstName,
-        ]);
-
-        if ($response->ok()) {
-            return $response->json()['gender'] ?? 'unknown';
-        }
-
-        return 'unknown';
+        $cacheKey = 'genderize:' . strtolower($firstName);
+        return Cache::remember($cacheKey, 60 * 60 * 24 * 7, function () use ($firstName) {
+            try {
+                $response = Http::timeout(5)->retry(2, 500)->get('https://api.genderize.io', [
+                    'name' => $firstName,
+                ]);
+                if ($response->ok()) {
+                    $g = $response->json()['gender'] ?? null;
+                    return $g ?: 'unknown';
+                }
+            } catch (\Throwable $e) {
+            }
+            return 'unknown';
+        });
     }
 }

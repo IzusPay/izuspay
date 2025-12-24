@@ -6,7 +6,7 @@
                             <i data-lucide="menu" class="w-5 h-5"></i>
                         </button>
                     </div>
-                      <h1 class="text-lg font-bold dark:text-white">Minha Associação</h1>
+                      <h1 class="text-lg font-bold dark:text-white">IzusPass</h1>
                     <div class="flex items-center space-x-2 lg:space-x-4">
                         <button id="theme-toggle" class="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                             <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>

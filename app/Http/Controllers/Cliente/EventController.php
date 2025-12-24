@@ -5,12 +5,10 @@ namespace App\Http\Controllers\Cliente;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Sale;
-use App\Models\TicketOrder;
 use App\Models\TicketType;
 use App\Models\WebhookEndpoint;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -134,6 +132,13 @@ class EventController extends Controller
             }
         }
 
-        return redirect()->route('checkout.success', $result['transaction_hash'])->with('success', 'Pedido criado. Complete o pagamento para emitir os ingressos.');
+        return redirect()
+            ->route('checkout.pix', $result['transaction_hash'])
+            ->with([
+                'success' => 'Pedido criado. Complete o pagamento via PIX.',
+                'pix_qr_code' => $result['pix_qr_code'] ?? '',
+                'plan_name' => $evento->title.' - '.$type->name,
+                'total_price_cents' => (int) round(($type->price * (int) $data['quantity']) * 100),
+            ]);
     }
 }
