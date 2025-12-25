@@ -20,6 +20,12 @@ class AuthenticateApiToken
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // 0. Tentar autenticação via JWT (Guard 'api')
+        if (Auth::guard('api')->check()) {
+            Auth::shouldUse('api');
+            return $next($request);
+        }
+
         // 1. Pegar o token do cabeçalho da requisição.
         // O padrão é usar o cabeçalho 'Authorization' com o formato 'Bearer SEU_TOKEN'.
         $token = $request->bearerToken();
