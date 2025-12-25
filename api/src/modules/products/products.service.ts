@@ -14,6 +14,7 @@ export class ProductsService {
 
   create(companyId: string, createProductDto: CreateProductDto) {
     const product = this.productsRepository.create({
+      paymentMethods: createProductDto.paymentMethods || ['PIX'], // Ensure value is set
       ...createProductDto,
       companyId,
     });

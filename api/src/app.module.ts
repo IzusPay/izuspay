@@ -10,7 +10,6 @@ import { UsersModule } from './modules/users/users.module';
 import { CompaniesModule } from './modules/companies/companies.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { AddressesModule } from './modules/addresses/addresses.module';
-import { LegacyModule } from './modules/legacy/legacy.module';
 import { BankAccountsModule } from './modules/bank-accounts/bank-accounts.module';
 import { WithdrawalsModule } from './modules/withdrawals/withdrawals.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
@@ -36,47 +35,14 @@ import { SystemSettingsModule } from './modules/system-settings/system-settings.
       name: 'default',
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
+        type: 'postgres',
         host: configService.get<string>('DB_HOST'),
         port: configService.get<number>('DB_PORT'),
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [
-          __dirname + '/modules/companies/**/*.entity{.ts,.js}',
-          __dirname + '/modules/users/**/*.entity{.ts,.js}',
-          __dirname + '/modules/addresses/**/*.entity{.ts,.js}',
-          __dirname + '/modules/documents/**/*.entity{.ts,.js}',
-          __dirname + '/modules/bank-accounts/**/*.entity{.ts,.js}',
-          __dirname + '/modules/withdrawals/**/*.entity{.ts,.js}',
-          __dirname + '/modules/audit-logs/**/*.entity{.ts,.js}',
-          __dirname + '/modules/system-fees/**/*.entity{.ts,.js}',
-          __dirname + '/modules/financial/**/*.entity{.ts,.js}',
-          __dirname + '/modules/gateways/**/*.entity{.ts,.js}',
-          __dirname + '/modules/banners/**/*.entity{.ts,.js}',
-          __dirname + '/modules/products/**/*.entity{.ts,.js}',
-          __dirname + '/modules/sales/**/*.entity{.ts,.js}',
-          __dirname + '/modules/customers/**/*.entity{.ts,.js}',
-          __dirname + '/modules/api-keys/**/*.entity{.ts,.js}',
-          __dirname + '/modules/webhooks/**/*.entity{.ts,.js}',
-          __dirname + '/modules/system-settings/**/*.entity{.ts,.js}',
-        ],
-        synchronize: true, // Auto-create tables for the new DB
-      }),
-      inject: [ConfigService],
-    }),
-    TypeOrmModule.forRootAsync({
-      name: 'legacy',
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get<string>('LEGACY_DB_HOST'),
-        port: configService.get<number>('LEGACY_DB_PORT'),
-        username: configService.get<string>('LEGACY_DB_USERNAME'),
-        password: configService.get<string>('LEGACY_DB_PASSWORD'),
-        database: configService.get<string>('LEGACY_DB_DATABASE'),
-        entities: [__dirname + '/modules/legacy/entities/*.entity{.ts,.js}'],
-        synchronize: false, // NEVER sync legacy DB
+        autoLoadEntities: true,
+        synchronize: configService.get<boolean>('DB_SYNCHRONIZE', false), // Recommended: false for production
       }),
       inject: [ConfigService],
     }),
@@ -86,7 +52,6 @@ import { SystemSettingsModule } from './modules/system-settings/system-settings.
     CompaniesModule,
     DocumentsModule,
     AddressesModule,
-    LegacyModule,
     BankAccountsModule,
     WithdrawalsModule,
     AuditLogsModule,

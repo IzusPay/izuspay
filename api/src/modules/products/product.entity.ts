@@ -21,7 +21,7 @@ export class Product {
   @Column({ default: true })
   active: boolean;
 
-  @Column({ type: 'simple-array' })
+  @Column({ type: 'simple-array', default: 'PIX' })
   paymentMethods: string[]; // ['PIX', 'CREDIT_CARD']
 
   @Column({ nullable: true })

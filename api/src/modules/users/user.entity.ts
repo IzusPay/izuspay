@@ -24,7 +24,7 @@ export class User {
   role: Role;
 
   @Column({ nullable: true })
-  companyId: string;
+  companyId: string | null;
 
   @ManyToOne(() => Company, (company) => company.users)
   @JoinColumn({ name: 'companyId' })

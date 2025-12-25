@@ -83,9 +83,21 @@ export class CompaniesService {
     }
   }
 
-  create(createCompanyDto: CreateCompanyDto) {
-    // This simple create might need address handling too if used directly
-    const company = this.companiesRepository.create(createCompanyDto as any);
+  async create(createCompanyDto: CreateCompanyDto) {
+    const address = new Address();
+    address.street = createCompanyDto.street;
+    address.number = createCompanyDto.number;
+    address.complement = createCompanyDto.complement || null;
+    address.neighborhood = createCompanyDto.neighborhood;
+    address.city = createCompanyDto.city;
+    address.state = createCompanyDto.state;
+    address.zipCode = createCompanyDto.zipCode;
+
+    const company = this.companiesRepository.create({
+      ...createCompanyDto,
+      address: address,
+      status: CompanyStatus.ACTIVE, // Admin created companies are active by default? Or pending? Let's say Active or Pending.
+    });
     return this.companiesRepository.save(company);
   }
 

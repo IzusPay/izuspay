@@ -32,6 +32,12 @@ export class Gateway {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   transactionFeeFixed: number;
 
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
+  costFeePercentage: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  costFeeFixed: number;
+
   @Column({ default: 0 })
   priority: number;
 

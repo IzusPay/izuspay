@@ -18,6 +18,7 @@ export class UsersService {
     return this.usersRepository.findOne({
       where: { email },
       relations: ['company'],
+      select: ['id', 'email', 'name', 'password', 'role', 'companyId', 'status', 'createdAt', 'updatedAt'], // Explicitly select password
     });
   }
 

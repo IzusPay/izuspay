@@ -44,6 +44,16 @@ export class CreateGatewayDto {
   @IsNumber()
   transactionFeeFixed: number;
 
+  @ApiProperty({ required: false, default: 0 })
+  @IsOptional()
+  @IsNumber()
+  costFeePercentage?: number;
+
+  @ApiProperty({ required: false, default: 0 })
+  @IsOptional()
+  @IsNumber()
+  costFeeFixed?: number;
+
   @ApiProperty()
   @IsOptional()
   @IsString()
