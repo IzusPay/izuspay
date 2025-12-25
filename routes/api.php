@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ApiKeyApiController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GoatPaymentController;
 use App\Http\Controllers\Api\PaymentController;
@@ -22,6 +23,10 @@ Route::group(['prefix' => 'auth'], function () {
         Route::post('refresh', [AuthController::class, 'refresh']);
         Route::post('me', [AuthController::class, 'me']);
     });
+});
+
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::apiResource('api-keys', ApiKeyApiController::class);
 });
 
 Route::post('/webhook-cakto', [WebhookController::class, 'handle'])->name('webhook.handle');
