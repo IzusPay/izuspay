@@ -25,7 +25,7 @@ Route::group(['prefix' => 'auth'], function () {
     });
 });
 
-Route::group(['middleware' => 'auth:api'], function () {
+Route::group(['middleware' => 'auth:api', 'as' => 'api.'], function () {
     Route::apiResource('api-keys', ApiKeyApiController::class);
 });
 
