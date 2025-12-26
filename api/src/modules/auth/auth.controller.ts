@@ -23,6 +23,29 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Generate 2FA Secret and QR Code' })
+  @UseGuards(AuthGuard('jwt'))
+  @Get('2fa/generate')
+  async generateTwoFactor(@Request() req: any) {
+    return this.authService.generateTwoFactorSecret(req.user);
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Enable 2FA with code' })
+  @UseGuards(AuthGuard('jwt'))
+  @Post('2fa/enable')
+  async enableTwoFactor(@Request() req: any, @Body() body: { code: string }) {
+    return this.authService.enableTwoFactor(req.user.id, body.code);
+  }
+
+  @ApiOperation({ summary: 'Verify 2FA code during login' })
+  @HttpCode(HttpStatus.OK)
+  @Post('2fa/authenticate')
+  async verifyTwoFactor(@Body() body: { token: string; code: string }) {
+    return this.authService.verifyTwoFactor(body.token, body.code);
+  }
+
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Obter perfil do usuário logado' })
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')

@@ -18,8 +18,31 @@ export class UsersService {
     return this.usersRepository.findOne({
       where: { email },
       relations: ['company'],
-      select: ['id', 'email', 'name', 'password', 'role', 'companyId', 'status', 'createdAt', 'updatedAt'], // Explicitly select password
+      select: ['id', 'email', 'name', 'password', 'role', 'companyId', 'status', 'isTwoFactorEnabled', 'createdAt', 'updatedAt'], // Explicitly select password and 2FA status
     });
+  }
+
+  async findByIdWithSecret(id: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { id },
+      relations: ['company'],
+      select: ['id', 'email', 'name', 'role', 'companyId', 'twoFactorSecret', 'isTwoFactorEnabled'],
+    });
+  }
+
+  async findByIdWithPermissions(id: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { id },
+      relations: ['accessRole', 'accessRole.permissions', 'accessRole.permissions.module'],
+    });
+  }
+
+  async setTwoFactorSecret(id: string, secret: string) {
+    return this.usersRepository.update(id, { twoFactorSecret: secret });
+  }
+
+  async enableTwoFactor(id: string) {
+    return this.usersRepository.update(id, { isTwoFactorEnabled: true });
   }
 
   async update(id: string, updateUserDto: any): Promise<User> {
