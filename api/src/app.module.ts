@@ -25,6 +25,7 @@ import { CustomersModule } from './modules/customers/customers.module';
 import { ApiKeysModule } from './modules/api-keys/api-keys.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { SystemSettingsModule } from './modules/system-settings/system-settings.module';
+import { AccessControlModule } from './modules/access-control/access-control.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { SystemSettingsModule } from './modules/system-settings/system-settings.
     ApiKeysModule,
     PaymentsModule,
     SystemSettingsModule,
+    AccessControlModule,
   ],
   controllers: [AppController],
   providers: [
