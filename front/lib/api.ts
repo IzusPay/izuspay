@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://izuspay.com.br"
+const API_BASE_URL = "http://localhost:3001"
 
 // Get JWT token from localStorage
 export function getAuthToken(): string | null {
@@ -27,7 +27,7 @@ export async function apiClient(endpoint: string, options: RequestInit = {}): Pr
   const jwtToken = getAuthToken()
 
   const headers: HeadersInit = {
-    "Content-Type": "application/json",
+    ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
     ...(options.headers || {}),
   }
 
@@ -53,7 +53,7 @@ export async function apiClient(endpoint: string, options: RequestInit = {}): Pr
 // Auth API functions
 export const authApi = {
   async login(email: string, password: string) {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,8 +70,8 @@ export const authApi = {
   },
 
   async me() {
-    const response = await apiClient("/api/auth/me", {
-      method: "POST",
+    const response = await apiClient("/auth/profile", {
+      method: "GET",
     })
 
     if (!response.ok) {
@@ -82,28 +82,15 @@ export const authApi = {
   },
 
   async refresh() {
-    const response = await apiClient("/api/auth/refresh", {
-      method: "POST",
-    })
-
-    if (!response.ok) {
-      throw new Error("Failed to refresh token")
-    }
-
-    return response.json()
+    // Not implemented in backend yet
+    return { access_token: getAuthToken() }
   },
 
   async logout() {
-    const response = await apiClient("/api/auth/logout", {
-      method: "POST",
-    })
-
+    // Client-side logout only
     removeAuthToken()
-
-    if (!response.ok) {
-      throw new Error("Failed to logout")
+    if (typeof window !== "undefined") {
+      window.location.href = "/login"
     }
-
-    return response.json()
-  },
+  }
 }

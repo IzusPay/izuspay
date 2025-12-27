@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Request, Put } from '@nestjs/common';
 import { WebhooksService } from './webhooks.service';
 import { CreateWebhookDto } from './dto/create-webhook.dto';
+import { UpdateWebhookDto } from './dto/update-webhook.dto';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CombinedAuthGuard } from '../auth/guards/combined-auth.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -27,6 +28,12 @@ export class WebhooksController {
   @ApiOperation({ summary: 'List all webhooks' })
   findAll(@Request() req: any) {
     return this.webhooksService.findAllByCompany(req.user.companyId);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update a webhook' })
+  update(@Request() req: any, @Param('id') id: string, @Body() updateWebhookDto: UpdateWebhookDto) {
+    return this.webhooksService.update(id, req.user.companyId, updateWebhookDto);
   }
 
   @Delete(':id')

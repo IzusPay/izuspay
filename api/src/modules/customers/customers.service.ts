@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Customer } from './customer.entity';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 
+import { UpdateCustomerDto } from './dto/update-customer.dto';
+
 @Injectable()
 export class CustomersService {
   constructor(
@@ -16,6 +18,12 @@ export class CustomersService {
       ...createCustomerDto,
       companyId,
     });
+    return this.customersRepository.save(customer);
+  }
+
+  async update(id: string, updateCustomerDto: UpdateCustomerDto) {
+    const customer = await this.findOne(id);
+    Object.assign(customer, updateCustomerDto);
     return this.customersRepository.save(customer);
   }
 

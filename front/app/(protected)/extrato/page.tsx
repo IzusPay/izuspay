@@ -1,6 +1,5 @@
 "use client"
 
-import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -90,9 +89,9 @@ export default function ExtratoPage() {
     .reduce((sum, t) => sum + (Number.parseFloat(t.amount) || 0), 0)
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold">Transações</h1>
+        <h1 className="text-2xl font-semibold">Extrato</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6 border-l-4 border-l-green-500">
@@ -268,6 +267,6 @@ export default function ExtratoPage() {
           )}
         </Card>
       </div>
-    </DashboardLayout>
+    </>
   )
 }

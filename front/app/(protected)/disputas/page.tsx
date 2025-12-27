@@ -1,6 +1,5 @@
 "use client"
 
-import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,7 +8,7 @@ import { AlertTriangle, Search } from "lucide-react"
 
 export default function DisputasPage() {
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold">Disputas</h1>
 
@@ -69,6 +68,6 @@ export default function DisputasPage() {
           </Tabs>
         </Card>
       </div>
-    </DashboardLayout>
+    </>
   )
 }

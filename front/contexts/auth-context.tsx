@@ -5,9 +5,21 @@ import { authApi, setAuthToken, removeAuthToken, getAuthToken } from "@/lib/api"
 import { useRouter } from "next/navigation"
 
 interface User {
-  id: number
+  id: string
   name: string
   email: string
+  role?: string
+  companyId?: string
+  permissions?: Record<
+    string,
+    {
+      canCreate: boolean
+      canRead: boolean
+      canUpdate: boolean
+      canDelete: boolean
+      canDetail: boolean
+    }
+  >
 }
 
 interface AuthContextType {

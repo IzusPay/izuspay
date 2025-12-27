@@ -1,6 +1,5 @@
 "use client"
 
-import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,9 +10,12 @@ import { Switch } from "@/components/ui/switch"
 import { Plus, Trash2, Search, Edit2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { apiClient } from "@/lib/api"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function WebhooksPage() {
+  const { user } = useAuth()
   const [webhooks, setWebhooks] = useState<any[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingWebhook, setEditingWebhook] = useState<any>(null)
   const [webhookForm, setWebhookForm] = useState({
@@ -21,11 +23,24 @@ export default function WebhooksPage() {
     description: "",
     isActive: true,
   })
-  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Verify Read Permission
+  if (user?.role !== "admin" && !user?.permissions?.["webhooks"]?.canRead) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600">Acesso Negado</h1>
+          <p className="text-gray-600">Você não tem permissão para acessar este módulo.</p>
+        </div>
+      </div>
+    )
+  }
 
   useEffect(() => {
-    fetchWebhooks()
-  }, [])
+    if (user?.role === "admin" || user?.permissions?.["webhooks"]?.canRead) {
+      fetchWebhooks()
+    }
+  }, [user])
 
   const fetchWebhooks = async () => {
     try {
@@ -110,7 +125,7 @@ export default function WebhooksPage() {
   const inactiveCount = webhooks.filter((w) => !w.is_active).length
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold">Webhooks</h1>
 
@@ -153,12 +168,14 @@ export default function WebhooksPage() {
                 }
               }}
             >
-              <DialogTrigger asChild>
-                <Button className="bg-black text-white hover:bg-gray-800">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Novo Webhook
-                </Button>
-              </DialogTrigger>
+              {(user?.role === "admin" || user?.permissions?.["webhooks"]?.canCreate) && (
+                <DialogTrigger asChild>
+                  <Button className="bg-black text-white hover:bg-gray-800">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Webhook
+                  </Button>
+                </DialogTrigger>
+              )}
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>{editingWebhook ? "Editar Webhook" : "Novo Webhook"}</DialogTitle>
@@ -274,6 +291,6 @@ export default function WebhooksPage() {
           </Table>
         </Card>
       </div>
-    </DashboardLayout>
+    </>
   )
 }

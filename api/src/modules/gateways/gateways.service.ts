@@ -76,7 +76,34 @@ export class GatewaysService {
     const gateway = await this.findOne(id);
     if (!gateway) return null;
 
-    Object.assign(gateway, updateGatewayDto);
+    const { params, ...gatewayData } = updateGatewayDto;
+
+    // Convert typeId to string if present
+    const gatewayDataWithType = {
+      ...gatewayData,
+      typeId: gatewayData.typeId ? String(gatewayData.typeId) : undefined,
+    };
+
+    // Update basic fields
+    Object.assign(gateway, gatewayDataWithType);
+
+    // Update params if provided
+    if (params) {
+      // Clear existing params (TypeORM cascade will handle this if we replace the array, 
+      // but to be safe with orphan removal, we might need more logic. 
+      // For now, replacing the array with new instances works if cascade is true.)
+      
+      // Better approach: remove old params first to avoid duplicates/orphans if cascade doesn't handle delete
+      // But we don't have param repo. 
+      // Relying on TypeORM mechanism:
+      gateway.params = params.map(p => {
+        const param = new GatewayParam();
+        param.label = p.label;
+        param.value = p.value;
+        return param;
+      });
+    }
+
     return this.gatewaysRepository.save(gateway);
   }
 

@@ -12,6 +12,8 @@ import { SystemSettingsService } from '../system-settings/system-settings.servic
 import { Sale } from '../sales/sale.entity';
 import { WebhooksQueueService } from './queue/webhooks-queue.service';
 
+import { UpdateWebhookDto } from './dto/update-webhook.dto';
+
 @Injectable()
 export class WebhooksService {
   private readonly logger = new Logger(WebhooksService.name);
@@ -40,6 +42,20 @@ export class WebhooksService {
       ...createWebhookDto,
       companyId,
     });
+    return this.webhooksRepository.save(webhook);
+  }
+
+  async update(id: string, companyId: string, updateWebhookDto: UpdateWebhookDto) {
+    const webhook = await this.webhooksRepository.findOne({ where: { id, companyId } });
+    if (!webhook) throw new NotFoundException('Webhook not found');
+
+    // Handle snake_case alias
+    if (updateWebhookDto.is_active !== undefined) {
+      updateWebhookDto.active = updateWebhookDto.is_active;
+      delete updateWebhookDto.is_active;
+    }
+
+    Object.assign(webhook, updateWebhookDto);
     return this.webhooksRepository.save(webhook);
   }
 

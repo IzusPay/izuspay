@@ -13,6 +13,9 @@ async function bootstrap() {
     transform: true, // Converte tipos automaticamente (ex: string -> number)
   }));
 
+  // Enable CORS
+  app.enableCors();
+
   // Configuração do Swagger
   const config = new DocumentBuilder()
     .setTitle('IzusPay API')

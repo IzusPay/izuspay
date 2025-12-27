@@ -22,8 +22,9 @@ export class PermissionsGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
+    const userId = user?.id || user?.userId;
 
-    if (!user || !user.id) {
+    if (!user || !userId) {
       return false;
     }
 
@@ -33,7 +34,7 @@ export class PermissionsGuard implements CanActivate {
     }
 
     // 2. Load User with ACL Permissions
-    const userWithPermissions = await this.usersService.findByIdWithPermissions(user.id);
+    const userWithPermissions = await this.usersService.findByIdWithPermissions(userId);
     
     if (!userWithPermissions || !userWithPermissions.accessRole) {
         return false; // No ACL role assigned

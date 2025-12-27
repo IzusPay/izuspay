@@ -140,7 +140,22 @@ export class CompaniesService {
 
   async update(id: string, updateCompanyDto: UpdateCompanyDto) {
     const company = await this.findOne(id);
-    this.companiesRepository.merge(company, updateCompanyDto as any);
+    
+    const { address: addressDto, ...companyData } = updateCompanyDto;
+
+    if (addressDto) {
+      if (company.address) {
+        // Update existing address
+        Object.assign(company.address, addressDto);
+      } else {
+        // Create new address if missing
+        const newAddress = new Address();
+        Object.assign(newAddress, addressDto);
+        company.address = newAddress;
+      }
+    }
+
+    this.companiesRepository.merge(company, companyData as any);
     return this.companiesRepository.save(company);
   }
 

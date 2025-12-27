@@ -36,6 +36,23 @@ export class AuthService {
   }
 
   async login(user: any) {
+    const fullUser = await this.usersService.findByIdWithPermissions(user.id);
+    
+    const permissions: Record<string, any> = {};
+    if (fullUser && fullUser.accessRole && fullUser.accessRole.permissions) {
+      fullUser.accessRole.permissions.forEach((curr) => {
+        if (curr.module) {
+          permissions[curr.module.key] = {
+            canCreate: curr.canCreate,
+            canRead: curr.canRead,
+            canUpdate: curr.canUpdate,
+            canDelete: curr.canDelete,
+            canDetail: curr.canDetail,
+          };
+        }
+      });
+    }
+
     const payload: JwtPayload = { username: user.email, sub: user.id, companyId: user.companyId, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
@@ -45,8 +62,41 @@ export class AuthService {
         name: user.name,
         role: user.role,
         companyId: user.companyId,
-        isTwoFactorEnabled: user.isTwoFactorEnabled
+        isTwoFactorEnabled: user.isTwoFactorEnabled,
+        permissions: permissions
       }
+    };
+  }
+
+  async getProfile(userId: string) {
+    const user = await this.usersService.findByIdWithPermissions(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const permissions: Record<string, any> = {};
+    if (user.accessRole && user.accessRole.permissions) {
+      user.accessRole.permissions.forEach((curr) => {
+        if (curr.module) {
+          permissions[curr.module.key] = {
+            canCreate: curr.canCreate,
+            canRead: curr.canRead,
+            canUpdate: curr.canUpdate,
+            canDelete: curr.canDelete,
+            canDetail: curr.canDetail,
+          };
+        }
+      });
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      companyId: user.companyId,
+      isTwoFactorEnabled: user.isTwoFactorEnabled,
+      permissions: permissions
     };
   }
 

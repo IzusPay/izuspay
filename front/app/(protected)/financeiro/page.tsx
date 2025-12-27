@@ -1,6 +1,5 @@
 "use client"
 
-import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -114,9 +113,9 @@ export default function FinanceiroPage() {
   }
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold">Split Financeiro</h1>
+        <h1 className="text-2xl font-semibold">Financeiro</h1>
 
         <Tabs defaultValue="saque">
           <TabsList>
@@ -312,6 +311,6 @@ export default function FinanceiroPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardLayout>
+    </>
   )
 }

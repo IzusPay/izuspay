@@ -28,7 +28,6 @@ export class AccessControlController {
   }
 
   @Get('modules')
-  @Roles(Role.Admin)
   @ApiOperation({ summary: 'List all System Modules' })
   findAllModules() {
     return this.aclService.findAllModules();
@@ -42,5 +41,15 @@ export class AccessControlController {
     @Body() body: { permissions: { moduleId: string; actions: any }[] },
   ) {
     return this.aclService.updatePermissions(roleId, body.permissions);
+  }
+
+  @Put('modules/:id')
+  @Roles(Role.Admin)
+  @ApiOperation({ summary: 'Update a Module' })
+  updateModule(
+    @Param('id') id: string,
+    @Body() body: { icon?: string; route?: string },
+  ) {
+    return this.aclService.updateModule(id, body);
   }
 }

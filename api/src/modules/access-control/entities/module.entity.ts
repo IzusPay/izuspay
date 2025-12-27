@@ -12,6 +12,12 @@ export class ModuleEntity {
   @Column({ unique: true })
   key: string; // Unique key e.g. "sales"
 
+  @Column({ nullable: true })
+  icon: string;
+
+  @Column({ nullable: true })
+  route: string;
+
   @OneToMany(() => Permission, (permission) => permission.module)
   permissions: Permission[];
 

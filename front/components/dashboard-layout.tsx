@@ -1,26 +1,41 @@
 "use client"
 
-import { type ReactNode, useState } from "react"
+import { type ReactNode, useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, Building2, Receipt, AlertCircle, LinkIcon, Webhook, LogOut, Menu, X } from "lucide-react"
+import * as LucideIcons from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/auth-context"
-
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Financeiro", href: "/financeiro", icon: Building2 },
-  { name: "Extrato", href: "/extrato", icon: Receipt },
-  { name: "Disputas", href: "/disputas", icon: AlertCircle },
-  { name: "Integrações", href: "/integracoes", icon: LinkIcon },
-  { name: "Webhooks", href: "/webhooks", icon: Webhook },
-]
+import { accessControlService, ACLModule } from "@/lib/services/access-control.service"
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { user, logout } = useAuth()
+  const [modules, setModules] = useState<ACLModule[]>([])
+
+  useEffect(() => {
+    accessControlService.findAllModules().then(setModules).catch(console.error)
+  }, [])
+
+  const navigation = [
+    { name: "Dashboard", href: "/dashboard", icon: LucideIcons.Home, module: null },
+    ...modules.map((mod) => ({
+      name: mod.name,
+      href: mod.route || "#",
+      icon: (LucideIcons as Record<string, any>)[mod.icon || "Circle"] || LucideIcons.Circle,
+      module: mod.key,
+    })),
+  ]
+
+  const filteredNavigation = navigation.filter((item) => {
+    if (!item.module) return true
+    // Safety net: Admin role bypasses strict ACL
+    if (user?.role === "admin") return true
+    if (!user?.permissions) return false
+    return user.permissions[item.module]?.canRead
+  })
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -48,13 +63,13 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
               className="lg:hidden text-white hover:bg-gray-800"
               onClick={() => setSidebarOpen(false)}
             >
-              <X className="h-5 w-5" />
+              <LucideIcons.X className="h-5 w-5" />
             </Button>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2">
-            {navigation.map((item) => {
+            {filteredNavigation.map((item) => {
               const isActive = pathname === item.href
               return (
                 <Link
@@ -96,7 +111,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
                 onClick={() => logout()}
                 title="Sair"
               >
-                <LogOut className="h-4 w-4" />
+                <LucideIcons.LogOut className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -108,7 +123,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
         {/* Mobile header */}
         <header className="lg:hidden sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-white px-6">
           <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(true)}>
-            <Menu className="h-5 w-5" />
+            <LucideIcons.Menu className="h-5 w-5" />
           </Button>
           <div className="text-xl font-bold">IzusPay</div>
         </header>

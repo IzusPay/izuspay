@@ -1,6 +1,5 @@
 "use client"
 
-import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -121,7 +120,7 @@ export default function IntegracoesPage() {
   }
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold">Integrações</h1>
 
@@ -278,6 +277,6 @@ export default function IntegracoesPage() {
           </Table>
         </Card>
       </div>
-    </DashboardLayout>
+    </>
   )
 }
